@@ -1,0 +1,133 @@
+@model ProductModel
+@{
+    //page title
+    ViewBag.Title = T("Admin.Catalog.Products.Calendar").Text;
+    //active menu item (system name)
+    Html.SetActiveMenuItemSystemName("Products");
+}
+<form asp-controller="Product" asp-action="Edit" method="post" id="product-form">
+    <div class="content-header clearfix">
+        <h1 class="pull-left">
+            @T("Admin.Catalog.Products.Calendar") - @Model.Name
+            <small>
+                <i class="fa fa-arrow-circle-left"></i>
+                <a asp-action="List">@T("Admin.Catalog.Products.BackToList")</a>
+            </small>
+        </h1>
+    </div>
+    <div class="content">
+        <div class="form-horizontal">
+
+            <div class="column-left">
+                <div id="nav"></div>
+            </div>
+            <div class="column-main">                
+                <div id="calendar"></div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script type="text/javascript">
+    var nav = new DayPilot.Navigator("nav");
+    nav.selectMode = "week";
+    nav.showMonths = 2;
+    nav.skipMonths = 1;
+    nav.onTimeRangeSelected = function (args) {
+        loadEvents(args.start.firstDayOfWeek(), args.start.addDays(7));
+    };
+    nav.init();
+
+    var calendar = new DayPilot.Calendar("calendar");
+    calendar.viewType = "Week";
+    calendar.timeRangeSelectedHandling = "Disabled";
+
+    calendar.onEventMoved = function (args) {
+        $.post("backend_move.php", JSON.stringify(args), function (data) {
+            calendar.message(data.message);
+        });
+    };
+
+    calendar.onEventResized = function (args) {
+        $.post("backend_move.php", JSON.stringify(args), function (data) {
+            calendar.message(data.message);
+        });
+    };
+
+    calendar.onBeforeEventRender = function (args) {
+        if (!args.data.tags) {
+            return;
+        }
+        switch (args.data.tags.status) {
+            case "free":
+                args.data.barColor = "green";
+                break;
+            case "waiting":
+                args.data.barColor = "orange";
+                break;
+            case "confirmed":
+                args.data.barColor = "#f41616";  // red
+                break;
+        }
+    };
+
+    calendar.onEventClick = function (args) {
+        if (args.e.tag("status") !== "free") {
+            calendar.message("You can only request a new appointment in a free slot.");
+            return;
+        }
+        console.log(args);
+        var params = {
+            id: args.e.id(),
+        };
+
+        $.ajax({
+            url: "@Url.Action("AppointmentConfirm", "Appointment")",
+            type: "post",
+            data: params,
+            cache: false
+        }).done(function (result) {
+            if (result.status) {
+                loadEvents();
+            }
+            else {
+
+            }
+        }).fail(function (result) {
+            // Error
+        });
+    };
+
+    calendar.init();
+
+    loadEvents();
+
+    function loadEvents(day) {
+        var start = nav.visibleStart();
+        var params = {
+            start: start.toString(),
+            end: nav.visibleEnd().toString(),
+            resourceId: @Model.Id
+        };
+        addAntiForgeryToken(params);
+        console.log(params);
+        $.ajax({
+            url: "@Url.Action("List", "Appointment")",
+            type: "post",
+            data: params,
+            cache: false,
+        }).done(function (result) {
+            if (day) {
+                calendar.startDate = day;
+            }
+            calendar.events.list = result;
+            calendar.update();
+
+            nav.events.list = result;
+            nav.update();
+        }).fail(function (result) {
+            // Error
+        });
+    }
+</script>
+

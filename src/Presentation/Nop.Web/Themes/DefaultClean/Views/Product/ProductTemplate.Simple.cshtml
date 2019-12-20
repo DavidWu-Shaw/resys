@@ -1,0 +1,185 @@
+﻿@model ProductDetailsModel
+@using Nop.Core.Domain.Seo;
+@inject Nop.Core.IWebHelper webHelper 
+@inject SeoSettings seoSettings
+@{
+    Layout = "_ColumnsOne";
+
+    //title
+    Html.AddTitleParts(!string.IsNullOrEmpty(Model.MetaTitle) ? Model.MetaTitle : Model.Name);
+    //meta
+    Html.AddMetaDescriptionParts(Model.MetaDescription);
+    Html.AddMetaKeywordParts(Model.MetaKeywords);
+    //page class
+    Html.AppendPageCssClassParts("html-product-details-page");
+
+    //canonical URL
+    if (seoSettings.CanonicalUrlsEnabled)
+    {
+        var productUrl = Url.RouteUrl("Product", new { SeName = Model.SeName }, webHelper.CurrentRequestProtocol).ToLowerInvariant();
+        Html.AddCanonicalUrlParts(productUrl, seoSettings.QueryStringInCanonicalUrlsEnabled);
+    }
+
+    //open graph META tags
+    if (seoSettings.OpenGraphMetaTags)
+    {
+        Html.AddHeadCustomParts("<meta property=\"og:type\" content=\"product\" />");
+        Html.AddHeadCustomParts("<meta property=\"og:title\" content=\"" + Html.Encode(Model.Name) + "\" />");
+        Html.AddHeadCustomParts("<meta property=\"og:description\" content=\"" + Html.Encode(Nop.Core.Html.HtmlHelper.StripTags(Model.MetaDescription)) + "\" />");
+        Html.AddHeadCustomParts("<meta property=\"og:image\" content=\"" + Model.DefaultPictureModel.ImageUrl + "\" />");
+        Html.AddHeadCustomParts("<meta property=\"og:image:url\" content=\"" + Model.DefaultPictureModel.ImageUrl + "\" />");
+        Html.AddHeadCustomParts("<meta property=\"og:url\" content=\"" + webHelper.GetThisPageUrl(false) + "\" />");
+        Html.AddHeadCustomParts("<meta property=\"og:site_name\" content=\"" + Html.Encode(Model.CurrentStoreName) + "\" />");
+    }
+
+    //Twitter META tags
+    if (seoSettings.TwitterMetaTags)
+    {
+        Html.AddHeadCustomParts("<meta property=\"twitter:card\" content=\"summary\" />");
+        Html.AddHeadCustomParts("<meta property=\"twitter:site\" content=\"" + Html.Encode(Model.CurrentStoreName) + "\" />");
+        Html.AddHeadCustomParts("<meta property=\"twitter:title\" content=\"" + Html.Encode(Model.Name) + "\" />");
+        Html.AddHeadCustomParts("<meta property=\"twitter:description\" content=\"" + Html.Encode(Nop.Core.Html.HtmlHelper.StripTags(Model.MetaDescription)) + "\" />");
+        Html.AddHeadCustomParts("<meta property=\"twitter:image\" content=\"" + Model.DefaultPictureModel.ImageUrl + "\" />");
+        Html.AddHeadCustomParts("<meta property=\"twitter:url\" content=\"" + webHelper.GetThisPageUrl(false) + "\" />");
+    }
+}
+<!--product breadcrumb-->
+@section Breadcrumb
+{
+    @await Html.PartialAsync("_ProductBreadcrumb", Model.Breadcrumb)
+}
+@await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductDetailsAfterBreadcrumb, additionalData = Model })
+<div class="page product-details-page">
+    <div class="page-body">
+        @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductDetailsTop, additionalData = Model })
+        <form asp-route="Product" asp-route-sename="@Model.SeName" method="post" id="product-details-form">
+            <div itemscope itemtype="http://schema.org/Product" data-productid="@Model.Id">
+                <div class="overview1">
+                    <div class="product-name">
+                        <h1 itemprop="name">
+                            @Model.Name
+                        </h1>
+                    </div>
+                    @if (!string.IsNullOrEmpty(Model.ShortDescription))
+                    {
+                        <div class="short-description">
+                            @Html.Raw(Model.ShortDescription)
+                        </div>
+                    }
+                    <!--product reviews-->
+                    @await Html.PartialAsync("_ProductReviewOverview", Model.ProductReviewOverview)
+                </div>
+                <div class="main">
+                    <div>
+                        <div class="column-left">
+                            <div id="nav"></div>
+                        </div>
+                        <div class="column-main">
+                            <div class="toolbar">Available time slots:</div>
+                            <div id="calendar"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductDetailsBottom, additionalData = Model })
+    </div>
+</div>
+
+<script type="text/javascript">
+    var nav = new DayPilot.Navigator("nav");
+    nav.selectMode = "week";
+    nav.showMonths = 2;
+    nav.skipMonths = 1;
+    nav.onTimeRangeSelected = function (args) {
+        loadEvents(args.start.firstDayOfWeek(DayPilot.Locale.find(nav.locale).weekStarts), args.start.addDays(7));
+    };
+    nav.init();
+
+    var calendar = new DayPilot.Calendar("calendar");
+    calendar.viewType = "Week";
+    calendar.timeRangeSelectedHandling = "Disabled";
+    calendar.eventMoveHandling = "Disabled";
+    calendar.eventResizeHandling = "Disabled";
+    calendar.onBeforeEventRender = function (args) {
+        if (!args.data.tags) {
+            return;
+        }
+        console.log(args.data);
+
+        switch (args.data.tags.status) {
+            case "free":
+                args.data.barColor = "green";
+                args.data.html = "Available<br/>" + args.data.tags.doctor;
+                args.data.toolTip = "Click to request this time slot";
+                break;
+            case "waiting":
+                args.data.barColor = "orange";
+                args.data.html = "Your appointment, waiting for confirmation";
+                break;
+            case "confirmed":
+                args.data.barColor = "#f41616";  // red
+                args.data.html = "Your appointment, confirmed";
+                break;
+        }
+    };
+
+    calendar.onEventClick = function (args) {
+        if (args.e.tag("status") !== "free") {
+            calendar.message("You can only request a new appointment in a free slot.");
+            return;
+        }
+        console.log(args);
+        var params = {
+            id: args.e.id(),
+        };
+
+        $.ajax({
+            url: "@Url.Action("AppointmentRequest", "Appointment")",
+            type: "post",
+            data: params,
+            cache: false
+        }).done(function (result) {
+            if (result.status) {
+                loadEvents();
+            }
+            else {
+
+            }
+        }).fail(function (result) {
+            // Error
+        });
+    };
+
+    calendar.init();
+
+    loadEvents();
+
+    function loadEvents(day) {
+        var start = nav.visibleStart() > new DayPilot.Date() ? nav.visibleStart() : new DayPilot.Date();
+        var params = {
+            start: start.toString(),
+            end: nav.visibleEnd().toString(),
+            resourceId: @Model.Id
+        };
+
+        console.log(params);
+        $.ajax({
+            url: "@Url.Action("AvailableSlotsByCustomer", "Appointment")",
+            type: "post",
+            data: params,
+            cache: false
+        }).done(function (result) {
+            if (day) {
+                calendar.startDate = day;
+            }
+            calendar.events.list = result;
+            calendar.update();
+
+            nav.events.list = result;
+            nav.update();
+        }).fail(function (result) {
+            // Error
+        });
+    }
+</script>
