@@ -72,11 +72,14 @@
     scheduler.eventClickHandling = "Disabled";
     scheduler.eventMoveHandling = "Disabled";
     scheduler.eventResizeHandling = "Disabled";
-    scheduler.allowEventOverlap = false,
+    scheduler.allowEventOverlap = false;
+    scheduler.businessBeginsHour = @Model.ProductScheduleModel.BusinessBeginsHour;
+    scheduler.businessEndsHour = @Model.ProductScheduleModel.BusinessEndsHour;
+    scheduler.businessWeekends = true;
 
-        scheduler.onBeforeTimeHeaderRender = function (args) {
-            args.header.html = args.header.html.replace(" AM", "a").replace(" PM", "p");  // shorten the hour header
-        };
+    scheduler.onBeforeTimeHeaderRender = function (args) {
+        args.header.html = args.header.html.replace(" AM", "a").replace(" PM", "p");  // shorten the hour header
+    };
 
     scheduler.onBeforeEventRender = function (args) {
         switch (args.data.tags.status) {
@@ -195,10 +198,10 @@
         var scale = $("input[name=scale]:checked").val();
         var businessOnly = $("#business-only").prop("checked");
 
-        var morningShiftStarts = 9;
+        var morningShiftStarts = @Model.ProductScheduleModel.BusinessBeginsHour;
         var morningShiftEnds = 13;
         var afternoonShiftStarts = 14;
-        var afternoonShiftEnds = 18;
+        var afternoonShiftEnds = @Model.ProductScheduleModel.BusinessEndsHour;
 
         if (!businessOnly) {
             var morningShiftStarts = 0;

@@ -101,6 +101,12 @@
     calendar.timeRangeSelectedHandling = "Disabled";
     calendar.eventMoveHandling = "Disabled";
     calendar.eventResizeHandling = "Disabled";
+    calendar.bubble = null;
+    calendar.businessBeginsHour = 9;
+    calendar.businessEndsHour = 18;
+    calendar.dayBeginsHour = 9;
+    calendar.dayEndsHour = 18;
+
     calendar.onBeforeEventRender = function (args) {
         if (!args.data.tags) {
             return;

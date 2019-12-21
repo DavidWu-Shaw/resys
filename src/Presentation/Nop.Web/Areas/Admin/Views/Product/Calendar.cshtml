@@ -41,6 +41,8 @@
     var calendar = new DayPilot.Calendar("calendar");
     calendar.viewType = "Week";
     calendar.timeRangeSelectedHandling = "Disabled";
+    calendar.dayBeginsHour = @Model.ProductScheduleModel.BusinessBeginsHour;
+    calendar.dayEndsHour = @Model.ProductScheduleModel.BusinessEndsHour;
 
     calendar.onEventMoved = function (args) {
         $.post("backend_move.php", JSON.stringify(args), function (data) {
