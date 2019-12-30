@@ -9,7 +9,6 @@
         </div>
         <div class="header-links-wrapper">
             @await Component.InvokeAsync("HeaderLinks")
-            @await Component.InvokeAsync("FlyoutShoppingCart")
         </div>
     </div>
     @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.HeaderMiddle })
