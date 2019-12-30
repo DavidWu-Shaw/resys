@@ -54,138 +54,60 @@
         @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductDetailsTop, additionalData = Model })
         <form asp-route="Product" asp-route-sename="@Model.SeName" method="post" id="product-details-form">
             <div itemscope itemtype="http://schema.org/Product" data-productid="@Model.Id">
-                <div class="overview1">
-                    <div class="product-name">
-                        <h1 itemprop="name">
-                            @Model.Name
-                        </h1>
+                <div class="product-essential">
+                    @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductDetailsEssentialTop, additionalData = Model })
+                    <!--product pictures-->
+                    @await Html.PartialAsync("_ProductDetailsPictures", Model)
+                    <div class="overview">
+                        @await Html.PartialAsync("_Discontinued", Model)
+                        <div class="product-name">
+                            <h1 itemprop="name">
+                                @Model.Name
+                            </h1>
+                        </div>
+                        @if (!string.IsNullOrEmpty(Model.ShortDescription))
+                        {
+                            <div class="short-description">
+                                @Html.Raw(Model.ShortDescription)
+                            </div>
+                        }
+                        @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductDetailsOverviewTop, additionalData = Model })
+                        <!--product reviews-->
+                        @await Html.PartialAsync("_ProductReviewOverview", Model.ProductReviewOverview)
+                        <!--price & add to cart-->
+                        @{
+                            var dataDictAddToCart = new ViewDataDictionary(ViewData);
+                            dataDictAddToCart.TemplateInfo.HtmlFieldPrefix = $"addtocart_{Model.Id}";
+                            @await Html.PartialAsync("_AddToCart", Model.AddToCart, dataDictAddToCart)
+                        }
+                        <!--wishlist, compare, email a friend-->
+                        <div class="overview-buttons">
+                            @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductDetailsInsideOverviewButtonsBefore, additionalData = Model })
+                            @{
+                                var dataDictAddToWishlist = new ViewDataDictionary(ViewData);
+                                dataDictAddToWishlist.TemplateInfo.HtmlFieldPrefix = $"addtocart_{Model.Id}";
+                                @await Html.PartialAsync("_AddToWishlist", Model.AddToCart, dataDictAddToWishlist)
+                            }
+                            @await Html.PartialAsync("_CompareProductsButton", Model)
+                            @await Html.PartialAsync("_ProductEmailAFriendButton", Model)
+                            @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductDetailsInsideOverviewButtonsAfter, additionalData = Model })
+                        </div>
+                        @await Html.PartialAsync("_ShareButton", Model)
+                        @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductDetailsOverviewBottom, additionalData = Model })
                     </div>
-                    @if (!string.IsNullOrEmpty(Model.ShortDescription))
+                    @if (!string.IsNullOrEmpty(Model.FullDescription))
                     {
-                        <div class="short-description">
-                            @Html.Raw(Model.ShortDescription)
+                        <div class="full-description" itemprop="description">
+                            @Html.Raw(Model.FullDescription)
                         </div>
                     }
-                    <!--product reviews-->
-                    @await Html.PartialAsync("_ProductReviewOverview", Model.ProductReviewOverview)
+                    @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductDetailsEssentialBottom, additionalData = Model })
                 </div>
-                <div class="main">
-                    <div>
-                        <div class="column-left">
-                            <div id="nav"></div>
-                        </div>
-                        <div class="column-main">
-                            <div class="toolbar">Available time slots:</div>
-                            <div id="calendar"></div>
-                        </div>
-                    </div>
+                <div class="product-calendar">
+                    @await Html.PartialAsync("_Calendar", Model)
                 </div>
             </div>
         </form>
         @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductDetailsBottom, additionalData = Model })
     </div>
 </div>
-
-<script type="text/javascript">
-    var nav = new DayPilot.Navigator("nav");
-    nav.selectMode = "week";
-    nav.showMonths = 2;
-    nav.skipMonths = 1;
-    nav.onTimeRangeSelected = function (args) {
-        loadEvents(args.start.firstDayOfWeek(DayPilot.Locale.find(nav.locale).weekStarts), args.start.addDays(7));
-    };
-    nav.init();
-
-    var calendar = new DayPilot.Calendar("calendar");
-    calendar.viewType = "Week";
-    calendar.timeRangeSelectedHandling = "Disabled";
-    calendar.eventMoveHandling = "Disabled";
-    calendar.eventResizeHandling = "Disabled";
-    calendar.bubble = null;
-    calendar.businessBeginsHour = 9;
-    calendar.businessEndsHour = 18;
-    calendar.dayBeginsHour = 9;
-    calendar.dayEndsHour = 18;
-
-    calendar.onBeforeEventRender = function (args) {
-        if (!args.data.tags) {
-            return;
-        }
-        console.log(args.data);
-
-        switch (args.data.tags.status) {
-            case "free":
-                args.data.barColor = "green";
-                args.data.html = "Available<br/>" + args.data.tags.doctor;
-                args.data.toolTip = "Click to request this time slot";
-                break;
-            case "waiting":
-                args.data.barColor = "orange";
-                args.data.html = "Your appointment, waiting for confirmation";
-                break;
-            case "confirmed":
-                args.data.barColor = "#f41616";  // red
-                args.data.html = "Your appointment, confirmed";
-                break;
-        }
-    };
-
-    calendar.onEventClick = function (args) {
-        if (args.e.tag("status") !== "free") {
-            calendar.message("You can only request a new appointment in a free slot.");
-            return;
-        }
-        console.log(args);
-        var params = {
-            id: args.e.id(),
-        };
-
-        $.ajax({
-            url: "@Url.Action("AppointmentRequest", "Appointment")",
-            type: "post",
-            data: params,
-            cache: false
-        }).done(function (result) {
-            if (result.status) {
-                loadEvents();
-            }
-            else {
-
-            }
-        }).fail(function (result) {
-            // Error
-        });
-    };
-
-    calendar.init();
-
-    loadEvents();
-
-    function loadEvents(day) {
-        var start = nav.visibleStart() > new DayPilot.Date() ? nav.visibleStart() : new DayPilot.Date();
-        var params = {
-            start: start.toString(),
-            end: nav.visibleEnd().toString(),
-            resourceId: @Model.Id
-        };
-
-        console.log(params);
-        $.ajax({
-            url: "@Url.Action("AvailableSlotsByCustomer", "Appointment")",
-            type: "post",
-            data: params,
-            cache: false
-        }).done(function (result) {
-            if (day) {
-                calendar.startDate = day;
-            }
-            calendar.events.list = result;
-            calendar.update();
-
-            nav.events.list = result;
-            nav.update();
-        }).fail(function (result) {
-            // Error
-        });
-    }
-</script>

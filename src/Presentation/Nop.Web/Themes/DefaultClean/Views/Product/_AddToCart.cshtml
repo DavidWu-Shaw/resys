@@ -1,0 +1,7 @@
+﻿@model ProductDetailsModel.AddToCartModel
+<div class="add-to-cart">
+    <div class="add-to-cart-panel">
+        <a href="#book-time" class="button-1 add-to-cart-button">@T("ShoppingCart.AddToCart")</a>
+    </div>
+    @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductDetailsAddInfo, additionalData = Model })
+</div>
