@@ -15,6 +15,10 @@
             </small>
         </h1>
         <div class="pull-right">
+            <a asp-action="Calendar" asp-route-id="@Model.Id" class="btn bg-purple-active">
+                <i class="fa fa-eye"></i>
+                @T("Admin.Common.Calendar")
+            </a>
             <button type="button" onclick="javascript:OpenWindow('@Url.RouteUrl("Product", new {SeName = Model.SeName})', 800, 600, true); return false;" class="btn bg-purple">
                 <i class="fa fa-eye"></i>
                 @T("Admin.Common.Preview")
@@ -23,7 +27,6 @@
     </div>
     <div class="content">
         <div class="form-horizontal">
-
             <div class="column-left">
                 <div id="nav"></div>
             </div>
