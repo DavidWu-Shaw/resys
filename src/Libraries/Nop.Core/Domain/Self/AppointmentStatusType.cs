@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Nop.Core.Domain.Self
+﻿namespace Nop.Core.Domain.Self
 {
     public enum AppointmentStatusType
     {
-        free,
-        waiting,
-        confirmed
+        free = 0,
+        waiting = 1,
+        confirmed = 2
     }
 }

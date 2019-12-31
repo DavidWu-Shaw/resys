@@ -15,7 +15,7 @@ namespace Nop.Web.Models.Self
             };
             model.tags = new TagModel
             {
-                status = ((AppointmentStatusType)appointment.StatusId).ToString(),
+                status = appointment.Status.ToString(),
                 doctor = appointment.Product.Name
             };
             if (appointment.Customer != null)

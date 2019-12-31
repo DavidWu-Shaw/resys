@@ -85,7 +85,7 @@ namespace Nop.Web.Areas.Admin.Controllers
                     EndTimeUtc = slot.End.ToUniversalTime(),
                     ResourceId = resourceId,
                     Label = string.Empty,
-                    StatusId = (int)AppointmentStatusType.free
+                    Status = AppointmentStatusType.free
                 };
 
                 _appointmentService.InsertAppointment(appointment);

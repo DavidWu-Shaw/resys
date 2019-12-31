@@ -14,5 +14,11 @@ namespace Nop.Core.Domain.Self
         public int CustomerId { get; set; }
         public virtual Product Product { get; set; }
         public virtual Customer Customer { get; set; }
+
+        public AppointmentStatusType Status
+        {
+            get => (AppointmentStatusType)StatusId;
+            set => StatusId = (short)value;
+        }
     }
 }

@@ -57,9 +57,6 @@ namespace Nop.Web.Controllers
         [HttpPost]
         public virtual IActionResult AvailableSlotsByCustomer(DateTime start, DateTime end, int resourceId)
         {
-            if (_workContext.CurrentCustomer.IsGuest() && (!_orderSettings.AnonymousCheckoutAllowed))
-                return Challenge();
-
             var events = _appointmentService.GetAvailableAppointmentsByCustomer(start, end, resourceId, _workContext.CurrentCustomer.Id);
 
             var model = new List<AppointmentModel>();
@@ -79,11 +76,18 @@ namespace Nop.Web.Controllers
                 return Challenge();
 
             var requestedAppointment = _appointmentService.GetAppointmentById(id);
-            requestedAppointment.CustomerId = _workContext.CurrentCustomer.Id;
-            requestedAppointment.StatusId = (int)AppointmentStatusType.confirmed;
-            _appointmentService.UpdateAppointment(requestedAppointment);
+            if (requestedAppointment.Status == AppointmentStatusType.free)
+            {
+                requestedAppointment.CustomerId = _workContext.CurrentCustomer.Id;
+                requestedAppointment.Status = AppointmentStatusType.waiting;
+                _appointmentService.UpdateAppointment(requestedAppointment);
 
-            return Json(new { status = true, responseText = $"Appointment confirmed." });
+                return Json(new { status = true, responseText = $"Appointment requested." });
+            }
+            else
+            {
+                return Json(new { status = false, responseText = $"Appointment request failed." });
+            }
         }
         #endregion
     }
