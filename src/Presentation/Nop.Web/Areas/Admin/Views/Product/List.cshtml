@@ -264,14 +264,14 @@
                                     Title = T("Admin.Common.Schedule").Text,
                                     Width = "100",
                                     ClassName =  NopColumnClassDefaults.Button,
-                                    Render = new RenderButtonEdit(new DataUrl("Schedule"))
+                                    Render = new RenderButtonEdit(new DataUrl("AppointmentSchedule"))
                                 },
                                 new ColumnProperty(nameof(ProductModel.Id))
                                 {
                                     Title = T("Admin.Common.Calendar").Text,
                                     Width = "100",
                                     ClassName =  NopColumnClassDefaults.Button,
-                                    Render = new RenderButtonView(new DataUrl("Calendar"))
+                                    Render = new RenderButtonView(new DataUrl("AppointmentCalendar"))
                                 }
                             }
                    })

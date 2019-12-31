@@ -29,11 +29,11 @@
                 <i class="fa fa-floppy-o"></i>
                 @T("Admin.Common.SaveContinue")
             </button>
-            <a asp-action="AppointmentSchedule" asp-route-id="@Model.Id" class="btn bg-blue">
+            <a asp-action="Schedule" asp-route-id="@Model.Id" class="btn bg-blue">
                 <i class="fa fa-edit"></i>
                 @T("Admin.Common.Schedule")
             </a>
-            <a asp-action="AppointmentCalendar" asp-route-id="@Model.Id" class="btn bg-purple-active">
+            <a asp-action="Calendar" asp-route-id="@Model.Id" class="btn bg-purple-active">
                 <i class="fa fa-eye"></i>
                 @T("Admin.Common.Calendar")
             </a>

@@ -870,7 +870,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             return View(model);
         }
 
-        public virtual IActionResult Schedule(int id)
+        public virtual IActionResult AppointmentSchedule(int id)
         {
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageProducts))
                 return AccessDeniedView();
@@ -890,7 +890,27 @@ namespace Nop.Web.Areas.Admin.Controllers
             return View(model);
         }
 
-        public virtual IActionResult Calendar(int id)
+        public virtual IActionResult AppointmentCalendar(int id)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageProducts))
+                return AccessDeniedView();
+
+            //try to get a product with the specified id
+            var product = _productService.GetProductById(id);
+            if (product == null || product.Deleted)
+                return RedirectToAction("List");
+
+            //a vendor should have access only to his products
+            if (_workContext.CurrentVendor != null && product.VendorId != _workContext.CurrentVendor.Id)
+                return RedirectToAction("List");
+
+            //prepare model
+            var model = _productModelFactory.PrepareProductModel(null, product);
+
+            return View(model);
+        }
+
+        public virtual IActionResult AppointmentUpdate(int id)
         {
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageProducts))
                 return AccessDeniedView();

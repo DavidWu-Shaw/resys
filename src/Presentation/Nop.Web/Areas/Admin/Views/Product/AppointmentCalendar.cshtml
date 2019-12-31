@@ -15,7 +15,7 @@
             </small>
         </h1>
         <div class="pull-right">
-            <a asp-action="Schedule" asp-route-id="@Model.Id" class="btn bg-blue">
+            <a asp-action="AppointmentSchedule" asp-route-id="@Model.Id" class="btn bg-blue">
                 <i class="fa fa-edit"></i>
                 @T("Admin.Common.Schedule")
             </a>
@@ -84,11 +84,21 @@
     };
 
     calendar.onEventClick = function (args) {
-        if (args.e.tag("status") !== "free") {
-            calendar.message("You can only request a new appointment in a free slot.");
+        if (args.e.tag("status") == "free") {
             return;
         }
-        console.log(args);
+
+        var modal = new DayPilot.Modal({
+            onClosed: function (args) {
+                if (args.result) {  // args.result is empty when modal is closed without submitting
+                    loadEvents();
+                }
+            }
+        });
+
+        modal.showUrl("@Url.Action("AppointmentUpdate", "Product", new { id = 1 })");
+
+        console.log("args=", args);
         var params = {
             id: args.e.id(),
         };
