@@ -20,4 +20,10 @@ namespace Nop.Web.Areas.Admin.Models.Self
         public string CustomerEmail { get; set; }
         public string CustomerFullName { get; set; }
     }
+
+    public class TimeSlot
+    {
+        public DateTime Start { get; set; }
+        public DateTime End { get; set; }
+    }
 }

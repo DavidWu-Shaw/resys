@@ -108,7 +108,7 @@
         addAntiForgeryToken(params);
 
         $.ajax({
-            url: "@Url.Action("Delete", "Appointment")",
+            url: "@Url.Action("AppointmentDelete", "Product")",
             type: "post",
             data: params
         })
@@ -130,7 +130,7 @@
         addAntiForgeryToken(params);
 
         $.ajax({
-            url: "@Url.Action("Create", "Appointment")",
+            url: "@Url.Action("AppointmentCreate", "Product")",
             type: "post",
             data: params
         }).done(function (result) {
@@ -163,7 +163,7 @@
         addAntiForgeryToken(params);
 
         $.ajax({
-            url: "@Url.Action("List", "Appointment")",
+            url: "@Url.Action("AppointmentList", "Product")",
             type: "post",
             data: params,
             cache: false,

@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace Nop.Web.Models.Self
+﻿namespace Nop.Web.Areas.Admin.Models.Self
 {
-    public class AppointmentModel
+    public class AppointmentInfoModel
     {
         public string id { get; set; }
         public string text { get; set; }
@@ -16,11 +14,5 @@ namespace Nop.Web.Models.Self
     {
         public string status { get; set; }
         public string doctor { get; set; }
-    }
-
-    public class TimeSlot
-    {
-        public DateTime Start { get; set; }
-        public DateTime End { get; set; }
     }
 }

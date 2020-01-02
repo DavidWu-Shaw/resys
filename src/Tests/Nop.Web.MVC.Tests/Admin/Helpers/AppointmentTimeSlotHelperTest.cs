@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Nop.Web.Areas.Admin.Helpers;
-using Nop.Web.Models.Self;
+﻿using Nop.Web.Areas.Admin.Helpers;
+using Nop.Web.Areas.Admin.Models.Self;
 using NUnit.Framework;
+using System;
+using System.Collections.Generic;
 
 namespace Nop.Web.MVC.Tests.Admin.Helpers
 {
