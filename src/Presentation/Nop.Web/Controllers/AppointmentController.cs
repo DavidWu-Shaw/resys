@@ -76,10 +76,10 @@ namespace Nop.Web.Controllers
                 return Challenge();
 
             var requestedAppointment = _appointmentService.GetAppointmentById(id);
-            if (requestedAppointment.Status == AppointmentStatusType.free)
+            if (requestedAppointment.Status == AppointmentStatusType.Free)
             {
                 requestedAppointment.CustomerId = _workContext.CurrentCustomer.Id;
-                requestedAppointment.Status = AppointmentStatusType.waiting;
+                requestedAppointment.Status = AppointmentStatusType.Waiting;
                 _appointmentService.UpdateAppointment(requestedAppointment);
 
                 return Json(new { status = true, responseText = $"Appointment requested." });

@@ -1,9 +1,7 @@
-﻿using Nop.Web.Framework.Models;
+﻿using Nop.Core.Domain.Self;
+using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Nop.Web.Areas.Admin.Models.Self
 {
@@ -11,14 +9,19 @@ namespace Nop.Web.Areas.Admin.Models.Self
     {
         public DateTime StartTimeUtc { get; set; }
         public DateTime EndTimeUtc { get; set; }
-        public short StatusId { get; set; }
+        [NopResourceDisplayName("Admin.Appointment.Fields.Status")]
+        public AppointmentStatusType Status { get; set; }
         public int ResourceId { get; set; }
-        [NopResourceDisplayName("Admin.Orders.Fields.Customer")]
+        [NopResourceDisplayName("Admin.Appointment.Fields.Customer")]
         public int CustomerId { get; set; }
 
-        [NopResourceDisplayName("Admin.Orders.Fields.CustomerEmail")]
+        [NopResourceDisplayName("Admin.Appointment.Fields.CustomerEmail")]
         public string CustomerEmail { get; set; }
         public string CustomerFullName { get; set; }
+
+        public bool IsLoggedInAsVendor { get; set; }
+        public bool CanCancel { get; set; }
+        public bool CanConfirm { get; set; }
     }
 
     public class TimeSlot

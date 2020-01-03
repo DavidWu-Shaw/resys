@@ -2,8 +2,8 @@
 {
     public enum AppointmentStatusType
     {
-        free = 0,
-        waiting = 1,
-        confirmed = 2
+        Free = 0,
+        Waiting = 1,
+        Confirmed = 2
     }
 }

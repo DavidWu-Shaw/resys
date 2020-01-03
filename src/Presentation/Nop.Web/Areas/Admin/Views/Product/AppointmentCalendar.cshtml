@@ -71,32 +71,37 @@
             return;
         }
         switch (args.data.tags.status) {
-            case "free":
+            case "Free":
                 args.data.barColor = "green";
                 break;
-            case "waiting":
+            case "Waiting":
                 args.data.barColor = "orange";
+                args.data.toolTip = "Click to show detail";
                 break;
-            case "confirmed":
+            case "Confirmed":
                 args.data.barColor = "#f41616";  // red
+                args.data.toolTip = "Click to show detail";
                 break;
         }
     };
 
     calendar.onEventClick = function (args) {
-        if (args.e.tag("status") == "free") {
+        if (args.e.tag("status") == "Free") {
             return;
         }
 
         var modal = new DayPilot.Modal({
             onClosed: function (args) {
+                console.log("onclose.args=", args);
                 if (args.result) {  // args.result is empty when modal is closed without submitting
                     loadEvents();
                 }
             }
         });
 
-        modal.showUrl("@Url.Action("AppointmentUpdate", "Product", new { id = 1 })");
+        var url = '@Url.Action("AppointmentEdit", "Product", new { id = "ID" })';
+        url = url.replace("ID", args.e.id());
+        modal.showUrl(url);
 
         console.log("args=", args);
         var params = {

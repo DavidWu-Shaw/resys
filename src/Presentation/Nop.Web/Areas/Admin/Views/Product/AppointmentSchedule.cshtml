@@ -86,15 +86,15 @@
 
     scheduler.onBeforeEventRender = function (args) {
         switch (args.data.tags.status) {
-            case "free":
+            case "Free":
                 args.data.barColor = "green";
                 args.data.deleteDisabled = $('input[name=scale]:checked').val() === "shifts";  // only allow deleting in the more detailed hour scale mode
                 break;
-            case "waiting":
+            case "Waiting":
                 args.data.barColor = "orange";
                 args.data.deleteDisabled = true;
                 break;
-            case "confirmed":
+            case "Confirmed":
                 args.data.barColor = "#f41616";  // red
                 args.data.deleteDisabled = true;
                 break;

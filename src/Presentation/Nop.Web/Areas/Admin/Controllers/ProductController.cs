@@ -735,6 +735,79 @@ namespace Nop.Web.Areas.Admin.Controllers
 
         #region Appointment Methods
 
+        public virtual IActionResult AppointmentSchedule(int id)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageProducts))
+                return AccessDeniedView();
+
+            //try to get a product with the specified id
+            var product = _productService.GetProductById(id);
+            if (product == null || product.Deleted)
+                return RedirectToAction("List");
+
+            //a vendor should have access only to his products
+            if (_workContext.CurrentVendor != null && product.VendorId != _workContext.CurrentVendor.Id)
+                return RedirectToAction("List");
+
+            //prepare model
+            var model = _productModelFactory.PrepareProductModel(null, product);
+
+            return View(model);
+        }
+
+        public virtual IActionResult AppointmentCalendar(int id)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageProducts))
+                return AccessDeniedView();
+
+            //try to get a product with the specified id
+            var product = _productService.GetProductById(id);
+            if (product == null || product.Deleted)
+                return RedirectToAction("List");
+
+            //a vendor should have access only to his products
+            if (_workContext.CurrentVendor != null && product.VendorId != _workContext.CurrentVendor.Id)
+                return RedirectToAction("List");
+
+            //prepare model
+            var model = _productModelFactory.PrepareProductModel(null, product);
+
+            return View(model);
+        }
+
+        public virtual IActionResult AppointmentEdit(int id)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageProducts))
+                return AccessDeniedView();
+
+            //try to get a appointment with the specified id
+            var appointment = _appointmentService.GetAppointmentById(id);
+            if (appointment == null)
+                return RedirectToAction("AppointmentCalendar");
+
+            //a vendor should have access only to his products
+            if (_workContext.CurrentVendor != null && appointment.Product.VendorId != _workContext.CurrentVendor.Id)
+                return RedirectToAction("List");
+
+            //prepare model
+            var model = new AppointmentModel
+            {
+                Id = appointment.Id,
+                StartTimeUtc = appointment.StartTimeUtc,
+                EndTimeUtc = appointment.EndTimeUtc,
+                Status = appointment.Status,
+                ResourceId = appointment.ResourceId,
+                CustomerId = appointment.CustomerId,
+                CustomerFullName = appointment.Customer.Email,
+                CustomerEmail = appointment.Customer.Email
+            };
+            model.IsLoggedInAsVendor = _workContext.CurrentVendor != null;
+            model.CanCancel = appointment.Status == AppointmentStatusType.Confirmed;
+            model.CanConfirm = appointment.Status == AppointmentStatusType.Waiting;
+
+            return View(model);
+        }
+
         [HttpPost]
         public virtual IActionResult AppointmentList(DateTime start, DateTime end, int resourceId)
         {
@@ -768,7 +841,7 @@ namespace Nop.Web.Areas.Admin.Controllers
                     EndTimeUtc = slot.End.ToUniversalTime(),
                     ResourceId = resourceId,
                     Label = string.Empty,
-                    Status = AppointmentStatusType.free
+                    Status = AppointmentStatusType.Free
                 };
 
                 _appointmentService.InsertAppointment(appointment);
@@ -789,7 +862,6 @@ namespace Nop.Web.Areas.Admin.Controllers
                 return helper.GetSlotsByHour(start, end);
             }
         }
-
 
         private List<TimeSlot> GetSlotsByShift(DateTime start, DateTime end)
         {
@@ -955,66 +1027,6 @@ namespace Nop.Web.Areas.Admin.Controllers
             model = _productModelFactory.PrepareProductModel(model, null, true);
 
             //if we got this far, something failed, redisplay form
-            return View(model);
-        }
-
-        public virtual IActionResult AppointmentSchedule(int id)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageProducts))
-                return AccessDeniedView();
-
-            //try to get a product with the specified id
-            var product = _productService.GetProductById(id);
-            if (product == null || product.Deleted)
-                return RedirectToAction("List");
-
-            //a vendor should have access only to his products
-            if (_workContext.CurrentVendor != null && product.VendorId != _workContext.CurrentVendor.Id)
-                return RedirectToAction("List");
-
-            //prepare model
-            var model = _productModelFactory.PrepareProductModel(null, product);
-
-            return View(model);
-        }
-
-        public virtual IActionResult AppointmentCalendar(int id)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageProducts))
-                return AccessDeniedView();
-
-            //try to get a product with the specified id
-            var product = _productService.GetProductById(id);
-            if (product == null || product.Deleted)
-                return RedirectToAction("List");
-
-            //a vendor should have access only to his products
-            if (_workContext.CurrentVendor != null && product.VendorId != _workContext.CurrentVendor.Id)
-                return RedirectToAction("List");
-
-            //prepare model
-            var model = _productModelFactory.PrepareProductModel(null, product);
-
-            return View(model);
-        }
-
-        public virtual IActionResult AppointmentUpdate(int id)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageProducts))
-                return AccessDeniedView();
-
-            //try to get a product with the specified id
-            var product = _productService.GetProductById(id);
-            if (product == null || product.Deleted)
-                return RedirectToAction("List");
-
-            //a vendor should have access only to his products
-            if (_workContext.CurrentVendor != null && product.VendorId != _workContext.CurrentVendor.Id)
-                return RedirectToAction("List");
-
-            //prepare model
-            var model = _productModelFactory.PrepareProductModel(null, product);
-
             return View(model);
         }
 

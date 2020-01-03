@@ -41,16 +41,16 @@
         console.log(args.data);
 
         switch (args.data.tags.status) {
-            case "free":
+            case "Free":
                 args.data.barColor = "green";
                 args.data.html = "Available<br/>" + args.data.tags.doctor;
                 args.data.toolTip = "Click to request this time slot";
                 break;
-            case "waiting":
+            case "Waiting":
                 args.data.barColor = "orange";
                 args.data.html = "Your appointment, waiting for confirmation";
                 break;
-            case "confirmed":
+            case "Confirmed":
                 args.data.barColor = "#f41616";  // red
                 args.data.html = "Your appointment, confirmed";
                 break;
@@ -58,7 +58,7 @@
     };
 
     calendar.onEventClick = function (args) {
-        if (args.e.tag("status") !== "free") {
+        if (args.e.tag("status") !== "Free") {
             calendar.message("You can only request a new appointment in a free slot.");
             return;
         }
