@@ -27,7 +27,6 @@
     </div>
     <div class="content">
         <div class="form-horizontal">
-
             <div class="column-left">
                 <div id="nav"></div>
             </div>
@@ -102,27 +101,6 @@
         var url = '@Url.Action("AppointmentEdit", "Product", new { id = "ID" })';
         url = url.replace("ID", args.e.id());
         modal.showUrl(url);
-
-        console.log("args=", args);
-        var params = {
-            id: args.e.id(),
-        };
-
-        $.ajax({
-            url: "@Url.Action("AppointmentConfirm", "Product")",
-            type: "post",
-            data: params,
-            cache: false
-        }).done(function (result) {
-            if (result.status) {
-                loadEvents();
-            }
-            else {
-
-            }
-        }).fail(function (result) {
-            // Error
-        });
     };
 
     calendar.init();
@@ -136,6 +114,7 @@
             end: nav.visibleEnd().toString(),
             resourceId: @Model.Id
         };
+        console.log(addAntiForgeryToken);
         addAntiForgeryToken(params);
         console.log(params);
         $.ajax({
@@ -157,4 +136,3 @@
         });
     }
 </script>
-

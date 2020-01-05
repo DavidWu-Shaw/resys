@@ -801,7 +801,7 @@ namespace Nop.Web.Areas.Admin.Controllers
                 CustomerFullName = appointment.Customer.Email,
                 CustomerEmail = appointment.Customer.Email
             };
-            model.IsLoggedInAsVendor = _workContext.CurrentVendor != null;
+            model.IsLoggedInAsVendor = _workContext.CurrentVendor != null || _workContext.IsAdmin;
             model.CanCancel = appointment.Status == AppointmentStatusType.Confirmed;
             model.CanConfirm = appointment.Status == AppointmentStatusType.Waiting;
 
@@ -868,6 +868,41 @@ namespace Nop.Web.Areas.Admin.Controllers
             var result = new List<TimeSlot>();
 
             return result;
+        }
+
+        [HttpPost]
+        public virtual IActionResult AppointmentConfirm(int id)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageProductReviews))
+                return AccessDeniedView();
+
+            var requestedAppointment = _appointmentService.GetAppointmentById(id);
+            if (requestedAppointment.Status == AppointmentStatusType.Waiting)
+            {
+                requestedAppointment.Status = AppointmentStatusType.Confirmed;
+                _appointmentService.UpdateAppointment(requestedAppointment);
+
+                return Json(new { status = true, responseText = $"Appointment confirmed." });
+            }
+            else
+            {
+                // Customer may have just concelled this appointment
+                return Json(new { status = false, responseText = $"Appointment confirm failed." });
+            }
+        }
+
+        [HttpPost]
+        public virtual IActionResult AppointmentCancel(int id)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageProductReviews))
+                return AccessDeniedView();
+
+            var requestedAppointment = _appointmentService.GetAppointmentById(id);
+            requestedAppointment.Status = AppointmentStatusType.Free;
+            requestedAppointment.CustomerId = 0;
+            _appointmentService.UpdateAppointment(requestedAppointment);
+
+            return Json(new { status = true, responseText = $"Appointment cancelled." });
         }
 
         [HttpPost]
