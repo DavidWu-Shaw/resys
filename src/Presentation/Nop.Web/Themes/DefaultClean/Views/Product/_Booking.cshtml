@@ -72,14 +72,16 @@
             type: "post",
             data: params,
             cache: false
-        }).done(function (result) {
+        })
+        .done(function (result) {
             if (result.status) {
                 loadEvents();
             }
             else {
 
             }
-        }).fail(function (result) {
+        })
+        .fail(function (result) {
             // Error
         });
     };

@@ -78,14 +78,15 @@
             $.ajax({
                 url: "@Url.Action("AppointmentConfirm", "Product")",
                 type: "post",
+                datatype: "json",
                 data: params,
                 cache: false
             }).done(function (result) {
-                console.log(result);
+                console.log("result=", result);
                 modal.close(result);
             }).fail(function (result) {
                 // Error
-                console.log(result);
+                console.log("fail result=", result);
             });
         });
 
@@ -98,14 +99,17 @@
             $.ajax({
                 url: "@Url.Action("AppointmentCancel", "Product")",
                 type: "post",
+                datatype: "json",
                 data: params,
                 cache: false
-            }).done(function (result) {
-                console.log(result);
+            })
+            .done(function (result) {
+                console.log("result=", result);
                 modal.close(result);
-            }).fail(function (result) {
+            })
+            .fail(function (result) {
                 // Error
-                console.log(result);
+                console.log("fail result=", result);
             });
         });
     });

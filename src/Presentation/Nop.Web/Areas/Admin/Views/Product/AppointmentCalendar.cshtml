@@ -122,7 +122,8 @@
             type: "post",
             data: params,
             cache: false,
-        }).done(function (result) {
+        })
+        .done(function (result) {
             if (day) {
                 calendar.startDate = day;
             }
@@ -131,7 +132,8 @@
 
             nav.events.list = result;
             nav.update();
-        }).fail(function (result) {
+        })
+        .fail(function (result) {
             // Error
         });
     }

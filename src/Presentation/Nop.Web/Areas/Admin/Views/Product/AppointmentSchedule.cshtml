@@ -133,7 +133,8 @@
             url: "@Url.Action("AppointmentCreate", "Product")",
             type: "post",
             data: params
-        }).done(function (result) {
+        })
+        .done(function (result) {
             console.log(result);
             loadEvents();
             dp.message(result.responseText);
