@@ -103,7 +103,7 @@
                     }
                     @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductDetailsEssentialBottom, additionalData = Model })
                 </div>
-                @await Html.PartialAsync("_Booking", Model)
+                @await Html.PartialAsync("_BookingCalendar", Model)
             </div>
         </form>
         @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductDetailsBottom, additionalData = Model })
