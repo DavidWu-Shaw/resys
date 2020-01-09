@@ -8,6 +8,7 @@ using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Localization;
 using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Security;
+using Nop.Core.Domain.Self;
 using Nop.Core.Rss;
 using Nop.Services.Catalog;
 using Nop.Services.Events;
@@ -16,6 +17,7 @@ using Nop.Services.Logging;
 using Nop.Services.Messages;
 using Nop.Services.Orders;
 using Nop.Services.Security;
+using Nop.Services.Self;
 using Nop.Services.Seo;
 using Nop.Services.Stores;
 using Nop.Web.Factories;
@@ -26,6 +28,7 @@ using Nop.Web.Framework.Mvc.Filters;
 using Nop.Web.Framework.Security;
 using Nop.Web.Framework.Security.Captcha;
 using Nop.Web.Models.Catalog;
+using Nop.Web.Models.Self;
 
 namespace Nop.Web.Controllers
 {
@@ -43,7 +46,9 @@ namespace Nop.Web.Controllers
         private readonly IOrderService _orderService;
         private readonly IPermissionService _permissionService;
         private readonly IProductModelFactory _productModelFactory;
+        private readonly IAppointmentModelFactory _appointmentModelFactory;
         private readonly IProductService _productService;
+        private readonly IAppointmentService _appointmentService;
         private readonly IRecentlyViewedProductsService _recentlyViewedProductsService;
         private readonly IShoppingCartService _shoppingCartService;
         private readonly IStoreContext _storeContext;
@@ -69,7 +74,9 @@ namespace Nop.Web.Controllers
             IOrderService orderService,
             IPermissionService permissionService,
             IProductModelFactory productModelFactory,
+            IAppointmentModelFactory appointmentModelFactory,
             IProductService productService,
+            IAppointmentService appointmentService,
             IRecentlyViewedProductsService recentlyViewedProductsService,
             IShoppingCartService shoppingCartService,
             IStoreContext storeContext,
@@ -91,7 +98,9 @@ namespace Nop.Web.Controllers
             _orderService = orderService;
             _permissionService = permissionService;
             _productModelFactory = productModelFactory;
+            _appointmentModelFactory = appointmentModelFactory;
             _productService = productService;
+            _appointmentService = appointmentService;
             _recentlyViewedProductsService = recentlyViewedProductsService;
             _shoppingCartService = shoppingCartService;
             _storeContext = storeContext;
@@ -105,6 +114,68 @@ namespace Nop.Web.Controllers
         }
 
         #endregion
+
+        #region Appointment Methods
+
+        public virtual IActionResult AppointmentUpdate(int id)
+        {
+            //try to get a appointment with the specified id
+            var appointment = _appointmentService.GetAppointmentById(id);
+
+            //prepare model
+            var model = _appointmentModelFactory.PrepareAppointmentUpdateModel(appointment);
+
+            return Json(model);
+        }
+
+        [HttpPost]
+        public virtual IActionResult AppointmentSlotsByCustomer(DateTime start, DateTime end, int resourceId)
+        {
+            var events = _appointmentService.GetAvailableAppointmentsByCustomer(start, end, resourceId, _workContext.CurrentCustomer.Id);
+
+            var model = new List<AppointmentInfoModel>();
+            foreach (var appointment in events)
+            {
+                var item = _appointmentModelFactory.PrepareAppointmentInfoModel(appointment);
+                model.Add(item);
+            }
+
+            return Json(model);
+        }
+
+        [HttpPost]
+        public virtual IActionResult AppointmentRequest(int id)
+        {
+            if (_workContext.CurrentCustomer.IsGuest())
+                return Challenge();
+
+            var requestedAppointment = _appointmentService.GetAppointmentById(id);
+            if (requestedAppointment.Status == AppointmentStatusType.Free)
+            {
+                requestedAppointment.CustomerId = _workContext.CurrentCustomer.Id;
+                requestedAppointment.Status = AppointmentStatusType.Waiting;
+                _appointmentService.UpdateAppointment(requestedAppointment);
+
+                return Json(new { status = true, responseText = $"Appointment requested." });
+            }
+            else
+            {
+                return Json(new { status = false, responseText = $"Appointment request failed." });
+            }
+        }
+
+        [HttpPost]
+        public virtual IActionResult AppointmentCancel(int id)
+        {
+            var requestedAppointment = _appointmentService.GetAppointmentById(id);
+            requestedAppointment.Status = AppointmentStatusType.Free;
+            requestedAppointment.CustomerId = 0;
+            _appointmentService.UpdateAppointment(requestedAppointment);
+
+            return Json(new { status = true, responseText = $"Appointment cancelled." });
+        }
+
+        #endregion Appointment Methods
 
         #region Product details page
 
@@ -179,6 +250,7 @@ namespace Nop.Web.Controllers
 
             //model
             var model = _productModelFactory.PrepareProductDetailsModel(product, updatecartitem, false);
+            model.AppointmentUpdateModel = _appointmentModelFactory.PrepareAppointmentUpdateModel(null);
             //template
             var productTemplateViewPath = _productModelFactory.PrepareProductTemplateViewPath(product);
 

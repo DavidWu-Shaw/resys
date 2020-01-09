@@ -45,14 +45,14 @@
                     @if (Model.CanCancel)
                     {
                         <button type="submit" name="btnCancelAppointment" id="btnCancelAppointment" class="btn bg-red" style="margin-right: 3px;">
-                            @T("Admin.AppointmentEdit.Status.Cancel")
+                            @T("Admin.AppointmentEdit.Cancel")
                         </button>
                         <nop-action-confirmation asp-button-id="cancelappointment" />
                     }
                     @if (Model.CanConfirm)
                     {
                         <button type="submit" name="btnConfirmAppointment" id="btnConfirmAppointment" class="btn btn-primary" style="margin-right: 3px;">
-                            @T("Admin.AppointmentEdit.Status.Confirm")
+                            @T("Admin.AppointmentEdit.Confirm")
                         </button>
                     }
                     <button type="submit" name="btnCloseAppointmentEdit" id="btnCloseAppointmentEdit" class="btn bg-teal">

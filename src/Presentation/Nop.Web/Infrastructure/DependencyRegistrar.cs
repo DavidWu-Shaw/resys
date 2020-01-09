@@ -5,6 +5,7 @@ using Nop.Core.Infrastructure.DependencyManagement;
 using Nop.Web.Areas.Admin.Factories;
 using Nop.Web.Framework.Factories;
 using Nop.Web.Infrastructure.Installation;
+using Nop.Web.Models.Self;
 
 namespace Nop.Web.Infrastructure
 {
@@ -100,6 +101,7 @@ namespace Nop.Web.Infrastructure
             builder.RegisterType<Factories.PollModelFactory>().As<Factories.IPollModelFactory>().InstancePerLifetimeScope();
             builder.RegisterType<Factories.PrivateMessagesModelFactory>().As<Factories.IPrivateMessagesModelFactory>().InstancePerLifetimeScope();
             builder.RegisterType<Factories.ProductModelFactory>().As<Factories.IProductModelFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<AppointmentModelFactory>().As<IAppointmentModelFactory>().InstancePerLifetimeScope();
             builder.RegisterType<Factories.ProfileModelFactory>().As<Factories.IProfileModelFactory>().InstancePerLifetimeScope();
             builder.RegisterType<Factories.ReturnRequestModelFactory>().As<Factories.IReturnRequestModelFactory>().InstancePerLifetimeScope();
             builder.RegisterType<Factories.ShoppingCartModelFactory>().As<Factories.IShoppingCartModelFactory>().InstancePerLifetimeScope();

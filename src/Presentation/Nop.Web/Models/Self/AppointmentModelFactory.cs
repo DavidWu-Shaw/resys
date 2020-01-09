@@ -1,12 +1,45 @@
 ﻿using Nop.Core.Domain.Self;
+using Nop.Services.Helpers;
 
 namespace Nop.Web.Models.Self
 {
-    public static class AppointmentModelFactory
+    public partial class AppointmentModelFactory : IAppointmentModelFactory
     {
-        public static AppointmentModel ConvertToModel(Appointment appointment)
+        private readonly IDateTimeHelper _dateTimeHelper;
+
+        public AppointmentModelFactory()
         {
-            var model = new AppointmentModel
+
+        }
+
+        public virtual AppointmentUpdateModel PrepareAppointmentUpdateModel(Appointment appointment)
+        {
+            var model = new AppointmentUpdateModel();
+            if (appointment != null)
+            {
+                model.Id = appointment.Id;
+                model.Status = appointment.Status;
+                model.ResourceId = appointment.ResourceId;
+                model.CustomerId = appointment.CustomerId;
+                if (appointment.Customer != null)
+                {
+                    model.CustomerEmail = appointment.Customer.Email;
+                }
+                model.CanCancel = appointment.Status != AppointmentStatusType.Free;
+                model.CanRequest = appointment.Status == AppointmentStatusType.Free;
+            }
+            else
+            {
+                model.Status = AppointmentStatusType.Free;
+                model.CanRequest = true;
+            }
+
+            return model;
+        }
+
+        public virtual AppointmentInfoModel PrepareAppointmentInfoModel(Appointment appointment)
+        {
+            var model = new AppointmentInfoModel
             {
                 id = appointment.Id.ToString(),
                 start = appointment.StartTimeUtc.ToLocalTime().ToString("yyyy-MM-ddTHH:mm:ss"),

@@ -1,0 +1,10 @@
+﻿using Nop.Web.Framework.Models;
+using Nop.Web.Models.Self;
+
+namespace Nop.Web.Models.Catalog
+{
+    public partial class ProductDetailsModel : BaseNopEntityModel
+    {
+        public AppointmentUpdateModel AppointmentUpdateModel { get; set; }
+    }
+}

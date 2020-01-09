@@ -1,9 +1,9 @@
 ﻿@model ProductDetailsModel
 
 <div id="book-time" class="book-main">
-    <h3>@T("ShoppingCart.AddToCart"): @Model.Name</h3>
+    <h3>@T("Product.BookTime"): @Model.Name</h3>
     <br />
-    <div>
+    <div id="booking-calendar">
         <div class="column-left">
             <div id="nav"></div>
         </div>
@@ -11,6 +11,9 @@
             <div class="toolbar">Available time slots:</div>
             <div id="calendar"></div>
         </div>
+    </div>
+    <div id="booking-request-form">
+        @await Html.PartialAsync("_AppointmentUpdateForm", Model.AppointmentUpdateModel)        
     </div>
 </div>
 <script type="text/javascript">
@@ -68,21 +71,18 @@
         };
 
         $.ajax({
-            url: "@Url.Action("AppointmentRequest", "Appointment")",
-            type: "post",
+            url: "@Url.Action("AppointmentUpdate", "Product")",
+            type: "get",
             data: params,
             cache: false
         })
         .done(function (result) {
-            if (result.status) {
-                loadEvents();
-            }
-            else {
-
-            }
+            console.log("result =", result);
+            $("#booking-calendar").hide();
         })
         .fail(function (result) {
             // Error
+            console.log("fail result =", result);
         });
     };
 
@@ -100,7 +100,7 @@
 
         console.log(params);
         $.ajax({
-            url: "@Url.Action("AvailableSlotsByCustomer", "Appointment")",
+            url: "@Url.Action("AppointmentSlotsByCustomer", "Product")",
             type: "post",
             data: params,
             cache: false
@@ -117,4 +117,50 @@
             // Error
         });
     }
+</script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#btnRequestAppointment").click(function () {
+            var params = {
+                id: @Model.Id
+            };
+            console.log(params);
+            $.ajax({
+                url: "@Url.Action("AppointmentRequest", "Product")",
+                type: "post",
+                datatype: "json",
+                data: params,
+                cache: false
+            }).done(function (result) {
+                console.log("result=", result);
+                modal.close(result);
+            }).fail(function (result) {
+                // Error
+                console.log("fail result=", result);
+            });
+        });
+
+        $("#btnCancelAppointment").click(function () {
+            var params = {
+                id: @Model.Id
+            };
+            console.log(params);
+            $.ajax({
+                url: "@Url.Action("AppointmentCancel", "Product")",
+                type: "post",
+                datatype: "json",
+                data: params,
+                cache: false
+            })
+            .done(function (result) {
+                console.log("result=", result);
+                modal.close(result);
+            })
+            .fail(function (result) {
+                // Error
+                console.log("fail result=", result);
+            });
+        });
+    });
 </script>
