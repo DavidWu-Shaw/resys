@@ -10,21 +10,7 @@ namespace Nop.Web.Models.Self
         public string TimeSlot { get; set; }
         [NopResourceDisplayName("Product.Appointment.Fields.Status")]
         public AppointmentStatusType Status { get; set; }
-        public int ResourceId { get; set; }
-        public int CustomerId { get; set; }
-
-        [NopResourceDisplayName("Product.Appointment.Fields.CustomerEmail")]
-        public string CustomerEmail { get; set; }
-        [NopResourceDisplayName("Product.Appointment.Fields.CustomerFirstName")]
-        public string CustomerFirstName { get; set; }
-        [NopResourceDisplayName("Product.Appointment.Fields.CustomerLastName")]
-        public string CustomerLastName { get; set; }
-        [NopResourceDisplayName("Product.Appointment.Fields.CustomerPhoneNumber")]
-        public string CustomerPhoneNumber { get; set; }
-        [NopResourceDisplayName("Product.Appointment.Fields.CustomerNotes")]
-        public string CustomerNotes { get; set; }
-
-        public bool CanCancel { get; set; }
-        public bool CanRequest { get; set; }
+        [NopResourceDisplayName("Product.Appointment.Fields.Notes")]
+        public string Notes { get; set; }
     }
 }

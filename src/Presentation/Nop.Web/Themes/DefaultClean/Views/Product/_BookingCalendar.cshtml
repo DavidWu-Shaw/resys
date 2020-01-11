@@ -2,18 +2,51 @@
 
 <div id="book-time" class="book-main">
     <h3>@T("Product.BookTime"): @Model.Name</h3>
-    <br />
-    <div id="booking-calendar">
-        <div class="column-left">
-            <div id="nav"></div>
+    <div class="fieldset">
+        <div class="form-fields">
+            <div id="selectedTimeBar" class="title">
+                <strong>@T("Product.BookTime.SelectTimeSlot"): </strong>
+                <span></span>
+            </div>
+            <div id="booking-calendar" class="form-fields">
+                <div class="column-left">
+                    <div id="nav"></div>
+                </div>
+                <div class="column-main">
+                    <div id="calendar"></div>
+                </div>
+            </div>
         </div>
-        <div class="column-main">
-            <div class="toolbar">Available time slots:</div>
-            <div id="calendar"></div>
+        <div class="form-fields" id="booking-request">
+            <div class="title">
+                <strong>@T("Product.BookTime.Notes"):</strong>
+            </div>
+            <div class="inputs">
+                <textarea id="txtNotes" name="Notes"></textarea>
+            </div>
+            <input type="hidden" id="appointmentId" />
+            <div class="buttons">
+                <button type="submit" name="btnCancelAppointment" id="btnCancelAppointment" class="btn bg-red" style="margin-right: 3px;">
+                    @T("Product.BookTime.AppointmentUpdate.Cancel")
+                </button>
+                <button type="submit" name="btnRequestAppointment" id="btnRequestAppointment" class="btn btn-primary" style="margin-right: 3px;">
+                    @T("Product.BookTime.AppointmentUpdate.Request")
+                </button>
+            </div>
         </div>
-    </div>
-    <div id="booking-request-form">
-        @await Html.PartialAsync("_AppointmentUpdateForm", Model.AppointmentUpdateModel)        
+        <div class="form-fields" id="message">
+            <div class="title">
+                <p id="rs-message">@T("Product.BookTime.Request.Success")</p>
+                <p id="rf-message">@T("Product.BookTime.Request.Failed")</p>
+                <p id="cs-message">@T("Product.BookTime.Cancel.Success")</p>
+                <p id="cf-message">@T("Product.BookTime.Cancel.Failed")</p>
+            </div>
+            <div class="buttons">
+                <button type="submit" name="btnBackToCalendar" id="btnBackToCalendar" class="btn btn-primary" style="display:none">
+                    @T("Product.BookTime.AppointmentUpdate.BackToCalendar")
+                </button>
+            </div>
+        </div>
     </div>
 </div>
 <script type="text/javascript">
@@ -61,10 +94,6 @@
     };
 
     calendar.onEventClick = function (args) {
-        if (args.e.tag("status") !== "Free") {
-            calendar.message("You can only request a new appointment in a free slot.");
-            return;
-        }
         console.log(args);
         var params = {
             id: args.e.id(),
@@ -78,7 +107,7 @@
         })
         .done(function (result) {
             console.log("result =", result);
-            $("#booking-calendar").hide();
+            DisplaySelectedSlot(result);
         })
         .fail(function (result) {
             // Error
@@ -120,10 +149,78 @@
 </script>
 
 <script type="text/javascript">
+
+    function DisplaySelectedSlot(result) {
+        $("#selectedTimeBar span").text(result.TimeSlot);
+        $("#appointmentId").val(result.Id);
+        $("#txtNotes").val(result.Notes);
+        $("#btnBackToCalendar").show();
+        $("#booking-calendar").hide();
+        $("#booking-request").show();
+        switch (result.Status) {
+            case 0:
+                $("#btnRequestAppointment").show();
+                $("#btnCancelAppointment").hide();
+                break;
+            case 1:
+                $("#btnRequestAppointment").hide();
+                $("#btnCancelAppointment").show();
+                break;
+            default:
+                $("#btnRequestAppointment").hide();
+                $("#btnCancelAppointment").hide();
+        }
+    }
+
+    function ClearSelectedSlot() {
+        $("#selectedTimeBar span").text("");
+        $("#btnBackToCalendar").hide();
+        $("#booking-calendar").show();
+        $("#appointmentId").val("");
+        $("#booking-request").hide();
+        $("#rs-message").hide();
+        $("#rf-message").hide();
+        $("#cs-message").hide();
+        $("#cf-message").hide();
+    }
+
+    function DisplayRequestedMessage(status) {
+        if (status) {
+            $("#rs-message").show();
+        }
+        else {
+            $("#rf-message").show();
+        }
+    }
+
+    function DisplayCancelledMessage(status) {
+        if (status) {
+            $("#cs-message").show();
+        }
+        else {
+            $("#cf-message").show();
+        }
+    }
+
     $(document).ready(function () {
+
+        ClearSelectedSlot();
+
+        $("#selectedTimeBar").click(function () {
+            ClearSelectedSlot();
+            loadEvents();
+        });
+
+        $("#btnBackToCalendar").click(function () {
+            ClearSelectedSlot();
+            loadEvents();
+            return false;
+        });
+
         $("#btnRequestAppointment").click(function () {
             var params = {
-                id: @Model.Id
+                id: $("#appointmentId").val(),
+                notes: $("#txtNotes").val()
             };
             console.log(params);
             $.ajax({
@@ -134,16 +231,20 @@
                 cache: false
             }).done(function (result) {
                 console.log("result=", result);
-                modal.close(result);
+                $("#booking-request").hide();
+                DisplayRequestedMessage(true);
             }).fail(function (result) {
                 // Error
                 console.log("fail result=", result);
+                $("#booking-request").hide();
+                DisplayRequestedMessage(false);
             });
+            return false;
         });
 
         $("#btnCancelAppointment").click(function () {
             var params = {
-                id: @Model.Id
+                id: $("#appointmentId").val()
             };
             console.log(params);
             $.ajax({
@@ -152,15 +253,17 @@
                 datatype: "json",
                 data: params,
                 cache: false
-            })
-            .done(function (result) {
+            }).done(function (result) {
                 console.log("result=", result);
-                modal.close(result);
-            })
-            .fail(function (result) {
+                $("#booking-request").hide();
+                DisplayCancelledMessage(true);
+            }).fail(function (result) {
                 // Error
                 console.log("fail result=", result);
+                $("#booking-request").hide();
+                DisplayCancelledMessage(false);
             });
+            return false;
         });
     });
 </script>

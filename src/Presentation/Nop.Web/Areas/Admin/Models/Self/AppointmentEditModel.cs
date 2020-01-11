@@ -5,12 +5,14 @@ using System;
 
 namespace Nop.Web.Areas.Admin.Models.Self
 {
-    public class AppointmentModel : BaseNopEntityModel
+    public class AppointmentEditModel : BaseNopEntityModel
     {
         public DateTime StartTimeUtc { get; set; }
         public DateTime EndTimeUtc { get; set; }
         [NopResourceDisplayName("Admin.Appointment.Fields.Status")]
         public AppointmentStatusType Status { get; set; }
+        [NopResourceDisplayName("Admin.Appointment.Fields.Notes")]
+        public string Notes { get; set; }
         public int ResourceId { get; set; }
         [NopResourceDisplayName("Admin.Appointment.Fields.Customer")]
         public int CustomerId { get; set; }

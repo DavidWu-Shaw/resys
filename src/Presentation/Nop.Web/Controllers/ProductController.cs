@@ -12,6 +12,7 @@ using Nop.Core.Domain.Self;
 using Nop.Core.Rss;
 using Nop.Services.Catalog;
 using Nop.Services.Events;
+using Nop.Services.Helpers;
 using Nop.Services.Localization;
 using Nop.Services.Logging;
 using Nop.Services.Messages;
@@ -55,6 +56,7 @@ namespace Nop.Web.Controllers
         private readonly IStoreMappingService _storeMappingService;
         private readonly IUrlRecordService _urlRecordService;
         private readonly IWebHelper _webHelper;
+        private readonly IDateTimeHelper _dateTimeHelper;
         private readonly IWorkContext _workContext;
         private readonly IWorkflowMessageService _workflowMessageService;
         private readonly LocalizationSettings _localizationSettings;
@@ -83,6 +85,7 @@ namespace Nop.Web.Controllers
             IStoreMappingService storeMappingService,
             IUrlRecordService urlRecordService,
             IWebHelper webHelper,
+            IDateTimeHelper dateTimeHelper,
             IWorkContext workContext,
             IWorkflowMessageService workflowMessageService,
             LocalizationSettings localizationSettings,
@@ -107,6 +110,7 @@ namespace Nop.Web.Controllers
             _storeMappingService = storeMappingService;
             _urlRecordService = urlRecordService;
             _webHelper = webHelper;
+            _dateTimeHelper = dateTimeHelper;
             _workContext = workContext;
             _workflowMessageService = workflowMessageService;
             _localizationSettings = localizationSettings;
@@ -131,7 +135,9 @@ namespace Nop.Web.Controllers
         [HttpPost]
         public virtual IActionResult AppointmentSlotsByCustomer(DateTime start, DateTime end, int resourceId)
         {
-            var events = _appointmentService.GetAvailableAppointmentsByCustomer(start, end, resourceId, _workContext.CurrentCustomer.Id);
+            var startTimeUtc = _dateTimeHelper.ConvertToUtcTime(start);
+            var endTimeUtc = _dateTimeHelper.ConvertToUtcTime(end);
+            var events = _appointmentService.GetAvailableAppointmentsByCustomer(startTimeUtc, endTimeUtc, resourceId, _workContext.CurrentCustomer.Id);
 
             var model = new List<AppointmentInfoModel>();
             foreach (var appointment in events)
@@ -144,7 +150,7 @@ namespace Nop.Web.Controllers
         }
 
         [HttpPost]
-        public virtual IActionResult AppointmentRequest(int id)
+        public virtual IActionResult AppointmentRequest(int id, string notes)
         {
             if (_workContext.CurrentCustomer.IsGuest())
                 return Challenge();
@@ -154,6 +160,7 @@ namespace Nop.Web.Controllers
             {
                 requestedAppointment.CustomerId = _workContext.CurrentCustomer.Id;
                 requestedAppointment.Status = AppointmentStatusType.Waiting;
+                requestedAppointment.Notes = notes;
                 _appointmentService.UpdateAppointment(requestedAppointment);
 
                 return Json(new { status = true, responseText = $"Appointment requested." });
@@ -170,6 +177,7 @@ namespace Nop.Web.Controllers
             var requestedAppointment = _appointmentService.GetAppointmentById(id);
             requestedAppointment.Status = AppointmentStatusType.Free;
             requestedAppointment.CustomerId = 0;
+            requestedAppointment.Notes = "";
             _appointmentService.UpdateAppointment(requestedAppointment);
 
             return Json(new { status = true, responseText = $"Appointment cancelled." });
@@ -250,7 +258,6 @@ namespace Nop.Web.Controllers
 
             //model
             var model = _productModelFactory.PrepareProductDetailsModel(product, updatecartitem, false);
-            model.AppointmentUpdateModel = _appointmentModelFactory.PrepareAppointmentUpdateModel(null);
             //template
             var productTemplateViewPath = _productModelFactory.PrepareProductTemplateViewPath(product);
 

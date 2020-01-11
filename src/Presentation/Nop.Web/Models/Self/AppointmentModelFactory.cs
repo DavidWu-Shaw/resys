@@ -1,5 +1,6 @@
 ﻿using Nop.Core.Domain.Self;
 using Nop.Services.Helpers;
+using System;
 
 namespace Nop.Web.Models.Self
 {
@@ -7,9 +8,9 @@ namespace Nop.Web.Models.Self
     {
         private readonly IDateTimeHelper _dateTimeHelper;
 
-        public AppointmentModelFactory()
+        public AppointmentModelFactory(IDateTimeHelper dateTimeHelper)
         {
-
+            _dateTimeHelper = dateTimeHelper;
         }
 
         public virtual AppointmentUpdateModel PrepareAppointmentUpdateModel(Appointment appointment)
@@ -18,20 +19,11 @@ namespace Nop.Web.Models.Self
             if (appointment != null)
             {
                 model.Id = appointment.Id;
+                var start = _dateTimeHelper.ConvertToUserTime(appointment.StartTimeUtc, DateTimeKind.Utc);
+                var end = _dateTimeHelper.ConvertToUserTime(appointment.EndTimeUtc, DateTimeKind.Utc);
+                model.TimeSlot = $"{start.ToShortTimeString()} - {end.ToShortTimeString()} on {start.ToShortDateString()}";
                 model.Status = appointment.Status;
-                model.ResourceId = appointment.ResourceId;
-                model.CustomerId = appointment.CustomerId;
-                if (appointment.Customer != null)
-                {
-                    model.CustomerEmail = appointment.Customer.Email;
-                }
-                model.CanCancel = appointment.Status != AppointmentStatusType.Free;
-                model.CanRequest = appointment.Status == AppointmentStatusType.Free;
-            }
-            else
-            {
-                model.Status = AppointmentStatusType.Free;
-                model.CanRequest = true;
+                model.Notes = appointment.Notes;
             }
 
             return model;

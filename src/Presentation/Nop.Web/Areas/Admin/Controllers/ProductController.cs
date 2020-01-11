@@ -790,12 +790,13 @@ namespace Nop.Web.Areas.Admin.Controllers
                 return RedirectToAction("List");
 
             //prepare model
-            var model = new AppointmentModel
+            var model = new AppointmentEditModel
             {
                 Id = appointment.Id,
                 StartTimeUtc = appointment.StartTimeUtc,
                 EndTimeUtc = appointment.EndTimeUtc,
                 Status = appointment.Status,
+                Notes = appointment.Notes,
                 ResourceId = appointment.ResourceId,
                 CustomerId = appointment.CustomerId,
                 CustomerFullName = appointment.Customer.Email,
@@ -840,7 +841,7 @@ namespace Nop.Web.Areas.Admin.Controllers
                     StartTimeUtc = slot.Start.ToUniversalTime(),
                     EndTimeUtc = slot.End.ToUniversalTime(),
                     ResourceId = resourceId,
-                    Label = string.Empty,
+                    Notes = string.Empty,
                     Status = AppointmentStatusType.Free
                 };
 
