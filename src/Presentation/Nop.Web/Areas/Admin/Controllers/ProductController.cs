@@ -11,6 +11,7 @@ using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Discounts;
 using Nop.Core.Domain.Media;
 using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.Self;
 using Nop.Core.Domain.Vendors;
 using Nop.Core.Infrastructure;
 using Nop.Services.Catalog;
@@ -19,17 +20,21 @@ using Nop.Services.Configuration;
 using Nop.Services.Customers;
 using Nop.Services.Discounts;
 using Nop.Services.ExportImport;
+using Nop.Services.Helpers;
 using Nop.Services.Localization;
 using Nop.Services.Logging;
 using Nop.Services.Media;
 using Nop.Services.Messages;
 using Nop.Services.Orders;
 using Nop.Services.Security;
+using Nop.Services.Self;
 using Nop.Services.Seo;
 using Nop.Services.Shipping;
 using Nop.Web.Areas.Admin.Factories;
+using Nop.Web.Areas.Admin.Helpers;
 using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Catalog;
+using Nop.Web.Areas.Admin.Models.Self;
 using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.Filters;
@@ -38,6 +43,11 @@ namespace Nop.Web.Areas.Admin.Controllers
 {
     public partial class ProductController : BaseAdminController
     {
+        public const int MORNING_SHIFT_STARTS = 9;
+        public const int MORNING_SHIFT_ENDS = 13;
+        public const int AFTERNOON_SHIFT_STARTS = 14;
+        public const int AFTERNOON_SHIFT_ENDS = 18;
+
         #region Fields
 
         private readonly IAclService _aclService;
@@ -62,7 +72,9 @@ namespace Nop.Web.Areas.Admin.Controllers
         private readonly IProductAttributeParser _productAttributeParser;
         private readonly IProductAttributeService _productAttributeService;
         private readonly IProductModelFactory _productModelFactory;
+        private readonly IAppointmentModelFactory _appointmentModelFactory;
         private readonly IProductService _productService;
+        private readonly IAppointmentService _appointmentService;
         private readonly IProductTagService _productTagService;
         private readonly ISettingService _settingService;
         private readonly IShippingService _shippingService;
@@ -70,6 +82,7 @@ namespace Nop.Web.Areas.Admin.Controllers
         private readonly ISpecificationAttributeService _specificationAttributeService;
         private readonly IUrlRecordService _urlRecordService;
         private readonly IWorkContext _workContext;
+        private readonly IDateTimeHelper _dateTimeHelper;
         private readonly VendorSettings _vendorSettings;
 
         #endregion
@@ -98,7 +111,9 @@ namespace Nop.Web.Areas.Admin.Controllers
             IProductAttributeParser productAttributeParser,
             IProductAttributeService productAttributeService,
             IProductModelFactory productModelFactory,
+            IAppointmentModelFactory appointmentModelFactory,
             IProductService productService,
+            IAppointmentService appointmentService,
             IProductTagService productTagService,
             ISettingService settingService,
             IShippingService shippingService,
@@ -106,6 +121,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             ISpecificationAttributeService specificationAttributeService,
             IUrlRecordService urlRecordService,
             IWorkContext workContext,
+            IDateTimeHelper dateTimeHelper,
             VendorSettings vendorSettings)
         {
             _aclService = aclService;
@@ -130,7 +146,9 @@ namespace Nop.Web.Areas.Admin.Controllers
             _productAttributeParser = productAttributeParser;
             _productAttributeService = productAttributeService;
             _productModelFactory = productModelFactory;
+            _appointmentModelFactory = appointmentModelFactory;
             _productService = productService;
+            _appointmentService = appointmentService;
             _productTagService = productTagService;
             _settingService = settingService;
             _shippingService = shippingService;
@@ -138,6 +156,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             _specificationAttributeService = specificationAttributeService;
             _urlRecordService = urlRecordService;
             _workContext = workContext;
+            _dateTimeHelper = dateTimeHelper;
             _vendorSettings = vendorSettings;
         }
 
@@ -721,6 +740,199 @@ namespace Nop.Web.Areas.Admin.Controllers
 
         #endregion
 
+        #region Appointment Methods
+
+        /// <summary>
+        /// Get method for /Admin/Product/AppointmentSchedule/{productId}
+        /// </summary>
+        /// <param name="id">Product Id</param>
+        /// <returns></returns>
+        public virtual IActionResult AppointmentSchedule(int id)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageProducts))
+                return AccessDeniedView();
+
+            //try to get a product with the specified id
+            var product = _productService.GetProductById(id);
+            if (product == null || product.Deleted)
+                return RedirectToAction("List");
+
+            //a vendor should have access only to his products
+            if (_workContext.CurrentVendor != null && product.VendorId != _workContext.CurrentVendor.Id)
+                return RedirectToAction("List");
+
+            //prepare model
+            var model = _productModelFactory.PrepareProductModel(null, product);
+
+            return View(model);
+        }
+
+        /// <summary>
+        /// Get method for /Admin/Product/AppointmentCalendar/{productId}
+        /// </summary>
+        /// <param name="id">Product Id</param>
+        /// <returns></returns>
+        public virtual IActionResult AppointmentCalendar(int id)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageProducts))
+                return AccessDeniedView();
+
+            //try to get a product with the specified id
+            var product = _productService.GetProductById(id);
+            if (product == null || product.Deleted)
+                return RedirectToAction("List");
+
+            //a vendor should have access only to his products
+            if (_workContext.CurrentVendor != null && product.VendorId != _workContext.CurrentVendor.Id)
+                return RedirectToAction("List");
+
+            //prepare model
+            var model = _productModelFactory.PrepareProductModel(null, product);
+
+            return View(model);
+        }
+
+        /// <summary>
+        /// Get method for /Admin/Product/AppointmentEdit/{appointmentId}
+        /// </summary>
+        /// <param name="id">Appointment Id</param>
+        /// <returns></returns>
+        public virtual IActionResult AppointmentEdit(int id)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageProducts))
+                return AccessDeniedView();
+
+            var appointment = _appointmentService.GetAppointmentById(id);
+            if (appointment == null)
+                return RedirectToAction("AppointmentCalendar");
+
+            //a vendor should have access only to his products
+            if (_workContext.CurrentVendor != null && appointment.Product.VendorId != _workContext.CurrentVendor.Id)
+                return RedirectToAction("List");
+
+            //prepare model
+            var model = _appointmentModelFactory.PrepareAppointmentEditModel(appointment);
+            // TODO: remove admin user later
+            model.IsLoggedInAsVendor = _workContext.CurrentVendor != null || _workContext.IsAdmin;
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public virtual IActionResult AppointmentList(DateTime start, DateTime end, int resourceId)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageProductReviews))
+                return AccessDeniedDataTablesJson();
+
+            var appointments = _appointmentService.GetAppointmentsByResource(start, end, resourceId);
+
+            var model = new List<AppointmentInfoModel>();
+            foreach (var appointment in appointments)
+            {
+                var item = _appointmentModelFactory.PrepareAppointmentInfoModel(appointment);
+                model.Add(item);
+            }
+
+            return Json(model);
+        }
+
+        [HttpPost]
+        public virtual IActionResult AppointmentCreate(DateTime start, DateTime end, int resourceId, string scale)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageProductReviews))
+                return AccessDeniedView();
+
+            var timeSlots = GetSlots(start, end, scale);
+            foreach (var slot in timeSlots)
+            {
+                Appointment appointment = new Appointment
+                {
+                    StartTimeUtc = slot.Start.ToUniversalTime(),
+                    EndTimeUtc = slot.End.ToUniversalTime(),
+                    ResourceId = resourceId,
+                    Notes = string.Empty,
+                    Status = AppointmentStatusType.Free
+                };
+
+                _appointmentService.InsertAppointment(appointment);
+            }
+
+            return Json(new { status = true, responseText = $"{timeSlots.Count} records created." });
+        }
+
+        private List<TimeSlot> GetSlots(DateTime start, DateTime end, string scale)
+        {
+            if (scale == "shifts")
+            {
+                return GetSlotsByShift(start, end);
+            }
+            else
+            {
+                var helper = new AppointmentTimeSlotHelper(MORNING_SHIFT_STARTS, MORNING_SHIFT_ENDS, AFTERNOON_SHIFT_STARTS, AFTERNOON_SHIFT_ENDS);
+                return helper.GetSlotsByHour(start, end);
+            }
+        }
+
+        private List<TimeSlot> GetSlotsByShift(DateTime start, DateTime end)
+        {
+            var result = new List<TimeSlot>();
+
+            return result;
+        }
+
+        [HttpPost]
+        public virtual IActionResult AppointmentConfirm(int id)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageProductReviews))
+                return AccessDeniedView();
+
+            var appointment = _appointmentService.GetAppointmentById(id);
+            if (appointment != null && appointment.Status == AppointmentStatusType.Waiting)
+            {
+                appointment.Status = AppointmentStatusType.Confirmed;
+                _appointmentService.UpdateAppointment(appointment);
+
+                return Json(new { status = true, responseText = $"Appointment confirmed." });
+            }
+            // Customer may have just concelled this appointment
+            return Json(new { status = false, responseText = $"Appointment confirm failed." });
+        }
+
+        [HttpPost]
+        public virtual IActionResult AppointmentCancel(int id)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageProductReviews))
+                return AccessDeniedView();
+
+            var appointment = _appointmentService.GetAppointmentById(id);
+            if (appointment != null && (appointment.Status == AppointmentStatusType.Waiting || appointment.Status == AppointmentStatusType.Confirmed))
+            {
+                appointment.Status = AppointmentStatusType.Free;
+                appointment.CustomerId = 0;
+                _appointmentService.UpdateAppointment(appointment);
+
+                return Json(new { status = true, responseText = $"Appointment cancelled." });
+            }
+            return Json(new { status = false, responseText = $"Appointment cancellation failed." });
+        }
+
+        [HttpPost]
+        public virtual IActionResult AppointmentDelete(int id)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageProductReviews))
+                return AccessDeniedView();
+
+            var appointment = _appointmentService.GetAppointmentById(id);
+            if (appointment != null && appointment.Status == AppointmentStatusType.Free)
+            {
+                _appointmentService.DeleteAppointment(appointment);
+                return Json(new { status = true, responseText = "Deleted." });
+            }
+            return Json(new { status = false, responseText = "Delete failed." });
+        }
+
+        #endregion Appointment Methods
+
         #region Methods
 
         #region Product list / create / edit / delete
@@ -867,46 +1079,6 @@ namespace Nop.Web.Areas.Admin.Controllers
             model = _productModelFactory.PrepareProductModel(model, null, true);
 
             //if we got this far, something failed, redisplay form
-            return View(model);
-        }
-
-        public virtual IActionResult Schedule(int id)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageProducts))
-                return AccessDeniedView();
-
-            //try to get a product with the specified id
-            var product = _productService.GetProductById(id);
-            if (product == null || product.Deleted)
-                return RedirectToAction("List");
-
-            //a vendor should have access only to his products
-            if (_workContext.CurrentVendor != null && product.VendorId != _workContext.CurrentVendor.Id)
-                return RedirectToAction("List");
-
-            //prepare model
-            var model = _productModelFactory.PrepareProductModel(null, product);
-
-            return View(model);
-        }
-
-        public virtual IActionResult Calendar(int id)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageProducts))
-                return AccessDeniedView();
-
-            //try to get a product with the specified id
-            var product = _productService.GetProductById(id);
-            if (product == null || product.Deleted)
-                return RedirectToAction("List");
-
-            //a vendor should have access only to his products
-            if (_workContext.CurrentVendor != null && product.VendorId != _workContext.CurrentVendor.Id)
-                return RedirectToAction("List");
-
-            //prepare model
-            var model = _productModelFactory.PrepareProductModel(null, product);
-
             return View(model);
         }
 

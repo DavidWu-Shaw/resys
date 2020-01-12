@@ -15,6 +15,10 @@
             </small>
         </h1>
         <div class="pull-right">
+            <a asp-action="AppointmentCalendar" asp-route-id="@Model.Id" class="btn bg-purple-active">
+                <i class="fa fa-eye"></i>
+                @T("Admin.Common.Calendar")
+            </a>
             <button type="button" onclick="javascript:OpenWindow('@Url.RouteUrl("Product", new {SeName = Model.SeName})', 800, 600, true); return false;" class="btn bg-purple">
                 <i class="fa fa-eye"></i>
                 @T("Admin.Common.Preview")
@@ -23,7 +27,6 @@
     </div>
     <div class="content">
         <div class="form-horizontal">
-
             <div class="column-left">
                 <div id="nav"></div>
             </div>
@@ -72,23 +75,26 @@
     scheduler.eventClickHandling = "Disabled";
     scheduler.eventMoveHandling = "Disabled";
     scheduler.eventResizeHandling = "Disabled";
-    scheduler.allowEventOverlap = false,
+    scheduler.allowEventOverlap = false;
+    scheduler.businessBeginsHour = @Model.ProductScheduleModel.BusinessBeginsHour;
+    scheduler.businessEndsHour = @Model.ProductScheduleModel.BusinessEndsHour;
+    scheduler.businessWeekends = true;
 
-        scheduler.onBeforeTimeHeaderRender = function (args) {
-            args.header.html = args.header.html.replace(" AM", "a").replace(" PM", "p");  // shorten the hour header
-        };
+    scheduler.onBeforeTimeHeaderRender = function (args) {
+        args.header.html = args.header.html.replace(" AM", "a").replace(" PM", "p");  // shorten the hour header
+    };
 
     scheduler.onBeforeEventRender = function (args) {
         switch (args.data.tags.status) {
-            case "free":
+            case "Free":
                 args.data.barColor = "green";
                 args.data.deleteDisabled = $('input[name=scale]:checked').val() === "shifts";  // only allow deleting in the more detailed hour scale mode
                 break;
-            case "waiting":
+            case "Waiting":
                 args.data.barColor = "orange";
                 args.data.deleteDisabled = true;
                 break;
-            case "confirmed":
+            case "Confirmed":
                 args.data.barColor = "#f41616";  // red
                 args.data.deleteDisabled = true;
                 break;
@@ -102,11 +108,12 @@
         addAntiForgeryToken(params);
 
         $.ajax({
-            url: "@Url.Action("Delete", "Appointment")",
+            url: "@Url.Action("AppointmentDelete", "Product")",
             type: "post",
             data: params
         })
-        .done(function (result) {
+            .done(function (result) {
+                console.log("result=", result);
             scheduler.message("Deleted.");
         });
     };
@@ -124,11 +131,11 @@
         addAntiForgeryToken(params);
 
         $.ajax({
-            url: "@Url.Action("Create", "Appointment")",
+            url: "@Url.Action("AppointmentCreate", "Product")",
             type: "post",
             data: params
-        }).done(function (result) {
-            console.log(result);
+        })
+        .done(function (result) {
             loadEvents();
             dp.message(result.responseText);
         });
@@ -157,13 +164,12 @@
         addAntiForgeryToken(params);
 
         $.ajax({
-            url: "@Url.Action("List", "Appointment")",
+            url: "@Url.Action("AppointmentList", "Product")",
             type: "post",
             data: params,
             cache: false,
         })
         .done(function (result) {
-            console.log(result);
             scheduler.timeline = getTimeline(day);
             scheduler.events.list = result;
             scheduler.update();
@@ -195,10 +201,10 @@
         var scale = $("input[name=scale]:checked").val();
         var businessOnly = $("#business-only").prop("checked");
 
-        var morningShiftStarts = 9;
+        var morningShiftStarts = @Model.ProductScheduleModel.BusinessBeginsHour;
         var morningShiftEnds = 13;
         var afternoonShiftStarts = 14;
-        var afternoonShiftEnds = 18;
+        var afternoonShiftEnds = @Model.ProductScheduleModel.BusinessEndsHour;
 
         if (!businessOnly) {
             var morningShiftStarts = 0;

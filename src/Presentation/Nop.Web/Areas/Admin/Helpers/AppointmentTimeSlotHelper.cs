@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Nop.Web.Areas.Admin.Models.Self;
+using System;
 using System.Collections.Generic;
-using Nop.Web.Models.Self;
 
 namespace Nop.Web.Areas.Admin.Helpers
 {

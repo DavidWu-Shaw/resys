@@ -2,7 +2,7 @@
 using Nop.Services.Helpers;
 using System;
 
-namespace Nop.Web.Models.Self
+namespace Nop.Web.Areas.Admin.Models.Self
 {
     public partial class AppointmentModelFactory : IAppointmentModelFactory
     {
@@ -13,17 +13,31 @@ namespace Nop.Web.Models.Self
             _dateTimeHelper = dateTimeHelper;
         }
 
-        public virtual AppointmentUpdateModel PrepareAppointmentUpdateModel(Appointment appointment)
+        public virtual AppointmentEditModel PrepareAppointmentEditModel(Appointment appointment)
         {
-            var model = new AppointmentUpdateModel();
+            var model = new AppointmentEditModel();
             if (appointment != null)
             {
                 model.Id = appointment.Id;
                 var start = _dateTimeHelper.ConvertToUserTime(appointment.StartTimeUtc, DateTimeKind.Utc);
                 var end = _dateTimeHelper.ConvertToUserTime(appointment.EndTimeUtc, DateTimeKind.Utc);
-                model.TimeSlot = $"{start.ToShortTimeString()} - {end.ToShortTimeString()}, {start.ToShortDateString()} {start.ToString("dddd")}, {appointment.Status}";
+                model.TimeSlot = $"{start.ToShortTimeString()} - {end.ToShortTimeString()}, {start.ToShortDateString()} {start.ToString("dddd")}";
                 model.Status = appointment.Status;
                 model.Notes = appointment.Notes;
+                model.CustomerId = appointment.CustomerId;
+                if (appointment.Customer != null)
+                {
+                    model.CustomerFullName = appointment.Customer.Email;
+                    model.CustomerEmail = appointment.Customer.Email;
+                }
+                else
+                {
+                    model.CustomerFullName = "N/A";
+                    model.CustomerEmail = "N/A";
+                }
+                model.CanCancel = appointment.Status == AppointmentStatusType.Confirmed || appointment.Status == AppointmentStatusType.Waiting;
+                model.CanConfirm = appointment.Status == AppointmentStatusType.Waiting;
+                model.CanDelete = appointment.Status == AppointmentStatusType.Free;
             }
 
             return model;

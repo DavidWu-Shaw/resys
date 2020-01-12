@@ -245,22 +245,6 @@
                                     Title = T("Admin.Catalog.Products.Fields.Sku").Text,
                                     Width = "100"
                                 },
-                                new ColumnProperty(nameof(ProductModel.Price))
-                                {
-                                    Title = T("Admin.Catalog.Products.Fields.Price").Text,
-                                    Width = "150",
-                                    Render = new RenderCustom("renderColumnPrice")
-                                },
-                                new ColumnProperty(nameof(ProductModel.StockQuantityStr))
-                                {
-                                    Title = T("Admin.Catalog.Products.Fields.StockQuantity").Text,
-                                    Width = "100"
-                                },
-                                new ColumnProperty(nameof(ProductModel.ProductTypeName))
-                                {
-                                    Title = T("Admin.Catalog.Products.Fields.ProductType").Text,
-                                    Width = "100"
-                                },
                                 new ColumnProperty(nameof(ProductModel.Published))
                                 {
                                     Title = T("Admin.Catalog.Products.Fields.Published").Text,
@@ -280,7 +264,14 @@
                                     Title = T("Admin.Common.Schedule").Text,
                                     Width = "100",
                                     ClassName =  NopColumnClassDefaults.Button,
-                                    Render = new RenderButtonEdit(new DataUrl("Schedule"))
+                                    Render = new RenderButtonEdit(new DataUrl("AppointmentSchedule"))
+                                },
+                                new ColumnProperty(nameof(ProductModel.Id))
+                                {
+                                    Title = T("Admin.Common.Calendar").Text,
+                                    Width = "100",
+                                    ClassName =  NopColumnClassDefaults.Button,
+                                    Render = new RenderButtonView(new DataUrl("AppointmentCalendar"))
                                 }
                             }
                    })

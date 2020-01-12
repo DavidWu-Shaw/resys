@@ -8,14 +8,17 @@ using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Localization;
 using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Security;
+using Nop.Core.Domain.Self;
 using Nop.Core.Rss;
 using Nop.Services.Catalog;
 using Nop.Services.Events;
+using Nop.Services.Helpers;
 using Nop.Services.Localization;
 using Nop.Services.Logging;
 using Nop.Services.Messages;
 using Nop.Services.Orders;
 using Nop.Services.Security;
+using Nop.Services.Self;
 using Nop.Services.Seo;
 using Nop.Services.Stores;
 using Nop.Web.Factories;
@@ -26,6 +29,7 @@ using Nop.Web.Framework.Mvc.Filters;
 using Nop.Web.Framework.Security;
 using Nop.Web.Framework.Security.Captcha;
 using Nop.Web.Models.Catalog;
+using Nop.Web.Models.Self;
 
 namespace Nop.Web.Controllers
 {
@@ -43,13 +47,16 @@ namespace Nop.Web.Controllers
         private readonly IOrderService _orderService;
         private readonly IPermissionService _permissionService;
         private readonly IProductModelFactory _productModelFactory;
+        private readonly IAppointmentModelFactory _appointmentModelFactory;
         private readonly IProductService _productService;
+        private readonly IAppointmentService _appointmentService;
         private readonly IRecentlyViewedProductsService _recentlyViewedProductsService;
         private readonly IShoppingCartService _shoppingCartService;
         private readonly IStoreContext _storeContext;
         private readonly IStoreMappingService _storeMappingService;
         private readonly IUrlRecordService _urlRecordService;
         private readonly IWebHelper _webHelper;
+        private readonly IDateTimeHelper _dateTimeHelper;
         private readonly IWorkContext _workContext;
         private readonly IWorkflowMessageService _workflowMessageService;
         private readonly LocalizationSettings _localizationSettings;
@@ -69,13 +76,16 @@ namespace Nop.Web.Controllers
             IOrderService orderService,
             IPermissionService permissionService,
             IProductModelFactory productModelFactory,
+            IAppointmentModelFactory appointmentModelFactory,
             IProductService productService,
+            IAppointmentService appointmentService,
             IRecentlyViewedProductsService recentlyViewedProductsService,
             IShoppingCartService shoppingCartService,
             IStoreContext storeContext,
             IStoreMappingService storeMappingService,
             IUrlRecordService urlRecordService,
             IWebHelper webHelper,
+            IDateTimeHelper dateTimeHelper,
             IWorkContext workContext,
             IWorkflowMessageService workflowMessageService,
             LocalizationSettings localizationSettings,
@@ -91,13 +101,16 @@ namespace Nop.Web.Controllers
             _orderService = orderService;
             _permissionService = permissionService;
             _productModelFactory = productModelFactory;
+            _appointmentModelFactory = appointmentModelFactory;
             _productService = productService;
+            _appointmentService = appointmentService;
             _recentlyViewedProductsService = recentlyViewedProductsService;
             _shoppingCartService = shoppingCartService;
             _storeContext = storeContext;
             _storeMappingService = storeMappingService;
             _urlRecordService = urlRecordService;
             _webHelper = webHelper;
+            _dateTimeHelper = dateTimeHelper;
             _workContext = workContext;
             _workflowMessageService = workflowMessageService;
             _localizationSettings = localizationSettings;
@@ -105,6 +118,83 @@ namespace Nop.Web.Controllers
         }
 
         #endregion
+
+        #region Appointment Methods
+
+        public virtual IActionResult AppointmentUpdate(int id)
+        {
+            var appointment = _appointmentService.GetAppointmentById(id);
+            if (appointment != null && (appointment.CustomerId == 0 || appointment.CustomerId == _workContext.CurrentCustomer.Id))
+            {
+                //prepare model
+                var model = _appointmentModelFactory.PrepareAppointmentUpdateModel(appointment);
+                return Json(new { status = true, data = model });
+            }
+            else
+            {
+                return Json(new { status = false, data = "Selected time not available." });
+            }
+        }
+
+        [HttpPost]
+        public virtual IActionResult AppointmentSlotsByCustomer(DateTime start, DateTime end, int resourceId)
+        {
+            var startTimeUtc = _dateTimeHelper.ConvertToUtcTime(start);
+            var endTimeUtc = _dateTimeHelper.ConvertToUtcTime(end);
+            var events = _appointmentService.GetAvailableAppointmentsByCustomer(startTimeUtc, endTimeUtc, resourceId, _workContext.CurrentCustomer.Id);
+
+            var model = new List<AppointmentInfoModel>();
+            foreach (var appointment in events)
+            {
+                var item = _appointmentModelFactory.PrepareAppointmentInfoModel(appointment);
+                model.Add(item);
+            }
+
+            return Json(model);
+        }
+
+        [HttpPost]
+        public virtual IActionResult AppointmentRequest(int id, string notes)
+        {
+            if (_workContext.CurrentCustomer.IsGuest())
+                return Challenge();
+
+            var appointment = _appointmentService.GetAppointmentById(id);
+            if (appointment != null && appointment.Status == AppointmentStatusType.Free)
+            {
+                appointment.CustomerId = _workContext.CurrentCustomer.Id;
+                appointment.Status = AppointmentStatusType.Waiting;
+                appointment.Notes = notes;
+                _appointmentService.UpdateAppointment(appointment);
+
+                return Json(new { status = true, responseText = $"Appointment requested." });
+            }
+            else
+            {
+                return Json(new { status = false, responseText = $"Appointment request failed." });
+            }
+        }
+
+        [HttpPost]
+        public virtual IActionResult AppointmentCancel(int id)
+        {
+            var appointment = _appointmentService.GetAppointmentById(id);
+            if (appointment != null && appointment.CustomerId == _workContext.CurrentCustomer.Id)
+            {
+                appointment.Status = AppointmentStatusType.Free;
+                appointment.CustomerId = 0;
+                appointment.Notes = "";
+                _appointmentService.UpdateAppointment(appointment);
+
+                return Json(new { status = true, responseText = $"Appointment cancelled." });
+            }
+            else
+            {
+                return Json(new { status = false, responseText = $"Appointment cancellation failed." });
+            }
+        }
+
+        #endregion Appointment Methods
 
         #region Product details page
 

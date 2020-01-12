@@ -177,6 +177,20 @@ namespace Nop.Web.Areas.Admin.Factories
             return model;
         }
 
+        protected virtual ProductScheduleModel PrepareProductScheduleModel(ProductScheduleModel model, Product product)
+        {
+            if (model == null)
+                throw new ArgumentNullException(nameof(model));
+
+            model.BusinessBeginsHour = 9;
+            model.BusinessEndsHour = 18;
+            model.BusinessMorningShiftEndsHour = 12;
+            model.BusinessAfternoonShiftBeginsHour = 13;
+            model.BusinessOnWeekends = true;
+
+            return model;
+        }        
+
         /// <summary>
         /// Prepare product warehouse inventory models
         /// </summary>
@@ -769,6 +783,7 @@ namespace Nop.Web.Areas.Admin.Factories
 
                 //prepare copy product model
                 PrepareCopyProductModel(model.CopyProductModel, product);
+                PrepareProductScheduleModel(model.ProductScheduleModel, product);
 
                 //prepare nested search model
                 PrepareRelatedProductSearchModel(model.RelatedProductSearchModel, product);

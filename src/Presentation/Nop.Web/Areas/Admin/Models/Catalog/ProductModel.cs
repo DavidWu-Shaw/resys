@@ -62,6 +62,7 @@ namespace Nop.Web.Areas.Admin.Models.Catalog
             StockQuantityHistorySearchModel = new StockQuantityHistorySearchModel();
             ProductAttributeMappingSearchModel = new ProductAttributeMappingSearchModel();
             ProductAttributeCombinationSearchModel = new ProductAttributeCombinationSearchModel();
+            ProductScheduleModel = new ProductScheduleModel();
         }
 
         #endregion
@@ -438,7 +439,8 @@ namespace Nop.Web.Areas.Admin.Models.Catalog
 
         //copy product
         public CopyProductModel CopyProductModel { get; set; }
-
+        // Schedule settings
+        public ProductScheduleModel ProductScheduleModel { get; set; }
         //editor settings
         public ProductEditorSettingsModel ProductEditorSettingsModel { get; set; }
 
