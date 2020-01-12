@@ -123,13 +123,17 @@ namespace Nop.Web.Controllers
 
         public virtual IActionResult AppointmentUpdate(int id)
         {
-            //try to get a appointment with the specified id
             var appointment = _appointmentService.GetAppointmentById(id);
-
-            //prepare model
-            var model = _appointmentModelFactory.PrepareAppointmentUpdateModel(appointment);
-
-            return Json(model);
+            if (appointment != null && (appointment.CustomerId == 0 || appointment.CustomerId == _workContext.CurrentCustomer.Id))
+            {
+                //prepare model
+                var model = _appointmentModelFactory.PrepareAppointmentUpdateModel(appointment);
+                return Json(new { status = true, data = model });
+            }
+            else
+            {
+                return Json(new { status = false, data = "Selected time not available." });
+            }
         }
 
         [HttpPost]
@@ -155,13 +159,13 @@ namespace Nop.Web.Controllers
             if (_workContext.CurrentCustomer.IsGuest())
                 return Challenge();
 
-            var requestedAppointment = _appointmentService.GetAppointmentById(id);
-            if (requestedAppointment.Status == AppointmentStatusType.Free)
+            var appointment = _appointmentService.GetAppointmentById(id);
+            if (appointment.Status == AppointmentStatusType.Free)
             {
-                requestedAppointment.CustomerId = _workContext.CurrentCustomer.Id;
-                requestedAppointment.Status = AppointmentStatusType.Waiting;
-                requestedAppointment.Notes = notes;
-                _appointmentService.UpdateAppointment(requestedAppointment);
+                appointment.CustomerId = _workContext.CurrentCustomer.Id;
+                appointment.Status = AppointmentStatusType.Waiting;
+                appointment.Notes = notes;
+                _appointmentService.UpdateAppointment(appointment);
 
                 return Json(new { status = true, responseText = $"Appointment requested." });
             }
@@ -174,13 +178,20 @@ namespace Nop.Web.Controllers
         [HttpPost]
         public virtual IActionResult AppointmentCancel(int id)
         {
-            var requestedAppointment = _appointmentService.GetAppointmentById(id);
-            requestedAppointment.Status = AppointmentStatusType.Free;
-            requestedAppointment.CustomerId = 0;
-            requestedAppointment.Notes = "";
-            _appointmentService.UpdateAppointment(requestedAppointment);
+            var appointment = _appointmentService.GetAppointmentById(id);
+            if (appointment != null && appointment.CustomerId == _workContext.CurrentCustomer.Id)
+            {
+                appointment.Status = AppointmentStatusType.Free;
+                appointment.CustomerId = 0;
+                appointment.Notes = "";
+                _appointmentService.UpdateAppointment(appointment);
 
-            return Json(new { status = true, responseText = $"Appointment cancelled." });
+                return Json(new { status = true, responseText = $"Appointment cancelled." });
+            }
+            else
+            {
+                return Json(new { status = false, responseText = $"Appointment cancellation failed." });
+            }
         }
 
         #endregion Appointment Methods

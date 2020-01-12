@@ -5,7 +5,7 @@
     <div class="fieldset">
         <div class="form-fields">
             <div id="selectedTimeBar" class="title">
-                <strong>@T("Product.BookTime.SelectTimeSlot"): </strong>
+                @T("Product.BookTime.SelectTimeSlot"):
                 <span></span>
             </div>
             <div id="booking-calendar" class="form-fields">
@@ -19,7 +19,7 @@
         </div>
         <div class="form-fields" id="booking-request">
             <div class="title">
-                <strong>@T("Product.BookTime.Notes"):</strong>
+                @T("Product.BookTime.Notes"):
             </div>
             <div class="inputs">
                 <textarea id="txtNotes" name="Notes"></textarea>
@@ -74,12 +74,10 @@
         if (!args.data.tags) {
             return;
         }
-        console.log(args.data);
-
         switch (args.data.tags.status) {
             case "Free":
                 args.data.barColor = "green";
-                args.data.html = "Available<br/>" + args.data.tags.doctor;
+                args.data.html = "Available";
                 args.data.toolTip = "Click to request this time slot";
                 break;
             case "Waiting":
@@ -94,7 +92,6 @@
     };
 
     calendar.onEventClick = function (args) {
-        console.log(args);
         var params = {
             id: args.e.id(),
         };
@@ -151,24 +148,35 @@
 <script type="text/javascript">
 
     function DisplaySelectedSlot(result) {
-        $("#selectedTimeBar span").text(result.TimeSlot);
-        $("#appointmentId").val(result.Id);
-        $("#txtNotes").val(result.Notes);
-        $("#btnBackToCalendar").show();
-        $("#booking-calendar").hide();
-        $("#booking-request").show();
-        switch (result.Status) {
-            case 0:
-                $("#btnRequestAppointment").show();
-                $("#btnCancelAppointment").hide();
-                break;
-            case 1:
-                $("#btnRequestAppointment").hide();
-                $("#btnCancelAppointment").show();
-                break;
-            default:
-                $("#btnRequestAppointment").hide();
-                $("#btnCancelAppointment").hide();
+        if (result.status) {
+            $("#selectedTimeBar span").text(result.data.TimeSlot);
+            $("#appointmentId").val(result.data.Id);
+            $("#txtNotes").val(result.data.Notes);
+            $("#btnBackToCalendar").show();
+            $("#booking-calendar").hide();
+            $("#booking-request").show();
+            switch (result.data.Status) {
+                case 0:
+                    $("#btnRequestAppointment").show();
+                    $("#btnCancelAppointment").hide();
+                    $("#txtNotes").prop("disabled", false);
+                    break;
+                case 1:
+                    $("#btnRequestAppointment").hide();
+                    $("#btnCancelAppointment").show();
+                    $("#txtNotes").prop("disabled", true);
+                    break;
+                default:
+                    $("#btnRequestAppointment").hide();
+                    $("#btnCancelAppointment").hide();
+                    $("#txtNotes").prop("disabled", true);
+            }
+        }
+        else {
+            // current slot is not available
+            $("#btnBackToCalendar").show();
+            $("#booking-calendar").hide();
+            $("#selectedTimeBar span").text(result.data);
         }
     }
 
@@ -232,7 +240,7 @@
             }).done(function (result) {
                 console.log("result=", result);
                 $("#booking-request").hide();
-                DisplayRequestedMessage(true);
+                DisplayRequestedMessage(result.status);
             }).fail(function (result) {
                 // Error
                 console.log("fail result=", result);
@@ -256,7 +264,7 @@
             }).done(function (result) {
                 console.log("result=", result);
                 $("#booking-request").hide();
-                DisplayCancelledMessage(true);
+                DisplayCancelledMessage(result.status);
             }).fail(function (result) {
                 // Error
                 console.log("fail result=", result);
