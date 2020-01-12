@@ -7,8 +7,8 @@ namespace Nop.Web.Areas.Admin.Models.Self
 {
     public class AppointmentEditModel : BaseNopEntityModel
     {
-        public DateTime StartTimeUtc { get; set; }
-        public DateTime EndTimeUtc { get; set; }
+        [NopResourceDisplayName("Admin.Appointment.Fields.TimeSlot")]
+        public string TimeSlot { get; set; }
         [NopResourceDisplayName("Admin.Appointment.Fields.Status")]
         public AppointmentStatusType Status { get; set; }
         [NopResourceDisplayName("Admin.Appointment.Fields.Notes")]
@@ -19,16 +19,12 @@ namespace Nop.Web.Areas.Admin.Models.Self
 
         [NopResourceDisplayName("Admin.Appointment.Fields.CustomerEmail")]
         public string CustomerEmail { get; set; }
+        [NopResourceDisplayName("Admin.Appointment.Fields.CustomerFullName")]
         public string CustomerFullName { get; set; }
 
         public bool IsLoggedInAsVendor { get; set; }
         public bool CanCancel { get; set; }
+        public bool CanDelete { get; set; }
         public bool CanConfirm { get; set; }
-    }
-
-    public class TimeSlot
-    {
-        public DateTime Start { get; set; }
-        public DateTime End { get; set; }
     }
 }

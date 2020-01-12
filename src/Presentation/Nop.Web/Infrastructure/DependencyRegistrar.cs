@@ -3,9 +3,9 @@ using Nop.Core.Configuration;
 using Nop.Core.Infrastructure;
 using Nop.Core.Infrastructure.DependencyManagement;
 using Nop.Web.Areas.Admin.Factories;
+using Nop.Web.Areas.Admin.Models.Self;
 using Nop.Web.Framework.Factories;
 using Nop.Web.Infrastructure.Installation;
-using Nop.Web.Models.Self;
 
 namespace Nop.Web.Infrastructure
 {
@@ -64,6 +64,7 @@ namespace Nop.Web.Infrastructure
             builder.RegisterType<PluginModelFactory>().As<IPluginModelFactory>().InstancePerLifetimeScope();
             builder.RegisterType<PollModelFactory>().As<IPollModelFactory>().InstancePerLifetimeScope();
             builder.RegisterType<ProductModelFactory>().As<IProductModelFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<AppointmentModelFactory>().As<IAppointmentModelFactory>().InstancePerLifetimeScope();
             builder.RegisterType<ProductAttributeModelFactory>().As<IProductAttributeModelFactory>().InstancePerLifetimeScope();
             builder.RegisterType<ProductReviewModelFactory>().As<IProductReviewModelFactory>().InstancePerLifetimeScope();
             builder.RegisterType<ReportModelFactory>().As<IReportModelFactory>().InstancePerLifetimeScope();
@@ -101,7 +102,7 @@ namespace Nop.Web.Infrastructure
             builder.RegisterType<Factories.PollModelFactory>().As<Factories.IPollModelFactory>().InstancePerLifetimeScope();
             builder.RegisterType<Factories.PrivateMessagesModelFactory>().As<Factories.IPrivateMessagesModelFactory>().InstancePerLifetimeScope();
             builder.RegisterType<Factories.ProductModelFactory>().As<Factories.IProductModelFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<AppointmentModelFactory>().As<IAppointmentModelFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<Nop.Web.Models.Self.AppointmentModelFactory>().As<Nop.Web.Models.Self.IAppointmentModelFactory>().InstancePerLifetimeScope();
             builder.RegisterType<Factories.ProfileModelFactory>().As<Factories.IProfileModelFactory>().InstancePerLifetimeScope();
             builder.RegisterType<Factories.ReturnRequestModelFactory>().As<Factories.IReturnRequestModelFactory>().InstancePerLifetimeScope();
             builder.RegisterType<Factories.ShoppingCartModelFactory>().As<Factories.IShoppingCartModelFactory>().InstancePerLifetimeScope();

@@ -20,6 +20,7 @@ using Nop.Services.Configuration;
 using Nop.Services.Customers;
 using Nop.Services.Discounts;
 using Nop.Services.ExportImport;
+using Nop.Services.Helpers;
 using Nop.Services.Localization;
 using Nop.Services.Logging;
 using Nop.Services.Media;
@@ -71,6 +72,7 @@ namespace Nop.Web.Areas.Admin.Controllers
         private readonly IProductAttributeParser _productAttributeParser;
         private readonly IProductAttributeService _productAttributeService;
         private readonly IProductModelFactory _productModelFactory;
+        private readonly IAppointmentModelFactory _appointmentModelFactory;
         private readonly IProductService _productService;
         private readonly IAppointmentService _appointmentService;
         private readonly IProductTagService _productTagService;
@@ -80,6 +82,7 @@ namespace Nop.Web.Areas.Admin.Controllers
         private readonly ISpecificationAttributeService _specificationAttributeService;
         private readonly IUrlRecordService _urlRecordService;
         private readonly IWorkContext _workContext;
+        private readonly IDateTimeHelper _dateTimeHelper;
         private readonly VendorSettings _vendorSettings;
 
         #endregion
@@ -108,6 +111,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             IProductAttributeParser productAttributeParser,
             IProductAttributeService productAttributeService,
             IProductModelFactory productModelFactory,
+            IAppointmentModelFactory appointmentModelFactory,
             IProductService productService,
             IAppointmentService appointmentService,
             IProductTagService productTagService,
@@ -117,6 +121,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             ISpecificationAttributeService specificationAttributeService,
             IUrlRecordService urlRecordService,
             IWorkContext workContext,
+            IDateTimeHelper dateTimeHelper,
             VendorSettings vendorSettings)
         {
             _aclService = aclService;
@@ -141,6 +146,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             _productAttributeParser = productAttributeParser;
             _productAttributeService = productAttributeService;
             _productModelFactory = productModelFactory;
+            _appointmentModelFactory = appointmentModelFactory;
             _productService = productService;
             _appointmentService = appointmentService;
             _productTagService = productTagService;
@@ -150,6 +156,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             _specificationAttributeService = specificationAttributeService;
             _urlRecordService = urlRecordService;
             _workContext = workContext;
+            _dateTimeHelper = dateTimeHelper;
             _vendorSettings = vendorSettings;
         }
 
@@ -735,6 +742,11 @@ namespace Nop.Web.Areas.Admin.Controllers
 
         #region Appointment Methods
 
+        /// <summary>
+        /// Get method for /Admin/Product/AppointmentSchedule/{productId}
+        /// </summary>
+        /// <param name="id">Product Id</param>
+        /// <returns></returns>
         public virtual IActionResult AppointmentSchedule(int id)
         {
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageProducts))
@@ -755,6 +767,11 @@ namespace Nop.Web.Areas.Admin.Controllers
             return View(model);
         }
 
+        /// <summary>
+        /// Get method for /Admin/Product/AppointmentCalendar/{productId}
+        /// </summary>
+        /// <param name="id">Product Id</param>
+        /// <returns></returns>
         public virtual IActionResult AppointmentCalendar(int id)
         {
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageProducts))
@@ -775,12 +792,16 @@ namespace Nop.Web.Areas.Admin.Controllers
             return View(model);
         }
 
+        /// <summary>
+        /// Get method for /Admin/Product/AppointmentEdit/{appointmentId}
+        /// </summary>
+        /// <param name="id">Appointment Id</param>
+        /// <returns></returns>
         public virtual IActionResult AppointmentEdit(int id)
         {
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageProducts))
                 return AccessDeniedView();
 
-            //try to get a appointment with the specified id
             var appointment = _appointmentService.GetAppointmentById(id);
             if (appointment == null)
                 return RedirectToAction("AppointmentCalendar");
@@ -790,21 +811,9 @@ namespace Nop.Web.Areas.Admin.Controllers
                 return RedirectToAction("List");
 
             //prepare model
-            var model = new AppointmentEditModel
-            {
-                Id = appointment.Id,
-                StartTimeUtc = appointment.StartTimeUtc,
-                EndTimeUtc = appointment.EndTimeUtc,
-                Status = appointment.Status,
-                Notes = appointment.Notes,
-                ResourceId = appointment.ResourceId,
-                CustomerId = appointment.CustomerId,
-                CustomerFullName = appointment.Customer.Email,
-                CustomerEmail = appointment.Customer.Email
-            };
+            var model = _appointmentModelFactory.PrepareAppointmentEditModel(appointment);
+            // TODO: remove admin user later
             model.IsLoggedInAsVendor = _workContext.CurrentVendor != null || _workContext.IsAdmin;
-            model.CanCancel = appointment.Status == AppointmentStatusType.Confirmed;
-            model.CanConfirm = appointment.Status == AppointmentStatusType.Waiting;
 
             return View(model);
         }
@@ -815,12 +824,12 @@ namespace Nop.Web.Areas.Admin.Controllers
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageProductReviews))
                 return AccessDeniedDataTablesJson();
 
-            var events = _appointmentService.GetAppointmentsByResource(start, end, resourceId);
+            var appointments = _appointmentService.GetAppointmentsByResource(start, end, resourceId);
 
             var model = new List<AppointmentInfoModel>();
-            foreach (var appointment in events)
+            foreach (var appointment in appointments)
             {
-                var item = AppointmentModelFactory.ConvertToModel(appointment);
+                var item = _appointmentModelFactory.PrepareAppointmentInfoModel(appointment);
                 model.Add(item);
             }
 
@@ -877,19 +886,16 @@ namespace Nop.Web.Areas.Admin.Controllers
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageProductReviews))
                 return AccessDeniedView();
 
-            var requestedAppointment = _appointmentService.GetAppointmentById(id);
-            if (requestedAppointment.Status == AppointmentStatusType.Waiting)
+            var appointment = _appointmentService.GetAppointmentById(id);
+            if (appointment != null && appointment.Status == AppointmentStatusType.Waiting)
             {
-                requestedAppointment.Status = AppointmentStatusType.Confirmed;
-                _appointmentService.UpdateAppointment(requestedAppointment);
+                appointment.Status = AppointmentStatusType.Confirmed;
+                _appointmentService.UpdateAppointment(appointment);
 
                 return Json(new { status = true, responseText = $"Appointment confirmed." });
             }
-            else
-            {
-                // Customer may have just concelled this appointment
-                return Json(new { status = false, responseText = $"Appointment confirm failed." });
-            }
+            // Customer may have just concelled this appointment
+            return Json(new { status = false, responseText = $"Appointment confirm failed." });
         }
 
         [HttpPost]
@@ -898,12 +904,16 @@ namespace Nop.Web.Areas.Admin.Controllers
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageProductReviews))
                 return AccessDeniedView();
 
-            var requestedAppointment = _appointmentService.GetAppointmentById(id);
-            requestedAppointment.Status = AppointmentStatusType.Free;
-            requestedAppointment.CustomerId = 0;
-            _appointmentService.UpdateAppointment(requestedAppointment);
+            var appointment = _appointmentService.GetAppointmentById(id);
+            if (appointment != null && (appointment.Status == AppointmentStatusType.Waiting || appointment.Status == AppointmentStatusType.Confirmed))
+            {
+                appointment.Status = AppointmentStatusType.Free;
+                appointment.CustomerId = 0;
+                _appointmentService.UpdateAppointment(appointment);
 
-            return Json(new { status = true, responseText = $"Appointment cancelled." });
+                return Json(new { status = true, responseText = $"Appointment cancelled." });
+            }
+            return Json(new { status = false, responseText = $"Appointment cancellation failed." });
         }
 
         [HttpPost]
@@ -912,7 +922,13 @@ namespace Nop.Web.Areas.Admin.Controllers
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageProductReviews))
                 return AccessDeniedView();
 
-            return Json(new { status = true, responseText = "Deleted." });
+            var appointment = _appointmentService.GetAppointmentById(id);
+            if (appointment != null && appointment.Status == AppointmentStatusType.Free)
+            {
+                _appointmentService.DeleteAppointment(appointment);
+                return Json(new { status = true, responseText = "Deleted." });
+            }
+            return Json(new { status = false, responseText = "Delete failed." });
         }
 
         #endregion Appointment Methods

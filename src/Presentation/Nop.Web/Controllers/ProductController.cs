@@ -160,7 +160,7 @@ namespace Nop.Web.Controllers
                 return Challenge();
 
             var appointment = _appointmentService.GetAppointmentById(id);
-            if (appointment.Status == AppointmentStatusType.Free)
+            if (appointment != null && appointment.Status == AppointmentStatusType.Free)
             {
                 appointment.CustomerId = _workContext.CurrentCustomer.Id;
                 appointment.Status = AppointmentStatusType.Waiting;

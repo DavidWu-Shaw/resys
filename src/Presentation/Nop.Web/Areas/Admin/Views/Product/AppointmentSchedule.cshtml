@@ -112,7 +112,8 @@
             type: "post",
             data: params
         })
-        .done(function (result) {
+            .done(function (result) {
+                console.log("result=", result);
             scheduler.message("Deleted.");
         });
     };
@@ -135,7 +136,6 @@
             data: params
         })
         .done(function (result) {
-            console.log(result);
             loadEvents();
             dp.message(result.responseText);
         });
@@ -170,7 +170,6 @@
             cache: false,
         })
         .done(function (result) {
-            console.log(result);
             scheduler.timeline = getTimeline(day);
             scheduler.events.list = result;
             scheduler.update();

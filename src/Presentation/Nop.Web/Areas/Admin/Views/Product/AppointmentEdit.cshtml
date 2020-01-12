@@ -8,6 +8,22 @@
     <div class="panel-body">
         <div class="form-group">
             <div class="col-sm-5">
+                <nop-label asp-for="TimeSlot" />
+            </div>
+            <div class="col-sm-7">
+                <div class="form-text-row">@Model.TimeSlot</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-5">
+                <nop-label asp-for="Status" />
+            </div>
+            <div class="col-sm-7">
+                <div class="form-text-row">@Model.Status</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-5">
                 <nop-label asp-for="CustomerId" />
             </div>
             <div class="col-sm-7">
@@ -24,44 +40,35 @@
         </div>
         <div class="form-group">
             <div class="col-sm-5">
-                <nop-label asp-for="StartTimeUtc" />
-            </div>
-            <div class="col-sm-7">
-                <div class="form-text-row">@Model.StartTimeUtc</div>
-            </div>
-        </div>
-        <div class="form-group">
-            <div class="col-sm-5">
-                <nop-label asp-for="Status" />
-            </div>
-            <div class="col-sm-7">
-                <div class="form-text-row">@Model.Status</div>
-            </div>
-        </div>
-        <div class="form-group">
-            <div class="col-sm-5">
                 <nop-label asp-for="Notes" />
             </div>
             <div class="col-sm-7">
-                <div class="form-text-row">@Model.Notes</div>
+                <nop-textarea asp-for="@Model.Notes" disabled></nop-textarea>
             </div>
         </div>
         @if (Model.IsLoggedInAsVendor)
         {
             <div class="form-group">
                 <div class="col-sm-7 col-sm-offset-5">
-                    @if (Model.CanCancel)
-                    {
-                        <button type="submit" name="btnCancelAppointment" id="btnCancelAppointment" class="btn bg-red" style="margin-right: 3px;">
-                            @T("Admin.AppointmentEdit.Cancel")
-                        </button>
-                        <nop-action-confirmation asp-button-id="cancelappointment" />
-                    }
                     @if (Model.CanConfirm)
                     {
                         <button type="submit" name="btnConfirmAppointment" id="btnConfirmAppointment" class="btn btn-primary" style="margin-right: 3px;">
                             @T("Admin.AppointmentEdit.Confirm")
                         </button>
+                    }
+                    @if (Model.CanCancel)
+                    {
+                        <button type="submit" name="btnCancelAppointment" id="btnCancelAppointment" class="btn bg-red" style="margin-right: 3px;">
+                            @T("Admin.AppointmentEdit.Cancel")
+                        </button>
+                        <nop-action-confirmation asp-button-id="btnCancelAppointment" />
+                    }
+                    @if (Model.CanDelete)
+                    {
+                        <button type="submit" name="btnDeleteAppointment" id="btnDeleteAppointment" class="btn bg-red" style="margin-right: 3px;">
+                            @T("Admin.AppointmentEdit.Delete")
+                        </button>
+                        <nop-action-confirmation asp-button-id="btnDeleteAppointment" />
                     }
                     <button type="submit" name="btnCloseAppointmentEdit" id="btnCloseAppointmentEdit" class="btn bg-teal">
                         @T("Admin.Common.Close")
@@ -75,6 +82,7 @@
     $(document).ready(function () {
         $("#btnCloseAppointmentEdit").click(function () {
             modal.close();
+            return false;
         });
 
         $("#btnConfirmAppointment").click(function () {
@@ -95,7 +103,8 @@
             }).fail(function (result) {
                 // Error
                 console.log("fail result=", result);
-            });
+                });
+            return false;
         });
 
         $("#btnCancelAppointment").click(function () {
@@ -119,6 +128,31 @@
                 // Error
                 console.log("fail result=", result);
             });
+            return false;
+        });
+
+        $("#btnDeleteAppointment").click(function () {
+            var params = {
+                id: @Model.Id
+            };
+            addAntiForgeryToken(params);
+            console.log(params);
+            $.ajax({
+                url: "@Url.Action("AppointmentDelete", "Product")",
+                type: "post",
+                datatype: "json",
+                data: params,
+                cache: false
+            })
+            .done(function (result) {
+                console.log("result=", result);
+                modal.close(result);
+            })
+            .fail(function (result) {
+                // Error
+                console.log("fail result=", result);
+            });
+            return false;
         });
     });
 </script>

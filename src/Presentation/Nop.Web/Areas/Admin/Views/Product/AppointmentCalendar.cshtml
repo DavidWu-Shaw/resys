@@ -85,14 +85,13 @@
     };
 
     calendar.onEventClick = function (args) {
-        if (args.e.tag("status") == "Free") {
-            return;
-        }
-
         var modal = new DayPilot.Modal({
             onClosed: function (args) {
                 console.log("onclose.args=", args);
                 if (args.result) {  // args.result is empty when modal is closed without submitting
+                    loadEvents();
+                }
+                else {
                     loadEvents();
                 }
             }

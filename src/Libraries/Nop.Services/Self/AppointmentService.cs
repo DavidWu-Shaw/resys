@@ -61,6 +61,18 @@ namespace Nop.Services.Self
             _eventPublisher.EntityUpdated(appointment);
         }
 
+        public virtual void DeleteAppointment(Appointment appointment)
+        {
+            if (appointment == null)
+                throw new ArgumentNullException(nameof(appointment));
+
+            //update
+            _appointmentRepository.Delete(appointment);
+
+            //event notification
+            _eventPublisher.EntityDeleted(appointment);
+        }
+
         public virtual List<Appointment> GetAppointmentsByResource(DateTime startTimeUtc, DateTime endTimeUtc, int resourceId)
         {
             var query = _appointmentRepository.Table
