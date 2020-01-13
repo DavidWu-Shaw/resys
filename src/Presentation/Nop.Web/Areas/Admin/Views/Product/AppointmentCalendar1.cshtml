@@ -25,35 +25,17 @@
             </button>
         </div>
     </div>
-        <div class="panel-body">
-            <div class="form-group">
-                <div id="booking-calendar">
-                    <div class="column-left">
-                        <div id="nav"></div>
-                    </div>
-                    <div class="column-main">
-                        <div id="calendar"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="form-group">
-                <div class="col-sm-5">
-                    <h4>@T("Product.AppointmentCalendar.TimeSlot")</h4>
-                </div>
-                <div class="col-sm-7">
-                    <div class="form-text-row">12:00 - 13:00pm</div>
-                </div>
-            </div>
-            <div class="form-group">
-                <div class="col-sm-5">
-                    <h4>@T("Product.AppointmentCalendar.Status")</h4>
-                </div>
-                <div class="col-sm-7">
-                    <div class="form-text-row">Free</div>
-                </div>
-            </div>
-        </div>
 </form>
+<div class="content">
+    <div class="form-horizontal">
+        <div class="column-left">
+            <div id="nav"></div>
+        </div>
+        <div class="column-main">
+            <div id="calendar"></div>
+        </div>
+    </div>
+</div>
 
 <script type="text/javascript">
     var nav = new DayPilot.Navigator("nav");
@@ -103,24 +85,21 @@
     };
 
     calendar.onEventClick = function (args) {
-        var params = {
-            id: args.e.id(),
-        };
-
-        $.ajax({
-            url: "@Url.Action("AppointmentEdit", "Product")",
-            type: "get",
-            data: params,
-            cache: false
-        })
-        .done(function (result) {
-            console.log("result =", result);
-            DisplaySelectedSlot(result);
-        })
-        .fail(function (result) {
-            // Error
-            console.log("fail result =", result);
+        var modal = new DayPilot.Modal({
+            onClosed: function (args) {
+                console.log("onclose.args=", args);
+                if (args.result) {  // args.result is empty when modal is closed without submitting
+                    loadEvents();
+                }
+                else {
+                    loadEvents();
+                }
+            }
         });
+
+        var url = '@Url.Action("AppointmentEdit", "Product", new { id = "ID" })';
+        url = url.replace("ID", args.e.id());
+        modal.showUrl(url);
     };
 
     calendar.init();

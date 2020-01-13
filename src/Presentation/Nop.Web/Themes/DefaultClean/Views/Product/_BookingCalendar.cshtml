@@ -3,12 +3,11 @@
 <div id="book-time" class="book-main">
     <h3>@T("Product.BookTime"): @Model.Name</h3>
     <div class="fieldset">
-        <div class="form-fields">
-            <div id="selectedTimeBar" class="title">
+        <div class="form-fields" id="booking-calendar" >
+            <div class="title">
                 @T("Product.BookTime.SelectTimeSlot"):
-                <span></span>
             </div>
-            <div id="booking-calendar" class="form-fields">
+            <div>
                 <div class="column-left">
                     <div id="nav"></div>
                 </div>
@@ -18,6 +17,10 @@
             </div>
         </div>
         <div class="form-fields" id="booking-request">
+            <div id="selectedTimeBar" class="title">
+                @T("Product.BookTime.SelectTimeSlot"):
+                <span></span>
+            </div>
             <div class="title">
                 @T("Product.BookTime.Notes"):
             </div>
