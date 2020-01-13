@@ -25,34 +25,34 @@
             </button>
         </div>
     </div>
-        <div class="panel-body">
-            <div class="form-group">
-                <div id="booking-calendar">
-                    <div class="column-left">
-                        <div id="nav"></div>
-                    </div>
-                    <div class="column-main">
-                        <div id="calendar"></div>
-                    </div>
+    <div class="panel-body">
+        <div class="form-group">
+            <div id="booking-calendar">
+                <div class="column-left">
+                    <div id="nav"></div>
                 </div>
-            </div>
-            <div class="form-group">
-                <div class="col-sm-5">
-                    <h4>@T("Product.AppointmentCalendar.TimeSlot")</h4>
-                </div>
-                <div class="col-sm-7">
-                    <div class="form-text-row">12:00 - 13:00pm</div>
-                </div>
-            </div>
-            <div class="form-group">
-                <div class="col-sm-5">
-                    <h4>@T("Product.AppointmentCalendar.Status")</h4>
-                </div>
-                <div class="col-sm-7">
-                    <div class="form-text-row">Free</div>
+                <div class="column-main">
+                    <div id="calendar"></div>
                 </div>
             </div>
         </div>
+        <div class="form-group">
+            <div class="col-sm-5">
+                @T("Product.AppointmentCalendar.TimeSlot")
+            </div>
+            <div class="col-sm-7">
+                <div class="form-text-row" id="fTimeSlot">12:00 - 13:00pm</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-5">
+                @T("Product.AppointmentCalendar.Status")
+            </div>
+            <div class="col-sm-7">
+                <div class="form-text-row" id="fStatus">Free</div>
+            </div>
+        </div>
+    </div>
 </form>
 
 <script type="text/javascript">
@@ -157,4 +157,51 @@
             // Error
         });
     }
+
+    function DisplaySelectedSlot(result) {
+        if (result.status) {
+            $("#fTimeSlot").text(result.data.TimeSlot);
+            $("#fStatus").text(result.data.Status);
+            $("#appointmentId").val(result.data.Id);
+            $("#txtNotes").val(result.data.Notes);
+            $("#btnBackToCalendar").show();
+            $("#booking-calendar").hide();
+            $("#booking-request").show();
+            switch (result.data.Status) {
+                case 0:
+                    $("#btnRequestAppointment").show();
+                    $("#btnCancelAppointment").hide();
+                    $("#txtNotes").prop("disabled", false);
+                    break;
+                case 1:
+                    $("#btnRequestAppointment").hide();
+                    $("#btnCancelAppointment").show();
+                    $("#txtNotes").prop("disabled", true);
+                    break;
+                default:
+                    $("#btnRequestAppointment").hide();
+                    $("#btnCancelAppointment").hide();
+                    $("#txtNotes").prop("disabled", true);
+            }
+        }
+        else {
+            // current slot is not available
+            $("#btnBackToCalendar").show();
+            $("#booking-calendar").hide();
+            $("#fTimeSlot").text(result.data);
+        }
+    }
+
+    function ClearSelectedSlot() {
+        $("#selectedTimeBar span").text("");
+        $("#btnBackToCalendar").hide();
+        $("#booking-calendar").show();
+        $("#appointmentId").val("");
+        $("#booking-request").hide();
+        $("#rs-message").hide();
+        $("#rf-message").hide();
+        $("#cs-message").hide();
+        $("#cf-message").hide();
+    }
+
 </script>

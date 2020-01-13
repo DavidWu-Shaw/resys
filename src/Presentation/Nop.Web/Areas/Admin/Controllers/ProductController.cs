@@ -803,19 +803,18 @@ namespace Nop.Web.Areas.Admin.Controllers
                 return AccessDeniedView();
 
             var appointment = _appointmentService.GetAppointmentById(id);
-            if (appointment == null)
-                return RedirectToAction("AppointmentCalendar");
-
-            //a vendor should have access only to his products
-            if (_workContext.CurrentVendor != null && appointment.Product.VendorId != _workContext.CurrentVendor.Id)
-                return RedirectToAction("List");
-
-            //prepare model
-            var model = _appointmentModelFactory.PrepareAppointmentEditModel(appointment);
-            // TODO: remove admin user later
-            model.IsLoggedInAsVendor = _workContext.CurrentVendor != null || _workContext.IsAdmin;
-
-            return View(model);
+            if (appointment != null)
+            {
+                //prepare model
+                var model = _appointmentModelFactory.PrepareAppointmentEditModel(appointment);
+                // TODO: remove admin user later
+                model.IsLoggedInAsVendor = _workContext.CurrentVendor != null || _workContext.IsAdmin;
+                return Json(new { status = true, data = model });
+            }
+            else
+            {
+                return Json(new { status = false, data = "Selected time not available." });
+            }
         }
 
         [HttpPost]
