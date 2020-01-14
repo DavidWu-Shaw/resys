@@ -792,31 +792,6 @@ namespace Nop.Web.Areas.Admin.Controllers
             return View(model);
         }
 
-        /// <summary>
-        /// Get method for /Admin/Product/AppointmentEdit/{appointmentId}
-        /// </summary>
-        /// <param name="id">Appointment Id</param>
-        /// <returns></returns>
-        public virtual IActionResult AppointmentEdit(int id)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageProducts))
-                return AccessDeniedView();
-
-            var appointment = _appointmentService.GetAppointmentById(id);
-            if (appointment != null)
-            {
-                //prepare model
-                var model = _appointmentModelFactory.PrepareAppointmentEditModel(appointment);
-                // TODO: remove admin user later
-                model.IsLoggedInAsVendor = _workContext.CurrentVendor != null || _workContext.IsAdmin;
-                return Json(new { status = true, data = model });
-            }
-            else
-            {
-                return Json(new { status = false, data = "Selected time not available." });
-            }
-        }
-
         [HttpPost]
         public virtual IActionResult AppointmentList(DateTime start, DateTime end, int resourceId)
         {
@@ -879,6 +854,31 @@ namespace Nop.Web.Areas.Admin.Controllers
             return result;
         }
 
+        /// <summary>
+        /// Get method for /Admin/Product/AppointmentEdit/{appointmentId}
+        /// </summary>
+        /// <param name="id">Appointment Id</param>
+        /// <returns></returns>
+        public virtual IActionResult AppointmentEdit(int id)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageProducts))
+                return AccessDeniedView();
+
+            var appointment = _appointmentService.GetAppointmentById(id);
+            if (appointment != null)
+            {
+                //prepare model
+                var model = _appointmentModelFactory.PrepareAppointmentEditModel(appointment);
+                // TODO: remove admin user later
+                model.IsLoggedInAsVendor = _workContext.CurrentVendor != null || _workContext.IsAdmin;
+                return Json(new { status = true, data = model });
+            }
+            else
+            {
+                return Json(new { status = false, message = "Selected time not available." });
+            }
+        }
+
         [HttpPost]
         public virtual IActionResult AppointmentConfirm(int id)
         {
@@ -891,10 +891,12 @@ namespace Nop.Web.Areas.Admin.Controllers
                 appointment.Status = AppointmentStatusType.Confirmed;
                 _appointmentService.UpdateAppointment(appointment);
 
-                return Json(new { status = true, responseText = $"Appointment confirmed." });
+                var model = _appointmentModelFactory.PrepareAppointmentEditModel(appointment);
+
+                return Json(new { status = true, message = $"Appointment confirmed.", data = model });
             }
             // Customer may have just concelled this appointment
-            return Json(new { status = false, responseText = $"Appointment confirm failed." });
+            return Json(new { status = false, message = $"Appointment confirm failed." });
         }
 
         [HttpPost]
@@ -908,11 +910,14 @@ namespace Nop.Web.Areas.Admin.Controllers
             {
                 appointment.Status = AppointmentStatusType.Free;
                 appointment.CustomerId = 0;
+                appointment.Notes = "";
                 _appointmentService.UpdateAppointment(appointment);
 
-                return Json(new { status = true, responseText = $"Appointment cancelled." });
+                var model = _appointmentModelFactory.PrepareAppointmentEditModel(appointment);
+
+                return Json(new { status = true, message = $"Appointment cancelled.", data = model });
             }
-            return Json(new { status = false, responseText = $"Appointment cancellation failed." });
+            return Json(new { status = false, message = $"Appointment cancellation failed." });
         }
 
         [HttpPost]
@@ -925,9 +930,9 @@ namespace Nop.Web.Areas.Admin.Controllers
             if (appointment != null && appointment.Status == AppointmentStatusType.Free)
             {
                 _appointmentService.DeleteAppointment(appointment);
-                return Json(new { status = true, responseText = "Deleted." });
+                return Json(new { status = true, message = "Appointment deleted." });
             }
-            return Json(new { status = false, responseText = "Delete failed." });
+            return Json(new { status = false, message = "Appointment delete failed." });
         }
 
         #endregion Appointment Methods
