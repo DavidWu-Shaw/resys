@@ -21,10 +21,6 @@ namespace Nop.Web.Areas.Admin.Models.Self
         public string CustomerEmail { get; set; }
         [NopResourceDisplayName("Admin.Appointment.Fields.CustomerFullName")]
         public string CustomerFullName { get; set; }
-
         public bool IsLoggedInAsVendor { get; set; }
-        public bool CanCancel { get; set; }
-        public bool CanDelete { get; set; }
-        public bool CanConfirm { get; set; }
     }
 }

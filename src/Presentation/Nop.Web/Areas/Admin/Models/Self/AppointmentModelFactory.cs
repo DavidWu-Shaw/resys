@@ -35,9 +35,6 @@ namespace Nop.Web.Areas.Admin.Models.Self
                     model.CustomerFullName = "N/A";
                     model.CustomerEmail = "N/A";
                 }
-                model.CanCancel = appointment.Status == AppointmentStatusType.Confirmed || appointment.Status == AppointmentStatusType.Waiting;
-                model.CanConfirm = appointment.Status == AppointmentStatusType.Waiting;
-                model.CanDelete = appointment.Status == AppointmentStatusType.Free;
             }
 
             return model;
@@ -48,8 +45,8 @@ namespace Nop.Web.Areas.Admin.Models.Self
             var model = new AppointmentInfoModel
             {
                 id = appointment.Id.ToString(),
-                start = appointment.StartTimeUtc.ToLocalTime().ToString("yyyy-MM-ddTHH:mm:ss"),
-                end = appointment.EndTimeUtc.ToLocalTime().ToString("yyyy-MM-ddTHH:mm:ss"),
+                start = _dateTimeHelper.ConvertToUserTime(appointment.StartTimeUtc, DateTimeKind.Utc).ToString("yyyy-MM-ddTHH:mm:ss"),
+                end = _dateTimeHelper.ConvertToUserTime(appointment.EndTimeUtc, DateTimeKind.Utc).ToString("yyyy-MM-ddTHH:mm:ss"),
                 resource = appointment.ResourceId.ToString()
             };
             model.tags = new TagModel

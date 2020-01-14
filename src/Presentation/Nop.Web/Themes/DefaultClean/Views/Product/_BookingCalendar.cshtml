@@ -3,12 +3,11 @@
 <div id="book-time" class="book-main">
     <h3>@T("Product.BookTime"): @Model.Name</h3>
     <div class="fieldset">
-        <div class="form-fields">
-            <div id="selectedTimeBar" class="title">
+        <div class="form-fields" id="booking-calendar" >
+            <div class="title">
                 @T("Product.BookTime.SelectTimeSlot"):
-                <span></span>
             </div>
-            <div id="booking-calendar" class="form-fields">
+            <div>
                 <div class="column-left">
                     <div id="nav"></div>
                 </div>
@@ -17,7 +16,11 @@
                 </div>
             </div>
         </div>
-        <div class="form-fields" id="booking-request">
+        <div class="form-fields" id="booking-form">
+            <div id="selectedTimeBar" class="title">
+                @T("Product.BookTime.SelectTimeSlot"):
+                <span></span>
+            </div>
             <div class="title">
                 @T("Product.BookTime.Notes"):
             </div>
@@ -154,7 +157,7 @@
             $("#txtNotes").val(result.data.Notes);
             $("#btnBackToCalendar").show();
             $("#booking-calendar").hide();
-            $("#booking-request").show();
+            $("#booking-form").show();
             switch (result.data.Status) {
                 case 0:
                     $("#btnRequestAppointment").show();
@@ -185,7 +188,7 @@
         $("#btnBackToCalendar").hide();
         $("#booking-calendar").show();
         $("#appointmentId").val("");
-        $("#booking-request").hide();
+        $("#booking-form").hide();
         $("#rs-message").hide();
         $("#rf-message").hide();
         $("#cs-message").hide();
@@ -239,12 +242,12 @@
                 cache: false
             }).done(function (result) {
                 console.log("result=", result);
-                $("#booking-request").hide();
+                $("#booking-form").hide();
                 DisplayRequestedMessage(result.status);
             }).fail(function (result) {
                 // Error
                 console.log("fail result=", result);
-                $("#booking-request").hide();
+                $("#booking-form").hide();
                 DisplayRequestedMessage(false);
             });
             return false;
@@ -263,12 +266,12 @@
                 cache: false
             }).done(function (result) {
                 console.log("result=", result);
-                $("#booking-request").hide();
+                $("#booking-form").hide();
                 DisplayCancelledMessage(result.status);
             }).fail(function (result) {
                 // Error
                 console.log("fail result=", result);
-                $("#booking-request").hide();
+                $("#booking-form").hide();
                 DisplayCancelledMessage(false);
             });
             return false;
