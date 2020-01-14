@@ -121,21 +121,6 @@ namespace Nop.Web.Controllers
 
         #region Appointment Methods
 
-        public virtual IActionResult AppointmentUpdate(int id)
-        {
-            var appointment = _appointmentService.GetAppointmentById(id);
-            if (appointment != null && (appointment.CustomerId == 0 || appointment.CustomerId == _workContext.CurrentCustomer.Id))
-            {
-                //prepare model
-                var model = _appointmentModelFactory.PrepareAppointmentUpdateModel(appointment);
-                return Json(new { status = true, data = model });
-            }
-            else
-            {
-                return Json(new { status = false, data = "Selected time not available." });
-            }
-        }
-
         [HttpPost]
         public virtual IActionResult AppointmentSlotsByCustomer(DateTime start, DateTime end, int resourceId)
         {
@@ -153,6 +138,21 @@ namespace Nop.Web.Controllers
             return Json(model);
         }
 
+        public virtual IActionResult AppointmentUpdate(int id)
+        {
+            var appointment = _appointmentService.GetAppointmentById(id);
+            if (appointment != null && (appointment.CustomerId == 0 || appointment.CustomerId == _workContext.CurrentCustomer.Id))
+            {
+                //prepare model
+                var model = _appointmentModelFactory.PrepareAppointmentUpdateModel(appointment);
+                return Json(new { status = true, data = model });
+            }
+            else
+            {
+                return Json(new { status = false, data = "Selected time not available." });
+            }
+        }
+
         [HttpPost]
         public virtual IActionResult AppointmentRequest(int id, string notes)
         {
@@ -167,7 +167,9 @@ namespace Nop.Web.Controllers
                 appointment.Notes = notes;
                 _appointmentService.UpdateAppointment(appointment);
 
-                return Json(new { status = true, responseText = $"Appointment requested." });
+                var model = _appointmentModelFactory.PrepareAppointmentUpdateModel(appointment);
+
+                return Json(new { status = true, message = $"Appointment request sent.", data = model });
             }
             else
             {
@@ -186,7 +188,9 @@ namespace Nop.Web.Controllers
                 appointment.Notes = "";
                 _appointmentService.UpdateAppointment(appointment);
 
-                return Json(new { status = true, responseText = $"Appointment cancelled." });
+                var model = _appointmentModelFactory.PrepareAppointmentUpdateModel(appointment);
+
+                return Json(new { status = true, message = $"Appointment cancelled.", data = model });
             }
             else
             {

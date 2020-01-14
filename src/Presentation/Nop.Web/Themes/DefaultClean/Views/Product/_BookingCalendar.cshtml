@@ -29,29 +29,24 @@
             </div>
             <input type="hidden" id="appointmentId" />
             <div class="buttons">
-                <button type="submit" name="btnCancelAppointment" id="btnCancelAppointment" class="btn bg-red" style="margin-right: 3px;">
-                    @T("Product.BookTime.AppointmentUpdate.Cancel")
-                </button>
                 <button type="submit" name="btnRequestAppointment" id="btnRequestAppointment" class="btn btn-primary" style="margin-right: 3px;">
                     @T("Product.BookTime.AppointmentUpdate.Request")
                 </button>
-            </div>
-        </div>
-        <div class="form-fields" id="message">
-            <div class="title">
-                <p id="rs-message">@T("Product.BookTime.Request.Success")</p>
-                <p id="rf-message">@T("Product.BookTime.Request.Failed")</p>
-                <p id="cs-message">@T("Product.BookTime.Cancel.Success")</p>
-                <p id="cf-message">@T("Product.BookTime.Cancel.Failed")</p>
-            </div>
-            <div class="buttons">
-                <button type="submit" name="btnBackToCalendar" id="btnBackToCalendar" class="btn btn-primary" style="display:none">
+                <button type="submit" name="btnCancelAppointment" id="btnCancelAppointment" class="btn bg-red" style="margin-right: 3px;">
+                    @T("Product.BookTime.AppointmentUpdate.Cancel")
+                </button>
+                <button type="submit" name="btnBackToCalendar" id="btnBackToCalendar" class="btn btn-primary">
                     @T("Product.BookTime.AppointmentUpdate.BackToCalendar")
                 </button>
             </div>
         </div>
+        <div class="form-fields">
+            <div class="title" id="rMessage">
+            </div>
+        </div>
     </div>
 </div>
+
 <script type="text/javascript">
     var nav = new DayPilot.Navigator("nav");
     nav.selectMode = "week";
@@ -105,13 +100,13 @@
             data: params,
             cache: false
         })
-        .done(function (result) {
-            console.log("result =", result);
-            DisplaySelectedSlot(result);
+        .done(function (response) {
+            console.log("response =", response);
+            DisplaySelectedSlot(response);
         })
-        .fail(function (result) {
+        .fail(function (response) {
             // Error
-            console.log("fail result =", result);
+            console.log("fail response =", response);
         });
     };
 
@@ -133,16 +128,16 @@
             type: "post",
             data: params,
             cache: false
-        }).done(function (result) {
+        }).done(function (response) {
             if (day) {
                 calendar.startDate = day;
             }
-            calendar.events.list = result;
+            calendar.events.list = response;
             calendar.update();
 
-            nav.events.list = result;
+            nav.events.list = response;
             nav.update();
-        }).fail(function (result) {
+        }).fail(function (response) {
             // Error
         });
     }
@@ -150,77 +145,9 @@
 
 <script type="text/javascript">
 
-    function DisplaySelectedSlot(result) {
-        if (result.status) {
-            $("#selectedTimeBar span").text(result.data.TimeSlot);
-            $("#appointmentId").val(result.data.Id);
-            $("#txtNotes").val(result.data.Notes);
-            $("#btnBackToCalendar").show();
-            $("#booking-calendar").hide();
-            $("#booking-form").show();
-            switch (result.data.Status) {
-                case 0:
-                    $("#btnRequestAppointment").show();
-                    $("#btnCancelAppointment").hide();
-                    $("#txtNotes").prop("disabled", false);
-                    break;
-                case 1:
-                    $("#btnRequestAppointment").hide();
-                    $("#btnCancelAppointment").show();
-                    $("#txtNotes").prop("disabled", true);
-                    break;
-                default:
-                    $("#btnRequestAppointment").hide();
-                    $("#btnCancelAppointment").hide();
-                    $("#txtNotes").prop("disabled", true);
-            }
-        }
-        else {
-            // current slot is not available
-            $("#btnBackToCalendar").show();
-            $("#booking-calendar").hide();
-            $("#selectedTimeBar span").text(result.data);
-        }
-    }
-
-    function ClearSelectedSlot() {
-        $("#selectedTimeBar span").text("");
-        $("#btnBackToCalendar").hide();
-        $("#booking-calendar").show();
-        $("#appointmentId").val("");
-        $("#booking-form").hide();
-        $("#rs-message").hide();
-        $("#rf-message").hide();
-        $("#cs-message").hide();
-        $("#cf-message").hide();
-    }
-
-    function DisplayRequestedMessage(status) {
-        if (status) {
-            $("#rs-message").show();
-        }
-        else {
-            $("#rf-message").show();
-        }
-    }
-
-    function DisplayCancelledMessage(status) {
-        if (status) {
-            $("#cs-message").show();
-        }
-        else {
-            $("#cf-message").show();
-        }
-    }
-
-    $(document).ready(function () {
+        $(document).ready(function () {
 
         ClearSelectedSlot();
-
-        $("#selectedTimeBar").click(function () {
-            ClearSelectedSlot();
-            loadEvents();
-        });
 
         $("#btnBackToCalendar").click(function () {
             ClearSelectedSlot();
@@ -240,15 +167,12 @@
                 datatype: "json",
                 data: params,
                 cache: false
-            }).done(function (result) {
-                console.log("result=", result);
-                $("#booking-form").hide();
-                DisplayRequestedMessage(result.status);
-            }).fail(function (result) {
+            }).done(function (response) {
+                console.log("response=", response);
+                DisplaySelectedSlot(response);
+            }).fail(function (response) {
                 // Error
-                console.log("fail result=", result);
-                $("#booking-form").hide();
-                DisplayRequestedMessage(false);
+                console.log("fail response=", response);
             });
             return false;
         });
@@ -264,17 +188,54 @@
                 datatype: "json",
                 data: params,
                 cache: false
-            }).done(function (result) {
-                console.log("result=", result);
-                $("#booking-form").hide();
-                DisplayCancelledMessage(result.status);
-            }).fail(function (result) {
+            }).done(function (response) {
+                console.log("response=", response);
+                DisplaySelectedSlot(response);
+            }).fail(function (response) {
                 // Error
-                console.log("fail result=", result);
-                $("#booking-form").hide();
-                DisplayCancelledMessage(false);
+                console.log("fail response=", response);
             });
             return false;
         });
     });
+
+    function DisplaySelectedSlot(response) {
+        $("#booking-calendar").hide();
+        $("#booking-form").show();
+        if (response.status) {
+            $("#selectedTimeBar span").text(response.data.TimeSlot);
+            $("#appointmentId").val(response.data.Id);
+            $("#txtNotes").val(response.data.Notes);
+            switch (response.data.Status) {
+                case 0:
+                    $("#btnRequestAppointment").show();
+                    $("#btnCancelAppointment").hide();
+                    $("#txtNotes").prop("disabled", false);
+                    break;
+                case 1:
+                    $("#btnRequestAppointment").hide();
+                    $("#btnCancelAppointment").show();
+                    $("#txtNotes").prop("disabled", true);
+                    break;
+                default:
+                    $("#btnRequestAppointment").hide();
+                    $("#btnCancelAppointment").hide();
+                    $("#txtNotes").prop("disabled", true);
+            }
+        }
+        if (response.message) {
+            $("#rMessage").text(response.message);
+        }
+        else {
+            $("#rMessage").text("");
+        }
+    }
+
+    function ClearSelectedSlot() {
+        $("#booking-calendar").show();
+        $("#booking-form").hide();
+        $("#appointmentId").val("");
+        $("#rMessage").text("");
+    }
+
 </script>
