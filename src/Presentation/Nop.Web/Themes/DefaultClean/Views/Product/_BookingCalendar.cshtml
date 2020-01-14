@@ -41,8 +41,8 @@
             </div>
         </div>
         <div class="form-fields">
-            <div class="title" id="rMessage">
-            </div>
+            <p class="message" id="rMessage"></p>
+            <p class="message-error" id="eMessage"></p>
         </div>
     </div>
 </div>
@@ -104,9 +104,9 @@
             console.log("response =", response);
             DisplaySelectedSlot(response);
         })
-        .fail(function (response) {
+        .fail(function (xhr, ajaxOptions, thrownError) {
             // Error
-            console.log("fail response =", response);
+            DisplayError(xhr, thrownError);
         });
     };
 
@@ -128,7 +128,8 @@
             type: "post",
             data: params,
             cache: false
-        }).done(function (response) {
+        })
+        .done(function (response) {
             if (day) {
                 calendar.startDate = day;
             }
@@ -137,8 +138,10 @@
 
             nav.events.list = response;
             nav.update();
-        }).fail(function (response) {
+        })
+        .fail(function (xhr, ajaxOptions, thrownError) {
             // Error
+            DisplayError(xhr, thrownError);
         });
     }
 </script>
@@ -167,13 +170,16 @@
                 datatype: "json",
                 data: params,
                 cache: false
-            }).done(function (response) {
+            })
+            .done(function (response) {
                 console.log("response=", response);
                 DisplaySelectedSlot(response);
-            }).fail(function (response) {
+            })
+            .fail(function (xhr, ajaxOptions, thrownError) {
                 // Error
-                console.log("fail response=", response);
+                DisplayError(xhr, thrownError);
             });
+
             return false;
         });
 
@@ -188,13 +194,16 @@
                 datatype: "json",
                 data: params,
                 cache: false
-            }).done(function (response) {
+            })
+            .done(function (response) {
                 console.log("response=", response);
                 DisplaySelectedSlot(response);
-            }).fail(function (response) {
+            })
+            .fail(function (xhr, ajaxOptions, thrownError) {
                 // Error
-                console.log("fail response=", response);
+                DisplayError(xhr, thrownError);
             });
+
             return false;
         });
     });
@@ -236,6 +245,10 @@
         $("#booking-form").hide();
         $("#appointmentId").val("");
         $("#rMessage").text("");
+        $("#eMessage").text("");
     }
 
+    function DisplayError(response, thrownError) {
+        $("#eMessage").text(thrownError + "\r\n" + response.status + "\r\n" + response.statusText);
+    }
 </script>
