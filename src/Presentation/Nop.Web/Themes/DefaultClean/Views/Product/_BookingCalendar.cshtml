@@ -3,29 +3,26 @@
 <div id="book-time" class="book-main">
     <h3>@T("Product.BookTime"): @Model.Name</h3>
     <div class="fieldset">
-        <div class="form-fields" id="booking-calendar" >
-            <div class="title">
-                @T("Product.BookTime.SelectTimeSlot"):
+        <div class="form-fields" id="booking-calendar">
+            <div class="column-left">
+                <div id="nav"></div>
             </div>
-            <div>
-                <div class="column-left">
-                    <div id="nav"></div>
-                </div>
-                <div class="column-main">
-                    <div id="calendar"></div>
-                </div>
+            <div class="column-main">
+                <div id="calendar"></div>
             </div>
         </div>
         <div class="form-fields" id="booking-form">
-            <div id="selectedTimeBar" class="title">
-                @T("Product.BookTime.SelectTimeSlot"):
-                <span></span>
-            </div>
-            <div class="title">
-                @T("Product.BookTime.Notes"):
+            <div class="inputs">
+                <label for="txtTimeSlot">@T("Product.BookTime.SelectTimeSlot"):</label>
+                <input type="text" id="txtTimeSlot" name="txtTimeSlot" disabled />
             </div>
             <div class="inputs">
-                <textarea id="txtNotes" name="Notes"></textarea>
+                <label for="txtStatus">@T("Product.BookTime.TimeSlotStatus"):</label>
+                <input type="text" id="txtStatus" name="txtStatus" disabled />
+            </div>
+            <div class="inputs">
+                <label for="txtNotes">@T("Product.BookTime.Notes"):</label>
+                <textarea id="txtNotes" name="txtNotes"></textarea>
             </div>
             <input type="hidden" id="appointmentId" />
             <div class="buttons">
@@ -39,8 +36,6 @@
                     @T("Product.BookTime.AppointmentUpdate.BackToCalendar")
                 </button>
             </div>
-        </div>
-        <div class="form-fields">
             <p class="message" id="rMessage"></p>
             <p class="message-error" id="eMessage"></p>
         </div>
@@ -75,7 +70,7 @@
         switch (args.data.tags.status) {
             case "Free":
                 args.data.barColor = "green";
-                args.data.html = "Available";
+                args.data.html = "Free";
                 args.data.toolTip = "Click to request this time slot";
                 break;
             case "Waiting":
@@ -212,24 +207,30 @@
         $("#booking-calendar").hide();
         $("#booking-form").show();
         if (response.status) {
-            $("#selectedTimeBar span").text(response.data.TimeSlot);
+            $("#txtTimeSlot").val(response.data.TimeSlot);
             $("#appointmentId").val(response.data.Id);
             $("#txtNotes").val(response.data.Notes);
             switch (response.data.Status) {
                 case 0:
                     $("#btnRequestAppointment").show();
                     $("#btnCancelAppointment").hide();
+                    $("#txtStatus").val("Free");
                     $("#txtNotes").prop("disabled", false);
                     break;
                 case 1:
                     $("#btnRequestAppointment").hide();
                     $("#btnCancelAppointment").show();
+                    $("#txtStatus").val("Waiting for confirmation");
+                    $("#txtNotes").prop("disabled", true);
+                    break;
+                case 2:
+                    $("#btnRequestAppointment").hide();
+                    $("#btnCancelAppointment").hide();
+                    $("#txtStatus").val("Confirmed");
                     $("#txtNotes").prop("disabled", true);
                     break;
                 default:
-                    $("#btnRequestAppointment").hide();
-                    $("#btnCancelAppointment").hide();
-                    $("#txtNotes").prop("disabled", true);
+                    break;
             }
         }
         if (response.message) {

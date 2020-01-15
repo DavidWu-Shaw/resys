@@ -318,7 +318,7 @@
             $("#txtNotes").val(response.data.Notes);
             switch (response.data.Status) {
                 case 0:
-                    $("#fStatus").text("Available");
+                    $("#fStatus").text("Free");
                     $("#btnConfirmAppointment").hide();
                     $("#btnCancelAppointment").hide();
                     $("#btnDeleteAppointment").show();
@@ -334,6 +334,9 @@
                     $("#btnConfirmAppointment").hide();
                     $("#btnCancelAppointment").show();
                     $("#btnDeleteAppointment").hide();
+                    break;
+                default:
+                    break;
             }
         }
         if (response.message) {

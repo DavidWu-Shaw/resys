@@ -149,7 +149,8 @@ namespace Nop.Web.Controllers
             }
             else
             {
-                return Json(new { status = false, data = "Selected time not available." });
+                string statusText = _localizationService.GetResource("Product.AppointmentUpdate.SlotNotExist");
+                return Json(new { status = false, message = statusText });
             }
         }
 
@@ -169,11 +170,13 @@ namespace Nop.Web.Controllers
 
                 var model = _appointmentModelFactory.PrepareAppointmentUpdateModel(appointment);
 
-                return Json(new { status = true, message = $"Appointment request sent.", data = model });
+                string statusText = _localizationService.GetResource("Product.AppointmentRequest.Sent");
+                return Json(new { status = true, message = statusText, data = model });
             }
             else
             {
-                return Json(new { status = false, responseText = $"Appointment request failed." });
+                string statusText = _localizationService.GetResource("Product.AppointmentRequest.Failed");
+                return Json(new { status = false, message = statusText });
             }
         }
 
@@ -181,7 +184,7 @@ namespace Nop.Web.Controllers
         public virtual IActionResult AppointmentCancel(int id)
         {
             var appointment = _appointmentService.GetAppointmentById(id);
-            if (appointment != null && appointment.CustomerId == _workContext.CurrentCustomer.Id)
+            if (appointment != null && appointment.CustomerId == _workContext.CurrentCustomer.Id && appointment.Status == AppointmentStatusType.Waiting)
             {
                 appointment.Status = AppointmentStatusType.Free;
                 appointment.CustomerId = 0;
@@ -190,11 +193,13 @@ namespace Nop.Web.Controllers
 
                 var model = _appointmentModelFactory.PrepareAppointmentUpdateModel(appointment);
 
-                return Json(new { status = true, message = $"Appointment cancelled.", data = model });
+                string statusText = _localizationService.GetResource("Product.AppointmentCancel.Cancelled");
+                return Json(new { status = true, message = statusText, data = model });
             }
             else
             {
-                return Json(new { status = false, responseText = $"Appointment cancellation failed." });
+                string statusText = _localizationService.GetResource("Product.AppointmentCancel.Failed");
+                return Json(new { status = false, message = statusText });
             }
         }
 

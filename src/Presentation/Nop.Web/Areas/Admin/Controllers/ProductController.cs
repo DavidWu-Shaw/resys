@@ -875,7 +875,8 @@ namespace Nop.Web.Areas.Admin.Controllers
             }
             else
             {
-                return Json(new { status = false, message = "Selected time not available." });
+                string statusText = _localizationService.GetResource("Admin.Product.AppointmentEdit.SlotNoExist");
+                return Json(new { status = false, message = statusText });
             }
         }
 
@@ -893,10 +894,15 @@ namespace Nop.Web.Areas.Admin.Controllers
 
                 var model = _appointmentModelFactory.PrepareAppointmentEditModel(appointment);
 
-                return Json(new { status = true, message = $"Appointment confirmed.", data = model });
+                string statusText = _localizationService.GetResource("Admin.Product.AppointmentConfirm.Confirmed");
+                return Json(new { status = true, message = statusText, data = model });
             }
-            // Customer may have just concelled this appointment
-            return Json(new { status = false, message = $"Appointment confirm failed." });
+            else
+            {
+                // Customer may have just concelled this appointment
+                string statusText = _localizationService.GetResource("Admin.Product.AppointmentConfirm.Failed");
+                return Json(new { status = false, message = statusText });
+            }
         }
 
         [HttpPost]
@@ -915,9 +921,14 @@ namespace Nop.Web.Areas.Admin.Controllers
 
                 var model = _appointmentModelFactory.PrepareAppointmentEditModel(appointment);
 
-                return Json(new { status = true, message = $"Appointment cancelled.", data = model });
+                string statusText = _localizationService.GetResource("Admin.Product.AppointmentCancel.Cancelled");
+                return Json(new { status = true, message = statusText, data = model });
             }
-            return Json(new { status = false, message = $"Appointment cancellation failed." });
+            else
+            {
+                string statusText = _localizationService.GetResource("Admin.Product.AppointmentCancel.Failed");
+                return Json(new { status = false, message = statusText });
+            }
         }
 
         [HttpPost]
@@ -930,9 +941,14 @@ namespace Nop.Web.Areas.Admin.Controllers
             if (appointment != null && appointment.Status == AppointmentStatusType.Free)
             {
                 _appointmentService.DeleteAppointment(appointment);
-                return Json(new { status = true, message = "Appointment deleted." });
+                string statusText = _localizationService.GetResource("Admin.Product.AppointmentDelete.Deleted");
+                return Json(new { status = true, message = statusText });
             }
-            return Json(new { status = false, message = "Appointment delete failed." });
+            else
+            {
+                string statusText = _localizationService.GetResource("Admin.Product.AppointmentDelete.Failed");
+                return Json(new { status = false, message = statusText });
+            }
         }
 
         #endregion Appointment Methods
