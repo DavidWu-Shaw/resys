@@ -140,6 +140,12 @@ namespace Nop.Web.Controllers
 
         public virtual IActionResult AppointmentUpdate(int id)
         {
+            if (_workContext.CurrentCustomer.IsGuest())
+            {
+                string statusText = _localizationService.GetResource("Product.AppointmentUpdate.LoginRequired");
+                return Json(new { status = false, message = statusText, data = 0 });
+            }
+
             var appointment = _appointmentService.GetAppointmentById(id);
             if (appointment != null && (appointment.CustomerId == 0 || appointment.CustomerId == _workContext.CurrentCustomer.Id))
             {
@@ -158,7 +164,10 @@ namespace Nop.Web.Controllers
         public virtual IActionResult AppointmentRequest(int id, string notes)
         {
             if (_workContext.CurrentCustomer.IsGuest())
-                return Challenge();
+            {
+                string statusText = _localizationService.GetResource("Product.AppointmentUpdate.LoginRequired");
+                return Json(new { status = false, message = statusText, data = 0 });
+            }
 
             var appointment = _appointmentService.GetAppointmentById(id);
             if (appointment != null && appointment.Status == AppointmentStatusType.Free)
@@ -183,6 +192,12 @@ namespace Nop.Web.Controllers
         [HttpPost]
         public virtual IActionResult AppointmentCancel(int id)
         {
+            if (_workContext.CurrentCustomer.IsGuest())
+            {
+                string statusText = _localizationService.GetResource("Product.AppointmentUpdate.LoginRequired");
+                return Json(new { status = false, message = statusText, data = 0 });
+            }
+
             var appointment = _appointmentService.GetAppointmentById(id);
             if (appointment != null && appointment.CustomerId == _workContext.CurrentCustomer.Id && appointment.Status == AppointmentStatusType.Waiting)
             {
@@ -278,6 +293,7 @@ namespace Nop.Web.Controllers
 
             //model
             var model = _productModelFactory.PrepareProductDetailsModel(product, updatecartitem, false);
+            model.IsUserAuthenticated = _workContext.CurrentCustomer.IsRegistered();
             //template
             var productTemplateViewPath = _productModelFactory.PrepareProductTemplateViewPath(product);
 

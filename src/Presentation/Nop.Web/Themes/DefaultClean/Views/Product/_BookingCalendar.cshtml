@@ -1,7 +1,14 @@
 ﻿@model ProductDetailsModel
+@inject Nop.Core.IWebHelper webHelper
 
 <div id="book-time" class="book-main">
-    <h3>@T("Product.BookTime"): @Model.Name</h3>
+    <div class="title">
+        @if (!Model.IsUserAuthenticated)
+        {
+            <a id="aLogin" href="@Url.RouteUrl("Login", new { returnUrl = webHelper.GetRawUrl(Context.Request) })" class="ico-login">@T("Account.Login")</a>
+        }
+        <span>@T("Product.BookTime"): @Model.Name</span>
+    </div>
     <div class="fieldset">
         <div class="form-fields" id="booking-calendar">
             <div class="column-left">
@@ -36,9 +43,8 @@
                     @T("Product.BookTime.AppointmentUpdate.BackToCalendar")
                 </button>
             </div>
-            <p class="message" id="rMessage"></p>
-            <p class="message-error" id="eMessage"></p>
         </div>
+        <p class="message" id="rMessage"></p>
     </div>
 </div>
 
@@ -204,6 +210,10 @@
     });
 
     function DisplaySelectedSlot(response) {
+        if (response.status == false && response.data == 0) {
+            $("#rMessage").text(response.message);
+            return;
+        }
         $("#booking-calendar").hide();
         $("#booking-form").show();
         if (response.status) {
@@ -246,10 +256,9 @@
         $("#booking-form").hide();
         $("#appointmentId").val("");
         $("#rMessage").text("");
-        $("#eMessage").text("");
     }
 
     function DisplayError(response, thrownError) {
-        $("#eMessage").text(thrownError + "\r\n" + response.status + "\r\n" + response.statusText);
+        $("#rMessage").text(thrownError + "\r\n" + response.status + "\r\n" + response.statusText);
     }
 </script>
