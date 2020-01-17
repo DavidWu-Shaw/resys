@@ -276,7 +276,8 @@ namespace Nop.Web.Controllers
             //save as recently viewed
             _recentlyViewedProductsService.AddProductToRecentlyViewedList(product.Id);
 
-            //display "edit" (manage) link
+            //display "edit" (manage) link and manage calendar link
+            string manageCalendarUrl = string.Empty;
             if (_permissionService.Authorize(StandardPermissionProvider.AccessAdminPanel) &&
                 _permissionService.Authorize(StandardPermissionProvider.ManageProducts))
             {
@@ -284,6 +285,7 @@ namespace Nop.Web.Controllers
                 if (_workContext.CurrentVendor == null || _workContext.CurrentVendor.Id == product.VendorId)
                 {
                     DisplayEditLink(Url.Action("Edit", "Product", new { id = product.Id, area = AreaNames.Admin }));
+                    manageCalendarUrl = Url.Action("AppointmentCalendar", "Product", new { id = product.Id, area = AreaNames.Admin });
                 }
             }
 
@@ -294,6 +296,7 @@ namespace Nop.Web.Controllers
             //model
             var model = _productModelFactory.PrepareProductDetailsModel(product, updatecartitem, false);
             model.IsUserAuthenticated = _workContext.CurrentCustomer.IsRegistered();
+            model.ManageCalendarUrl = manageCalendarUrl;
             //template
             var productTemplateViewPath = _productModelFactory.PrepareProductTemplateViewPath(product);
 

@@ -3,11 +3,15 @@
 
 <div id="book-time" class="book-main">
     <div class="title">
+        <span>@T("Product.BookTime"): @Model.Name</span>
         @if (!Model.IsUserAuthenticated)
         {
             <a id="aLogin" href="@Url.RouteUrl("Login", new { returnUrl = webHelper.GetRawUrl(Context.Request) })" class="ico-login">@T("Account.Login")</a>
         }
-        <span>@T("Product.BookTime"): @Model.Name</span>
+        @if (!string.IsNullOrEmpty(Model.ManageCalendarUrl))
+        {
+            <a href="@Model.ManageCalendarUrl" class="manage-page">@T("Admin.Common.Calendar")</a>
+        }
     </div>
     <div class="fieldset">
         <div class="form-fields" id="booking-calendar">
@@ -103,7 +107,13 @@
         })
         .done(function (response) {
             console.log("response =", response);
-            DisplaySelectedSlot(response);
+            if (response.status == false && response.data == 0) {
+                // unauthenticated user, redirect to login page
+                window.location = $("#aLogin").attr("href");
+            }
+            else {
+                DisplaySelectedSlot(response);
+            }
         })
         .fail(function (xhr, ajaxOptions, thrownError) {
             // Error
@@ -210,10 +220,6 @@
     });
 
     function DisplaySelectedSlot(response) {
-        if (response.status == false && response.data == 0) {
-            $("#rMessage").text(response.message);
-            return;
-        }
         $("#booking-calendar").hide();
         $("#booking-form").show();
         if (response.status) {
