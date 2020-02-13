@@ -7097,3 +7097,8 @@ pre {
     width: 220px;
 }
 
+.product-name #book-button {
+    margin-top: 8px;
+    display: inline-block;
+    padding: 12px 24px;
+}

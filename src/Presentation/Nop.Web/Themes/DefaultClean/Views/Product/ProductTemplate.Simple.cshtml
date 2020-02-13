@@ -64,7 +64,7 @@
                             <h1 itemprop="name">
                                 @Model.Name
                             </h1>
-                            <a href="#book-time" class="button-1 add-to-cart-button">@T("Product.BookTime")</a>
+                            <a id="book-button" href="#book-time" class="button-1 add-to-cart-button">@T("Product.BookTime")</a>
                         </div>
                         @if (!string.IsNullOrEmpty(Model.ShortDescription))
                         {
