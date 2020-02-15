@@ -64,7 +64,11 @@
                             <h1 itemprop="name">
                                 @Model.Name
                             </h1>
-                            <a id="book-button" href="#book-time" class="button-1 add-to-cart-button">@T("Product.BookTime")</a>
+                            <a id="book-button" href="#book-time" class="button-1 add-to-cart-button anchor-button">@T("Product.BookTime")</a>
+                            @if (!string.IsNullOrEmpty(Model.ManageCalendarUrl))
+                            {
+                                <a href="@Model.ManageCalendarUrl" class="add-to-cart-button anchor-button">@T("Admin.Common.Calendar")</a>
+                            }
                         </div>
                         @if (!string.IsNullOrEmpty(Model.ShortDescription))
                         {

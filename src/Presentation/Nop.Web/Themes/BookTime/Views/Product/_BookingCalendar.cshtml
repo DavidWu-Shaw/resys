@@ -3,15 +3,7 @@
 
 <div id="book-time" class="book-main">
     <div class="title">
-        <span>@T("Product.BookTime"): @Model.Name</span>
-        @if (!Model.IsUserAuthenticated)
-        {
-            <a id="aLogin" href="@Url.RouteUrl("Login", new { returnUrl = webHelper.GetRawUrl(Context.Request) })" class="ico-login">@T("Account.Login")</a>
-        }
-        @if (!string.IsNullOrEmpty(Model.ManageCalendarUrl))
-        {
-            <a href="@Model.ManageCalendarUrl" class="manage-page">@T("Admin.Common.Calendar")</a>
-        }
+        <h3>@T("Product.BookTime"): @Model.Name</h3>
     </div>
     <div class="fieldset">
         <div class="form-fields" id="booking-calendar">

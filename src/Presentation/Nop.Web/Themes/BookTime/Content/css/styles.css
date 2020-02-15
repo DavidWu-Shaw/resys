@@ -2048,7 +2048,6 @@ label, label + * {
 	height: 43px;
     border: none;
 	background-color: #4ab2f1;
-    padding: 0 24px;
     font-size: 15px;
 	color: #fff;
 	text-transform: uppercase;
@@ -6662,6 +6661,7 @@ pre {
 }
 .product-details-page .title {
 	text-align: left;
+    margin-bottom: 4px;
 }
 
 
@@ -7094,7 +7094,7 @@ pre {
     width: 220px;
 }
 
-#book-button {
+.anchor-button {
     margin-top: 8px;
     display: inline-block;
     padding: 12px 24px;
