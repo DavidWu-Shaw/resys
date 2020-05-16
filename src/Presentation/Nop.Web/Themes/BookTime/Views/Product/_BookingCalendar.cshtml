@@ -29,13 +29,13 @@
             </div>
             <input type="hidden" id="appointmentId" />
             <div class="buttons">
-                <button type="submit" name="btnRequestAppointment" id="btnRequestAppointment" class="btn btn-primary" style="margin-right: 3px;">
+                <button type="submit" name="btnRequestAppointment" id="btnRequestAppointment" class="btn add-to-cart-button">
                     @T("Product.BookTime.AppointmentUpdate.Request")
                 </button>
-                <button type="submit" name="btnCancelAppointment" id="btnCancelAppointment" class="btn bg-red" style="margin-right: 3px;">
+                <button type="submit" name="btnCancelAppointment" id="btnCancelAppointment" class="btn bg-red add-to-cart-button">
                     @T("Product.BookTime.AppointmentUpdate.Cancel")
                 </button>
-                <button type="submit" name="btnBackToCalendar" id="btnBackToCalendar" class="btn btn-primary">
+                <button type="submit" name="btnBackToCalendar" id="btnBackToCalendar" class="btn add-to-cart-button">
                     @T("Product.BookTime.AppointmentUpdate.BackToCalendar")
                 </button>
             </div>
@@ -72,7 +72,7 @@
         switch (args.data.tags.status) {
             case "Free":
                 args.data.barColor = "green";
-                args.data.html = "Free";
+                args.data.html = "Available";
                 args.data.toolTip = "Click to request this time slot";
                 break;
             case "Waiting":
@@ -176,7 +176,13 @@
             })
             .done(function (response) {
                 console.log("response=", response);
-                DisplaySelectedSlot(response);
+                if (response.status) {
+                    ClearSelectedSlot();
+                    loadEvents();
+                }
+                else {
+                    DisplaySelectedSlot(response);
+                }
             })
             .fail(function (xhr, ajaxOptions, thrownError) {
                 // Error
@@ -200,7 +206,13 @@
             })
             .done(function (response) {
                 console.log("response=", response);
-                DisplaySelectedSlot(response);
+                if (response.status) {
+                    ClearSelectedSlot();
+                    loadEvents();
+                }
+                else {
+                    DisplaySelectedSlot(response);
+                }
             })
             .fail(function (xhr, ajaxOptions, thrownError) {
                 // Error
