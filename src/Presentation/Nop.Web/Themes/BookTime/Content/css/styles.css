@@ -6729,7 +6729,7 @@ pre {
 	overflow: hidden;
 }
 .login-page .new-wrapper {
-	float: left;
+	float: right;
 	width: 49%;
 	margin: 0;
 }
@@ -6737,7 +6737,7 @@ pre {
 	min-height: 200px;
 }
 .login-page .returning-wrapper {
-	float: right;
+	float: left;
 	width: 49%;
 }
 .login-page .returning-wrapper .form-fields {

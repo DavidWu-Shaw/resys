@@ -49,6 +49,7 @@
 
   <ItemGroup>
     <Folder Include="Plugins\" />
+    <Folder Include="Themes\BookTime\Views\Customer\" />
   </ItemGroup>
 
   <!-- This target execute after "Build" target.
