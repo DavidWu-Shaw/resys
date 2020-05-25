@@ -2057,6 +2057,22 @@ label, label + * {
 	background-color: #248ece;
 }
 
+.button-base {
+    display: inline-block;
+    min-width: 140px;
+    border: none;
+    background-color: #4ab2f1;
+    padding: 10px 20px;
+    text-align: center;
+    font-size: 15px;
+    color: #fff;
+    text-transform: uppercase;
+}
+
+.button-base:hover {
+    background-color: #248ece;
+}
+
 .product-share-button {
 	display: inline-block;
     overflow: hidden;
