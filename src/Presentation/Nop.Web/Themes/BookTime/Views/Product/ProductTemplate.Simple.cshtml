@@ -79,6 +79,16 @@
                         @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductDetailsOverviewTop, additionalData = Model })
                         <!--product reviews-->
                         @await Html.PartialAsync("_ProductReviewOverview", Model.ProductReviewOverview)
+                        <!--product vendor-->
+                        <div class="additional-details">
+                            @if (Model.ShowVendor)
+                            {
+                                <div class="product-vendor">
+                                    <span class="label">@T("Products.Vendor"):</span>
+                                    <span class="value"><a href="@Url.RouteUrl("Vendor", new { SeName = Model.VendorModel.SeName })">@Model.VendorModel.Name</a></span>
+                                </div>
+                            }
+                        </div>
                         <!--wishlist, compare, email a friend-->
                         <div class="overview-buttons">
                             @await Html.PartialAsync("_ProductEmailAFriendButton", Model)
