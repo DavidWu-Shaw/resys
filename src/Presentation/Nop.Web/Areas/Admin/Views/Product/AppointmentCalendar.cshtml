@@ -97,6 +97,8 @@
         <div class="form-group">
             <div class="col-sm-12" id="rMessage">
             </div>
+            <div class="col-sm-12" id="eMessage">
+            </div>
         </div>
     </div>
 </form>
@@ -163,9 +165,9 @@
             console.log("response =", response);
             DisplaySelectedSlot(response);
         })
-        .fail(function (response) {
+        .fail(function (xhr, ajaxOptions, thrownError) {
             // Error
-            console.log("fail response =", response);
+            DisplayError(xhr, thrownError);
         });
     };
 
@@ -199,8 +201,9 @@
             nav.events.list = response;
             nav.update();
         })
-        .fail(function (response) {
+        .fail(function (xhr, ajaxOptions, thrownError) {
             // Error
+            DisplayError(xhr, thrownError);
         });
     }
 
@@ -229,13 +232,16 @@
                 datatype: "json",
                 data: params,
                 cache: false
-            }).done(function (response) {
+            })
+            .done(function (response) {
                 console.log("response=", response);
                 DisplaySelectedSlot(response);
-            }).fail(function (response) {
+            })
+            .fail(function (xhr, ajaxOptions, thrownError) {
                 // Error
-                console.log("fail response=", response);
-                });
+                DisplayError(xhr, thrownError);
+            });
+
             return false;
         });
 
@@ -256,10 +262,11 @@
                 console.log("response=", response);
                 DisplaySelectedSlot(response);
             })
-            .fail(function (response) {
+            .fail(function (xhr, ajaxOptions, thrownError) {
                 // Error
-                console.log("fail response=", response);
+                DisplayError(xhr, thrownError);
             });
+
             return false;
         });
 
@@ -280,10 +287,11 @@
                 console.log("response=", response);
                 DisplayDeletedSlot(response);
             })
-            .fail(function (response) {
+            .fail(function (xhr, ajaxOptions, thrownError) {
                 // Error
-                console.log("fail response=", response);
+                DisplayError(xhr, thrownError);
             });
+
             return false;
         });
     });
@@ -310,7 +318,7 @@
             $("#txtNotes").val(response.data.Notes);
             switch (response.data.Status) {
                 case 0:
-                    $("#fStatus").text("Available");
+                    $("#fStatus").text("Free");
                     $("#btnConfirmAppointment").hide();
                     $("#btnCancelAppointment").hide();
                     $("#btnDeleteAppointment").show();
@@ -326,6 +334,9 @@
                     $("#btnConfirmAppointment").hide();
                     $("#btnCancelAppointment").show();
                     $("#btnDeleteAppointment").hide();
+                    break;
+                default:
+                    break;
             }
         }
         if (response.message) {
@@ -340,5 +351,12 @@
         $("#booking-calendar").show();
         $("#booking-form").hide();
         $("#appointmentId").val("");
+        $("#rMessage").text("");
+        $("#eMessage").text("");
     }
+
+    function DisplayError(response, thrownError) {
+        $("#eMessage").text(thrownError + "\r\n" + response.status + "\r\n" + response.statusText);
+    }
+
 </script>

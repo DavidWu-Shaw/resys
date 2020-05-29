@@ -121,21 +121,6 @@ namespace Nop.Web.Controllers
 
         #region Appointment Methods
 
-        public virtual IActionResult AppointmentUpdate(int id)
-        {
-            var appointment = _appointmentService.GetAppointmentById(id);
-            if (appointment != null && (appointment.CustomerId == 0 || appointment.CustomerId == _workContext.CurrentCustomer.Id))
-            {
-                //prepare model
-                var model = _appointmentModelFactory.PrepareAppointmentUpdateModel(appointment);
-                return Json(new { status = true, data = model });
-            }
-            else
-            {
-                return Json(new { status = false, data = "Selected time not available." });
-            }
-        }
-
         [HttpPost]
         public virtual IActionResult AppointmentSlotsByCustomer(DateTime start, DateTime end, int resourceId)
         {
@@ -153,11 +138,36 @@ namespace Nop.Web.Controllers
             return Json(model);
         }
 
+        public virtual IActionResult AppointmentUpdate(int id)
+        {
+            if (_workContext.CurrentCustomer.IsGuest())
+            {
+                string statusText = _localizationService.GetResource("Product.AppointmentUpdate.LoginRequired");
+                return Json(new { status = false, message = statusText, data = 0 });
+            }
+
+            var appointment = _appointmentService.GetAppointmentById(id);
+            if (appointment != null && (appointment.CustomerId == 0 || appointment.CustomerId == _workContext.CurrentCustomer.Id))
+            {
+                //prepare model
+                var model = _appointmentModelFactory.PrepareAppointmentUpdateModel(appointment);
+                return Json(new { status = true, data = model });
+            }
+            else
+            {
+                string statusText = _localizationService.GetResource("Product.AppointmentUpdate.SlotNotExist");
+                return Json(new { status = false, message = statusText });
+            }
+        }
+
         [HttpPost]
         public virtual IActionResult AppointmentRequest(int id, string notes)
         {
             if (_workContext.CurrentCustomer.IsGuest())
-                return Challenge();
+            {
+                string statusText = _localizationService.GetResource("Product.AppointmentUpdate.LoginRequired");
+                return Json(new { status = false, message = statusText, data = 0 });
+            }
 
             var appointment = _appointmentService.GetAppointmentById(id);
             if (appointment != null && appointment.Status == AppointmentStatusType.Free)
@@ -167,30 +177,44 @@ namespace Nop.Web.Controllers
                 appointment.Notes = notes;
                 _appointmentService.UpdateAppointment(appointment);
 
-                return Json(new { status = true, responseText = $"Appointment requested." });
+                var model = _appointmentModelFactory.PrepareAppointmentUpdateModel(appointment);
+
+                string statusText = _localizationService.GetResource("Product.AppointmentRequest.Sent");
+                return Json(new { status = true, message = statusText, data = model });
             }
             else
             {
-                return Json(new { status = false, responseText = $"Appointment request failed." });
+                string statusText = _localizationService.GetResource("Product.AppointmentRequest.Failed");
+                return Json(new { status = false, message = statusText });
             }
         }
 
         [HttpPost]
         public virtual IActionResult AppointmentCancel(int id)
         {
+            if (_workContext.CurrentCustomer.IsGuest())
+            {
+                string statusText = _localizationService.GetResource("Product.AppointmentUpdate.LoginRequired");
+                return Json(new { status = false, message = statusText, data = 0 });
+            }
+
             var appointment = _appointmentService.GetAppointmentById(id);
-            if (appointment != null && appointment.CustomerId == _workContext.CurrentCustomer.Id)
+            if (appointment != null && appointment.CustomerId == _workContext.CurrentCustomer.Id && appointment.Status == AppointmentStatusType.Waiting)
             {
                 appointment.Status = AppointmentStatusType.Free;
                 appointment.CustomerId = 0;
                 appointment.Notes = "";
                 _appointmentService.UpdateAppointment(appointment);
 
-                return Json(new { status = true, responseText = $"Appointment cancelled." });
+                var model = _appointmentModelFactory.PrepareAppointmentUpdateModel(appointment);
+
+                string statusText = _localizationService.GetResource("Product.AppointmentCancel.Cancelled");
+                return Json(new { status = true, message = statusText, data = model });
             }
             else
             {
-                return Json(new { status = false, responseText = $"Appointment cancellation failed." });
+                string statusText = _localizationService.GetResource("Product.AppointmentCancel.Failed");
+                return Json(new { status = false, message = statusText });
             }
         }
 
@@ -252,7 +276,8 @@ namespace Nop.Web.Controllers
             //save as recently viewed
             _recentlyViewedProductsService.AddProductToRecentlyViewedList(product.Id);
 
-            //display "edit" (manage) link
+            //display "edit" (manage) link and manage calendar link
+            string manageCalendarUrl = string.Empty;
             if (_permissionService.Authorize(StandardPermissionProvider.AccessAdminPanel) &&
                 _permissionService.Authorize(StandardPermissionProvider.ManageProducts))
             {
@@ -260,6 +285,7 @@ namespace Nop.Web.Controllers
                 if (_workContext.CurrentVendor == null || _workContext.CurrentVendor.Id == product.VendorId)
                 {
                     DisplayEditLink(Url.Action("Edit", "Product", new { id = product.Id, area = AreaNames.Admin }));
+                    manageCalendarUrl = Url.Action("AppointmentCalendar", "Product", new { id = product.Id, area = AreaNames.Admin });
                 }
             }
 
@@ -269,6 +295,8 @@ namespace Nop.Web.Controllers
 
             //model
             var model = _productModelFactory.PrepareProductDetailsModel(product, updatecartitem, false);
+            model.IsUserAuthenticated = _workContext.CurrentCustomer.IsRegistered();
+            model.ManageCalendarUrl = manageCalendarUrl;
             //template
             var productTemplateViewPath = _productModelFactory.PrepareProductTemplateViewPath(product);
 

@@ -834,7 +834,7 @@ label, label + * {
 .header-lower {
 	position: relative;
 	z-index: 0;
-	padding: 35px 0;
+	padding: 12px 0;
 }
 
 .header-logo {
@@ -1272,7 +1272,7 @@ label, label + * {
 
 
 .breadcrumb {
-	margin: 0 0 50px;
+	margin: 0 0 10px;
 	background-color: #f6f6f6;
 	padding: 5px 10px;
 }
@@ -1545,20 +1545,25 @@ label, label + * {
 	margin: 0;
     font-size: 0;
 }
-.item-box input[type="button"] {
+.item-box .book-button {
 	display: inline-block;
 	height: 40px;
+    padding: 10px 0;
 	border: none;
 	vertical-align: middle;
 }
-.item-box .product-box-add-to-cart-button {
-	width: 60%;
-	background-color: #4ab2f1;
-	text-align: center;
-	font-size: 15px;
-	color: #fff;
-	text-transform: uppercase;
-}
+    .item-box .product-box-add-to-cart-button {
+        width: 60%;
+        background-color: #4ab2f1;
+        text-align: center;
+        font-size: 15px;
+        color: #fff;
+        text-transform: uppercase;
+        display: inline-block;
+        height: 40px;
+        border: none;
+        vertical-align: middle;
+    }
 .item-box .product-box-add-to-cart-button:hover {
 	background-color: #248ece;
 }
@@ -1713,7 +1718,7 @@ label, label + * {
 	padding: 20px 0 0;
 }
 .product-essential {
-	margin: 0 0 40px;
+	margin: 0 0 10px;
 	border-bottom: 1px solid #ddd;
 	padding: 0 0 10px;
 }
@@ -1723,7 +1728,7 @@ label, label + * {
 	clear: both;
 }
 .gallery {
-	margin: 0 auto 50px;
+	margin: 0 auto 10px;
 }
 .gallery .picture-wrapper {
     margin: 0 0 10px;
@@ -1737,19 +1742,12 @@ label, label + * {
 .gallery .picture:before {
 	content: "";
 	display: block;
-	padding-top: 100%;
 }
 .gallery .picture img,
 .gallery .picture-thumbs img,
 .variant-picture img {
-	position: absolute;
-	top: 0;
-	right: 0;
-	bottom: 0;
-	left: 0;
-	max-width: 100%;
-	max-height: 100%;
-	margin: auto;
+    width: 550px;
+    height: 400px;
 }
 .gallery .picture-thumbs {
 	overflow: hidden;
@@ -2050,7 +2048,6 @@ label, label + * {
 	height: 43px;
     border: none;
 	background-color: #4ab2f1;
-    padding: 0 24px;
     font-size: 15px;
 	color: #fff;
 	text-transform: uppercase;
@@ -2058,6 +2055,22 @@ label, label + * {
 .overview .add-to-cart-button:hover,
 .variant-overview .add-to-cart-button:hover {
 	background-color: #248ece;
+}
+
+.button-base {
+    display: inline-block;
+    min-width: 140px;
+    border: none;
+    background-color: #4ab2f1;
+    padding: 10px 20px;
+    text-align: center;
+    font-size: 15px;
+    color: #fff;
+    text-transform: uppercase;
+}
+
+.button-base:hover {
+    background-color: #248ece;
 }
 
 .product-share-button {
@@ -6421,10 +6434,9 @@ pre {
 	position: relative;
 	z-index: 5;
 	width: 980px;
-	margin: 0 auto 30px;
-	border-top: 1px solid #ddd;
+	margin: 0 auto 20px;
 	border-bottom: 1px solid #ddd;
-	padding: 25px 0;
+	padding: 12px 0;
 	text-align: center;
 }
 .menu-toggle,
@@ -6610,7 +6622,7 @@ pre {
 
 
 .breadcrumb {
-	margin: 0 0 20px;
+	margin: 0;
 }
 
 .item-box .buttons {
@@ -6665,6 +6677,7 @@ pre {
 }
 .product-details-page .title {
 	text-align: left;
+    margin-bottom: 4px;
 }
 
 
@@ -6732,7 +6745,7 @@ pre {
 	overflow: hidden;
 }
 .login-page .new-wrapper {
-	float: left;
+	float: right;
 	width: 49%;
 	margin: 0;
 }
@@ -6740,7 +6753,7 @@ pre {
 	min-height: 200px;
 }
 .login-page .returning-wrapper {
-	float: right;
+	float: left;
 	width: 49%;
 }
 .login-page .returning-wrapper .form-fields {
@@ -7097,7 +7110,7 @@ pre {
     width: 220px;
 }
 
-.product-name #book-button {
+.anchor-button {
     margin-top: 8px;
     display: inline-block;
     padding: 12px 24px;
