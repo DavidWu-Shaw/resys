@@ -61,8 +61,9 @@
         }
         var color = "green";
         var slotId = args.cell.start.toString("HH:mm");
+        var opacity = 0.5;
         var text = "";
-        args.cell.html = "<div style='cursor: default; position: absolute; left: 0px; top:0px; right: 0px; bottom: 0px; padding-left: 3px; text-align: center; background-color: " + color + "; color:white;'>" + text + "</div>";
+        args.cell.html = "<div style='cursor: default; position: absolute; left: 0px; top:0px; right: 0px; bottom: 0px; padding-left: 3px; text-align: center; background-color: " + color + "; color:white; opacity: " + opacity + ";'>" + text + "</div>";
     };
 
     dp.timeHeaders = [
@@ -85,9 +86,9 @@
             args.right.html = "You can't create a reservation in the past";
             args.allowed = false;
         }
-        else if (args.duration.totalHours() > 4) {
+        else if (args.duration.totalHours() > 2) {
             args.right.enabled = true;
-            args.right.html = "You can only book up to 4 hours";
+            args.right.html = "You can only book up to 2 hours";
             args.allowed = false;
         }
     };
@@ -121,5 +122,28 @@
     }
 
     function loadEvents() {
+        var start = dp.startDate;
+        var end = dp.startDate.addDays(dp.days);
+        var params = {
+            start: start.toString(),
+            end: end.toString(),
+            resourceId: @Model.Id
+        };
+        console.log("params=", params);
+
+        $.ajax({
+            url: "@Url.Action("GetEventsByVendor", "Catalog")",
+            type: "post",
+            data: params,
+            cache: false
+        })
+        .done(function (response) {
+            dp.events.list = response;
+            dp.update();
+        })
+        .fail(function (xhr, ajaxOptions, thrownError) {
+            // Error
+            DisplayError(xhr, thrownError);
+        });
     }
 </script>

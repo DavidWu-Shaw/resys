@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Nop.Core;
@@ -251,16 +252,32 @@ namespace Nop.Web.Controllers
 
         public virtual IActionResult GetResourcesByVendor(int vendorId)
         {
-            var model = new List<ResourceModel>();
-            ResourceModel item1 = new ResourceModel { id = "1", name = "Court 1" };
-            ResourceModel item2 = new ResourceModel { id = "2", name = "Court 2" };
-            ResourceModel item3 = new ResourceModel { id = "3", name = "Court 3" };
-            ResourceModel item4 = new ResourceModel { id = "4", name = "Court 4" };
-            ResourceModel item5 = new ResourceModel { id = "5", name = "Court 5" };
+            var model = new List<VendorResourceModel>();
+            VendorResourceModel item1 = new VendorResourceModel { id = "1", name = "Court 1" };
+            VendorResourceModel item2 = new VendorResourceModel { id = "2", name = "Court 2" };
+            VendorResourceModel item3 = new VendorResourceModel { id = "3", name = "Court 3" };
+            VendorResourceModel item4 = new VendorResourceModel { id = "4", name = "Court 4" };
+            VendorResourceModel item5 = new VendorResourceModel { id = "5", name = "Court 5" };
             model.Add(item1);
             model.Add(item2);
             model.Add(item3);
             model.Add(item4);
+            model.Add(item5);
+
+            return Json(model);
+        }
+
+        [HttpPost]
+        public virtual IActionResult GetEventsByVendor(int vendorId, DateTime start, DateTime end)
+        {
+            var model = new List<VendorEventInfoModel>();
+            VendorEventInfoModel item1 = new VendorEventInfoModel { id = "1", text = "", resource = "1", start = "2020-05-30T14:00:00", end = "2020-05-30T15:00:00", backColor = "#E69138", bubbleHtml = "Not available" };
+            VendorEventInfoModel item2 = new VendorEventInfoModel { id = "2", text = "", resource = "1", start = "2020-05-30T15:00:00", end = "2020-05-30T16:00:00", backColor = "#E69138", bubbleHtml = "Not available" };
+            VendorEventInfoModel item3 = new VendorEventInfoModel { id = "3", text = "", resource = "2", start = "2020-05-30T14:00:00", end = "2020-05-30T15:00:00", backColor = "#E69138", bubbleHtml = "Not available" };
+            VendorEventInfoModel item5 = new VendorEventInfoModel { id = "5", text = "David", resource = "5", start = "2020-05-30T17:00:00", end = "2020-05-30T19:00:00", backColor = "#E69138", bubbleHtml = "Not available" };
+            model.Add(item1);
+            model.Add(item2);
+            model.Add(item3);
             model.Add(item5);
 
             return Json(model);
