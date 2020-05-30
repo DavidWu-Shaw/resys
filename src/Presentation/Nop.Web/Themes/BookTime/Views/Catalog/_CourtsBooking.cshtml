@@ -1,0 +1,210 @@
+﻿@model VendorModel
+
+<div id="book-time" class="book-main">
+    <div class="fieldset">
+        <div class="form-fields" id="booking-calendar">
+            <div class="column-left">
+                <div id="navigator"></div>
+            </div>
+            <div class="column-main">
+                <div id="scheduler"></div>
+            </div>
+        </div>
+        <div class="form-fields" id="booking-form">
+            <div class="inputs">
+                <label for="txtTimeSlot">@T("Product.BookTime.SelectTimeSlot"):</label>
+                <input type="text" id="txtTimeSlot" name="txtTimeSlot" disabled />
+            </div>
+            <div class="inputs">
+                <label for="txtStatus">@T("Product.BookTime.TimeSlotStatus"):</label>
+                <input type="text" id="txtStatus" name="txtStatus" disabled />
+            </div>
+            <div class="inputs">
+                <label for="txtNotes">@T("Product.BookTime.Notes"):</label>
+                <textarea id="txtNotes" name="txtNotes"></textarea>
+            </div>
+            <input type="hidden" id="appointmentId" />
+            <div class="buttons">
+                <button type="submit" name="btnRequestAppointment" id="btnRequestAppointment" class="button-base">
+                    @T("Product.BookTime.AppointmentUpdate.Request")
+                </button>
+                <button type="submit" name="btnCancelAppointment" id="btnCancelAppointment" class="button-base">
+                    @T("Product.BookTime.AppointmentUpdate.Cancel")
+                </button>
+                <button type="submit" name="btnBackToCalendar" id="btnBackToCalendar" class="button-base">
+                    @T("Product.BookTime.AppointmentUpdate.BackToCalendar")
+                </button>
+            </div>
+        </div>
+        <p class="message" id="rMessage"></p>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var nav = new DayPilot.Navigator("navigator");
+    nav.onTimeRangeSelected = function (args) {
+        var day = args.day;
+
+        if (dp.visibleStart() <= day && day < dp.visibleEnd()) {
+            dp.scrollTo(day, "fast");
+        }
+        else {
+            var start = day.firstDayOfMonth();
+            var days = day.daysInMonth();
+            dp.startDate = start;
+            dp.days = days;
+            dp.update();
+            dp.scrollTo(day, "fast");
+            loadEvents();
+        }
+    };
+
+    nav.init();
+
+    var dp = new DayPilot.Scheduler("scheduler");
+    dp.treeEnabled = false;
+    dp.heightSpec = "Max";
+    dp.height = 300;
+    dp.scale = "Hour";
+    dp.startDate = DayPilot.Date.today().firstDayOfMonth();
+    dp.days = DayPilot.Date.today().daysInMonth();
+    dp.cellWidth = 40;
+    dp.eventHeight = 40;
+    dp.durationBarVisible = false;
+    dp.treePreventParentUsage = true;
+
+    dp.onBeforeEventRender = function (args) {
+    };
+
+    var slotPrices = {
+        "06:00": 12,
+        "07:00": 15,
+        "08:00": 15,
+        "09:00": 15,
+        "10:00": 15,
+        "11:00": 12,
+        "12:00": 10,
+        "13:00": 10,
+        "14:00": 12,
+        "15:00": 12,
+        "16:00": 15,
+        "17:00": 15,
+        "18:00": 15,
+        "19:00": 15,
+        "20:00": 15,
+        "21:00": 12,
+        "22:00": 10,
+    };
+
+    dp.onBeforeCellRender = function (args) {
+        if (args.cell.isParent) {
+            return;
+        }
+        if (args.cell.start < new DayPilot.Date()) {  // past
+            return;
+        }
+        if (args.cell.utilization() > 0) {
+            return;
+        }
+        var color = "green";
+        var slotId = args.cell.start.toString("HH:mm");
+        var price = slotPrices[slotId];
+        var min = 5;
+        var max = 15;
+        var opacity = (price - min) / max;
+        var text = "$" + price;
+        args.cell.html = "<div style='cursor: default; position: absolute; left: 0px; top:0px; right: 0px; bottom: 0px; padding-left: 3px; text-align: center; background-color: " + color + "; color:white; opacity: " + opacity + ";'>" + text + "</div>";
+    };
+
+    dp.timeHeaders = [
+        { groupBy: "Month", format: "MMMM yyyy" },
+        { groupBy: "Day", format: "dddd, MMMM d" },
+        { groupBy: "Hour", format: "h tt" }
+    ];
+
+    dp.businessBeginsHour = 6;
+    dp.businessEndsHour = 23;
+    dp.businessWeekends = true;
+    dp.showNonBusiness = false;
+    dp.allowEventOverlap = false;
+    //dp.cellWidthSpec = "Auto";
+    dp.bubble = new DayPilot.Bubble();
+
+    dp.onTimeRangeSelecting = function (args) {
+        if (args.start < new DayPilot.Date()) {
+            args.right.enabled = true;
+            args.right.html = "You can't create a reservation in the past";
+            args.allowed = false;
+        }
+        else if (args.duration.totalHours() > 4) {
+            args.right.enabled = true;
+            args.right.html = "You can only book up to 4 hours";
+            args.allowed = false;
+        }
+    };
+
+    // event creating
+    // http://api.daypilot.org/daypilot-scheduler-ontimerangeselected/
+    dp.onTimeRangeSelected = function (args) {
+        var modal = new DayPilot.Modal();
+        modal.onClosed = function (args) {
+            dp.clearSelection();
+            loadEvents();
+        };
+        modal.showUrl("new.php?start=" + args.start + "&end=" + args.end + "&resource=" + args.resource);
+    };
+
+    dp.init();
+
+    var scrollTo = DayPilot.Date.today();
+    if (new DayPilot.Date().getHours() > 12) {
+        scrollTo = scrollTo.addHours(12);
+    }
+    dp.scrollTo(scrollTo);
+
+    loadResources();
+    loadEvents();
+
+    function loadResources() {
+        var params = {
+            resourceId: @Model.Id
+        };
+        $.ajax({
+            url: "@Url.Action("AppointmentSlotsByCustomer", "Product")",
+            type: "post",
+            data: params,
+            cache: false
+        })
+        .done(function (response) {
+            dp.rows.load(response);
+        })
+        .fail(function (xhr, ajaxOptions, thrownError) {
+            // Error
+            DisplayError(xhr, thrownError);
+        });
+    }
+
+    function loadEvents(day) {
+        var start = nav.visibleStart() > new DayPilot.Date() ? nav.visibleStart() : new DayPilot.Date();
+        var params = {
+            start: start.toString(),
+            end: nav.visibleEnd().toString(),
+            resourceId: @Model.Id
+        };
+
+        console.log(params);
+        $.ajax({
+            url: "@Url.Action("AppointmentSlotsByCustomer", "Product")",
+            type: "post",
+            data: params,
+            cache: false
+        })
+        .done(function (response) {
+            dp.events.load(response);
+        })
+        .fail(function (xhr, ajaxOptions, thrownError) {
+            // Error
+            DisplayError(xhr, thrownError);
+        });
+    }
+</script>
