@@ -268,19 +268,35 @@ namespace Nop.Web.Controllers
         }
 
         [HttpPost]
-        public virtual IActionResult GetEventsByVendor(int vendorId, DateTime start, DateTime end)
+        public virtual IActionResult GetAppointmentsByVendor(int vendorId, DateTime start, DateTime end)
         {
-            var model = new List<VendorEventInfoModel>();
-            VendorEventInfoModel item1 = new VendorEventInfoModel { id = "1", text = "", resource = "1", start = "2020-05-30T14:00:00", end = "2020-05-30T15:00:00", backColor = "#E69138", bubbleHtml = "Not available" };
-            VendorEventInfoModel item2 = new VendorEventInfoModel { id = "2", text = "", resource = "1", start = "2020-05-30T15:00:00", end = "2020-05-30T16:00:00", backColor = "#E69138", bubbleHtml = "Not available" };
-            VendorEventInfoModel item3 = new VendorEventInfoModel { id = "3", text = "", resource = "2", start = "2020-05-30T14:00:00", end = "2020-05-30T15:00:00", backColor = "#E69138", bubbleHtml = "Not available" };
-            VendorEventInfoModel item5 = new VendorEventInfoModel { id = "5", text = "David", resource = "5", start = "2020-05-30T17:00:00", end = "2020-05-30T19:00:00", backColor = "#E69138", bubbleHtml = "Not available" };
+            var model = new List<VendorAppointmentInfoModel>();
+            VendorAppointmentInfoModel item1 = new VendorAppointmentInfoModel { id = "1", text = "", resource = "1", start = "2020-05-30T14:00:00", end = "2020-05-30T15:00:00", backColor = "#E69138", bubbleHtml = "Not available" };
+            VendorAppointmentInfoModel item2 = new VendorAppointmentInfoModel { id = "2", text = "", resource = "1", start = "2020-05-30T15:00:00", end = "2020-05-30T16:00:00", backColor = "#E69138", bubbleHtml = "Not available" };
+            VendorAppointmentInfoModel item3 = new VendorAppointmentInfoModel { id = "3", text = "", resource = "2", start = "2020-05-30T14:00:00", end = "2020-05-30T15:00:00", backColor = "#E69138", bubbleHtml = "Not available" };
+            VendorAppointmentInfoModel item5 = new VendorAppointmentInfoModel { id = "5", text = "David", resource = "5", start = "2020-05-30T17:00:00", end = "2020-05-30T19:00:00", backColor = "#E69138", bubbleHtml = "Not available" };
             model.Add(item1);
             model.Add(item2);
             model.Add(item3);
             model.Add(item5);
 
             return Json(model);
+        }
+
+        public virtual IActionResult RequestVendorAppointment(int vendorId, int resourceId, DateTime start, DateTime end)
+        {
+            VendorAppointmentInfoModel model = new VendorAppointmentInfoModel();
+            model.resourceName = resourceId.ToString();
+            model.start = start.ToString();
+            model.end = end.ToString();
+
+            return PartialView(model);
+        }
+
+        [HttpPost]
+        public virtual IActionResult SaveVendorAppointment(int vendorId, int resourceId, DateTime start, DateTime end)
+        {
+            return View();
         }
 
         #endregion Vendor Appointments

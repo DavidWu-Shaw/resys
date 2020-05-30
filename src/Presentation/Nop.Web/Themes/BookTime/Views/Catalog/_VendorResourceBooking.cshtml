@@ -101,7 +101,11 @@
             dp.clearSelection();
             loadEvents();
         };
-        modal.showUrl("new.php?start=" + args.start + "&end=" + args.end + "&resource=" + args.resource);
+
+        var url = "@Url.Action("RequestVendorAppointment", "Catalog")" + "?vendorId=@Model.Id"
+            + "&resourceId=" + args.resource + "&start=" + args.start + "&end=" + args.end;
+        console.log(url);
+        modal.showUrl(url);
     };
 
     dp.init();
@@ -132,7 +136,7 @@
         console.log("params=", params);
 
         $.ajax({
-            url: "@Url.Action("GetEventsByVendor", "Catalog")",
+            url: "@Url.Action("GetAppointmentsByVendor", "Catalog")",
             type: "post",
             data: params,
             cache: false

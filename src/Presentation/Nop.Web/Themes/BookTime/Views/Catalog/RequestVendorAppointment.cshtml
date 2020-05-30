@@ -1,0 +1,28 @@
+﻿@model Nop.Web.Models.Self.VendorAppointmentInfoModel
+
+<div class="fieldset">
+    <div class="form-fields" id="booking-form">
+        <div class="inputs">
+            <label for="txtTimeSlot">@T("Catalog.RequestVendorAppointment.Resource"):</label>
+            <input type="text" id="txtResource" name="txtResource" value="@Model.resourceName" disabled />
+        </div>
+        <div class="inputs">
+            <label for="txtStatus">@T("Catalog.RequestVendorAppointment.Start"):</label>
+            <input type="text" id="txtStart" name="txtStart" value="@Model.start" disabled />
+        </div>
+        <div class="inputs">
+            <label for="txtStatus">@T("Catalog.RequestVendorAppointment.End"):</label>
+            <input type="text" id="txtStart" name="txtEnd" value="@Model.end" disabled />
+        </div>
+        <input type="hidden" id="appointmentId" />
+        <div class="buttons">
+            <button type="submit" name="btnRequestAppointment" id="btnRequestAppointment" class="button-base">
+                @T("Catalog.RequestVendorAppointment.Confirm")
+            </button>
+            <button type="submit" name="btnBackToCalendar" id="btnBackToCalendar" class="button-base">
+                @T("Catalog.RequestVendorAppointment.Close")
+            </button>
+        </div>
+    </div>
+    <p class="message" id="rMessage"></p>
+</div>
