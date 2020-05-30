@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Nop.Core;
 using Nop.Core.Domain.Catalog;
@@ -17,6 +18,7 @@ using Nop.Web.Framework;
 using Nop.Web.Framework.Mvc.Filters;
 using Nop.Web.Framework.Security;
 using Nop.Web.Models.Catalog;
+using Nop.Web.Models.Self;
 
 namespace Nop.Web.Controllers
 {
@@ -43,6 +45,7 @@ namespace Nop.Web.Controllers
         private readonly IWorkContext _workContext;
         private readonly MediaSettings _mediaSettings;
         private readonly VendorSettings _vendorSettings;
+        private readonly IAppointmentModelFactory _appointmentModelFactory;
 
         #endregion
 
@@ -244,8 +247,29 @@ namespace Nop.Web.Controllers
 
         #endregion
 
+        #region Vendor Appointments
+
+        public virtual IActionResult GetResourcesByVendor(int vendorId)
+        {
+            var model = new List<ResourceModel>();
+            ResourceModel item1 = new ResourceModel { id = "1", name = "Court 1" };
+            ResourceModel item2 = new ResourceModel { id = "2", name = "Court 2" };
+            ResourceModel item3 = new ResourceModel { id = "3", name = "Court 3" };
+            ResourceModel item4 = new ResourceModel { id = "4", name = "Court 4" };
+            ResourceModel item5 = new ResourceModel { id = "5", name = "Court 5" };
+            model.Add(item1);
+            model.Add(item2);
+            model.Add(item3);
+            model.Add(item4);
+            model.Add(item5);
+
+            return Json(model);
+        }
+
+        #endregion Vendor Appointments
+
         #region Product tags
-        
+
         [HttpsRequirement(SslRequirement.No)]
         public virtual IActionResult ProductsByTag(int productTagId, CatalogPagingFilteringModel command)
         {
