@@ -123,8 +123,8 @@
         var params = {
             vendorId: "@Model.Id",
             resourceId: args.resource,
-            start: args.start,
-            end: args.end
+            start: args.start.toString(),
+            end: args.end.toString(),
         };
         console.log("args=", args);
         console.log("params=", params);
@@ -246,6 +246,7 @@
         $("#booking-form").show();
         if (response.status) {
             $("#resourceId").val(response.data.resource);
+            $("#txtResource").val(response.data.resourceName);
             $("#txtStart").val(response.data.start);
             $("#txtEnd").val(response.data.end);
         }
