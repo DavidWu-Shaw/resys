@@ -320,13 +320,13 @@ namespace Nop.Web.Controllers
                 StartTimeUtc = start.ToUniversalTime(),
                 EndTimeUtc = end.ToUniversalTime(),
                 ResourceId = resourceId,
-                Notes = string.Empty,
                 Status = AppointmentStatusType.Confirmed,
-                CustomerId = _workContext.CurrentCustomer.Id
+                CustomerId = _workContext.CurrentCustomer.Id,
+                VendorId = vendorId
             };
             try
             {
-                //_appointmentService.InsertAppointment(appointment);
+                _appointmentService.InsertAppointment(appointment);
                 string statusText = _localizationService.GetResource("Product.AppointmentRequest.Sent");
                 return Json(new { status = true, message = statusText});
             }
