@@ -6,12 +6,14 @@ using Nop.Core;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Media;
+using Nop.Core.Domain.Self;
 using Nop.Core.Domain.Vendors;
 using Nop.Services.Catalog;
 using Nop.Services.Common;
 using Nop.Services.Localization;
 using Nop.Services.Logging;
 using Nop.Services.Security;
+using Nop.Services.Self;
 using Nop.Services.Stores;
 using Nop.Services.Vendors;
 using Nop.Web.Factories;
@@ -47,6 +49,7 @@ namespace Nop.Web.Controllers
         private readonly MediaSettings _mediaSettings;
         private readonly VendorSettings _vendorSettings;
         private readonly IAppointmentModelFactory _appointmentModelFactory;
+        private readonly IAppointmentService _appointmentService;
 
         #endregion
 
@@ -70,7 +73,8 @@ namespace Nop.Web.Controllers
             IWebHelper webHelper,
             IWorkContext workContext, 
             MediaSettings mediaSettings,
-            VendorSettings vendorSettings)
+            VendorSettings vendorSettings,
+            IAppointmentService appointmentService)
         {
             _catalogSettings = catalogSettings;
             _aclService = aclService;
@@ -91,6 +95,7 @@ namespace Nop.Web.Controllers
             _workContext = workContext;
             _mediaSettings = mediaSettings;
             _vendorSettings = vendorSettings;
+            _appointmentService = appointmentService;
         }
 
         #endregion
@@ -289,6 +294,7 @@ namespace Nop.Web.Controllers
             model.resourceName = resourceId.ToString();
             model.start = start.ToString();
             model.end = end.ToString();
+            model.vendorId = vendorId.ToString();
 
             return PartialView(model);
         }
@@ -296,7 +302,32 @@ namespace Nop.Web.Controllers
         [HttpPost]
         public virtual IActionResult SaveVendorAppointment(int vendorId, int resourceId, DateTime start, DateTime end)
         {
-            return View();
+            if (_workContext.CurrentCustomer.IsGuest())
+            {
+                string statusText = _localizationService.GetResource("Product.AppointmentUpdate.LoginRequired");
+                return Json(new { status = false, message = statusText});
+            }
+
+            Appointment appointment = new Appointment
+            {
+                StartTimeUtc = start.ToUniversalTime(),
+                EndTimeUtc = end.ToUniversalTime(),
+                ResourceId = resourceId,
+                Notes = string.Empty,
+                Status = AppointmentStatusType.Confirmed,
+                CustomerId = _workContext.CurrentCustomer.Id
+            };
+            try
+            {
+                //_appointmentService.InsertAppointment(appointment);
+                string statusText = _localizationService.GetResource("Product.AppointmentRequest.Sent");
+                return Json(new { status = true, message = statusText});
+            }
+            catch (Exception ex)
+            {
+                string statusText = _localizationService.GetResource("Product.AppointmentRequest.Failed");
+                return Json(new { status = false, message = statusText });
+            }
         }
 
         #endregion Vendor Appointments

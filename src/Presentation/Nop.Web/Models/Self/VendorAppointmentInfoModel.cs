@@ -12,5 +12,6 @@ namespace Nop.Web.Models.Self
         public string resourceName { get; set; }
         public string backColor { get; set; }
         public string bubbleHtml { get; set; }
+        public string vendorId { get; set; }
     }
 }
