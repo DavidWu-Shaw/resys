@@ -7,9 +7,33 @@
                 <div id="navigator"></div>
             </div>
             <div class="column-main">
-                <div id="scheduler"></div>
+                <div id="calendar"></div>
             </div>
         </div>
+        <div class="form-fields" id="booking-form">
+            <div class="inputs">
+                <label for="txtTimeSlot">@T("Catalog.RequestVendorAppointment.Resource"):</label>
+                <input type="text" id="txtResource" name="txtResource" disabled />
+            </div>
+            <div class="inputs">
+                <label for="txtStatus">@T("Catalog.RequestVendorAppointment.Start"):</label>
+                <input type="text" id="txtStart" name="txtStart" disabled />
+            </div>
+            <div class="inputs">
+                <label for="txtStatus">@T("Catalog.RequestVendorAppointment.End"):</label>
+                <input type="text" id="txtEnd" name="txtEnd" disabled />
+            </div>
+            <input type="hidden" id="resourceId" />
+            <div class="buttons">
+                <button type="submit" name="btnRequestAppointment" id="btnRequestAppointment" class="button-base">
+                    @T("Catalog.RequestVendorAppointment.Confirm")
+                </button>
+                <button type="submit" name="btnBackToCalendar" id="btnBackToCalendar" class="button-base">
+                    @T("Catalog.RequestVendorAppointment.Close")
+                </button>
+            </div>
+        </div>
+        <p class="message" id="rMessage"></p>
     </div>
 </div>
 
@@ -34,7 +58,7 @@
 
     nav.init();
 
-    var dp = new DayPilot.Scheduler("scheduler");
+    var dp = new DayPilot.Scheduler("calendar");
     dp.treeEnabled = false;
     dp.heightSpec = "Max";
     dp.height = 300;
@@ -96,16 +120,35 @@
     // event creating
     // http://api.daypilot.org/daypilot-scheduler-ontimerangeselected/
     dp.onTimeRangeSelected = function (args) {
-        var modal = new DayPilot.Modal();
-        modal.onClosed = function (args) {
-            dp.clearSelection();
-            loadEvents();
+        var params = {
+            vendorId: "@Model.Id",
+            resourceId: args.resource,
+            start: args.start,
+            end: args.end
         };
+        console.log("args=", args);
+        console.log("params=", params);
 
-        var url = "@Url.Action("RequestVendorAppointment", "Catalog")" + "?vendorId=@Model.Id"
-            + "&resourceId=" + args.resource + "&start=" + args.start + "&end=" + args.end;
-        console.log(url);
-        modal.showUrl(url);
+        $.ajax({
+            url: "@Url.Action("RequestVendorAppointment", "Catalog")",
+            type: "get",
+            data: params,
+            cache: false
+        })
+        .done(function (response) {
+            console.log("response =", response);
+            if (response.status == false && response.data == 0) {
+                // unauthenticated user, redirect to login page
+                window.location = $("#aLogin").attr("href");
+            }
+            else {
+                DisplaySelectedSlot(response);
+            }
+        })
+        .fail(function (xhr, ajaxOptions, thrownError) {
+            // Error
+            DisplayError(xhr, thrownError);
+        });
     };
 
     dp.init();
@@ -152,3 +195,76 @@
     }
 </script>
 
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        ClearSelectedSlot();
+
+        $("#btnBackToCalendar").click(function () {
+            ClearSelectedSlot();
+            loadEvents();
+            return false;
+        });
+
+        $("#btnRequestAppointment").click(function () {
+            var params = {
+                resourceId: $("#resourceId").val(),
+                start: $("#txtStart").val(),
+                end: $("#txtEnd").val(),
+                vendorId: "@Model.Id",
+            };
+            console.log("params=", params);
+            $.ajax({
+                url: "@Url.Action("SaveVendorAppointment", "Catalog")",
+                type: "post",
+                datatype: "json",
+                data: params,
+                cache: false
+            })
+            .done(function (response) {
+                console.log("response=", response);
+                if (response.status) {
+                    ClearSelectedSlot();
+                    loadEvents();
+                }
+                else {
+                    DisplaySelectedSlot(response);
+                }                
+            })
+            .fail(function (xhr, ajaxOptions, thrownError) {
+                // Error
+                DisplayError(xhr, thrownError);
+            });
+
+            return false;
+        });
+    });
+
+    function DisplaySelectedSlot(response) {
+        $("#booking-calendar").hide();
+        $("#booking-form").show();
+        if (response.status) {
+            $("#resourceId").val(response.data.resource);
+            $("#txtStart").val(response.data.start);
+            $("#txtEnd").val(response.data.end);
+        }
+        if (response.message) {
+            $("#rMessage").text(response.message);
+        }
+        else {
+            $("#rMessage").text("");
+        }
+    }
+
+    function ClearSelectedSlot() {
+        $("#booking-calendar").show();
+        $("#booking-form").hide();
+        $("#resourceId").val("");
+        $("#rMessage").text("");
+    }
+
+    function DisplayError(response, thrownError) {
+        $("#rMessage").text(thrownError + "\r\n" + response.status + "\r\n" + response.statusText);
+    }
+</script>

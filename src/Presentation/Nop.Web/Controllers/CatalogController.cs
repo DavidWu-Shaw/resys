@@ -290,13 +290,20 @@ namespace Nop.Web.Controllers
 
         public virtual IActionResult RequestVendorAppointment(int vendorId, int resourceId, DateTime start, DateTime end)
         {
+            if (_workContext.CurrentCustomer.IsGuest())
+            {
+                string statusText = _localizationService.GetResource("Product.AppointmentUpdate.LoginRequired");
+                return Json(new { status = false, message = statusText, data = 0 });
+            }
+
             VendorAppointmentInfoModel model = new VendorAppointmentInfoModel();
-            model.resourceName = resourceId.ToString();
+            model.vendorId = vendorId.ToString();
+            model.resource = resourceId.ToString();
+            model.resourceName = resourceId.ToString(); // TODO: get resource name 
             model.start = start.ToString();
             model.end = end.ToString();
-            model.vendorId = vendorId.ToString();
 
-            return PartialView(model);
+            return Json(new { status = true, data = model });
         }
 
         [HttpPost]
