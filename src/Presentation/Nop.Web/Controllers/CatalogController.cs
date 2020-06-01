@@ -263,6 +263,7 @@ namespace Nop.Web.Controllers
 
         public virtual IActionResult GetResourcesByVendor(int vendorId)
         {
+            // TODO: get products by vendor
             var model = new List<VendorResourceModel>();
             VendorResourceModel item1 = new VendorResourceModel { id = "1", name = "Court 1" };
             VendorResourceModel item2 = new VendorResourceModel { id = "2", name = "Court 2" };
@@ -349,7 +350,7 @@ namespace Nop.Web.Controllers
             }
             catch (Exception ex)
             {
-                string statusText = _localizationService.GetResource("Product.AppointmentRequest.Failed");
+                string statusText = $"{_localizationService.GetResource("Product.AppointmentRequest.Failed")}: {ex.Message}";
                 return Json(new { status = false, message = statusText });
             }
         }
