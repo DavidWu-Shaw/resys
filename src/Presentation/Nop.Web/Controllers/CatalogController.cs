@@ -10,6 +10,7 @@ using Nop.Core.Domain.Self;
 using Nop.Core.Domain.Vendors;
 using Nop.Services.Catalog;
 using Nop.Services.Common;
+using Nop.Services.Helpers;
 using Nop.Services.Localization;
 using Nop.Services.Logging;
 using Nop.Services.Security;
@@ -50,6 +51,7 @@ namespace Nop.Web.Controllers
         private readonly VendorSettings _vendorSettings;
         private readonly IAppointmentModelFactory _appointmentModelFactory;
         private readonly IAppointmentService _appointmentService;
+        private readonly IDateTimeHelper _dateTimeHelper;
 
         #endregion
 
@@ -74,6 +76,8 @@ namespace Nop.Web.Controllers
             IWorkContext workContext, 
             MediaSettings mediaSettings,
             VendorSettings vendorSettings,
+            IDateTimeHelper dateTimeHelper,
+            IAppointmentModelFactory appointmentModelFactory,
             IAppointmentService appointmentService)
         {
             _catalogSettings = catalogSettings;
@@ -95,7 +99,9 @@ namespace Nop.Web.Controllers
             _workContext = workContext;
             _mediaSettings = mediaSettings;
             _vendorSettings = vendorSettings;
+            _dateTimeHelper = dateTimeHelper;
             _appointmentService = appointmentService;
+            _appointmentModelFactory = appointmentModelFactory;
         }
 
         #endregion
@@ -275,15 +281,26 @@ namespace Nop.Web.Controllers
         [HttpPost]
         public virtual IActionResult GetAppointmentsByVendor(int vendorId, DateTime start, DateTime end)
         {
+            var startTimeUtc = _dateTimeHelper.ConvertToUtcTime(start);
+            var endTimeUtc = _dateTimeHelper.ConvertToUtcTime(end);
+            var events = _appointmentService.GetAppointmentsByVendor(vendorId, startTimeUtc, endTimeUtc);
+
             var model = new List<VendorAppointmentInfoModel>();
-            VendorAppointmentInfoModel item1 = new VendorAppointmentInfoModel { id = "1", text = "", resource = "1", start = "2020-05-30T14:00:00", end = "2020-05-30T15:00:00", backColor = "#E69138", bubbleHtml = "Not available" };
-            VendorAppointmentInfoModel item2 = new VendorAppointmentInfoModel { id = "2", text = "", resource = "1", start = "2020-05-30T15:00:00", end = "2020-05-30T16:00:00", backColor = "#E69138", bubbleHtml = "Not available" };
-            VendorAppointmentInfoModel item3 = new VendorAppointmentInfoModel { id = "3", text = "", resource = "2", start = "2020-05-30T14:00:00", end = "2020-05-30T15:00:00", backColor = "#E69138", bubbleHtml = "Not available" };
-            VendorAppointmentInfoModel item5 = new VendorAppointmentInfoModel { id = "5", text = "David", resource = "5", start = "2020-05-30T17:00:00", end = "2020-05-30T19:00:00", backColor = "#E69138", bubbleHtml = "Not available" };
-            model.Add(item1);
-            model.Add(item2);
-            model.Add(item3);
-            model.Add(item5);
+            foreach (var appointment in events)
+            {
+                var item = _appointmentModelFactory.PrepareVendorAppointmentInfoModel(appointment);
+                model.Add(item);
+                item.backColor = "#E69138";
+                item.bubbleHtml = "Not available";
+                item.moveDisabled = true;
+                item.resizeDisabled = true;
+                item.clickDisabled = true;
+                // TODO: remove customer name for non-admin user ?
+                if (appointment.Customer != null)
+                {
+                    item.text = appointment.Customer.Username;
+                };
+            }
 
             return Json(model);
         }

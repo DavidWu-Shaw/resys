@@ -50,5 +50,18 @@ namespace Nop.Web.Models.Self
 
             return model;
         }
+
+        public virtual VendorAppointmentInfoModel PrepareVendorAppointmentInfoModel(Appointment appointment)
+        {
+            var model = new VendorAppointmentInfoModel
+            {
+                id = appointment.Id.ToString(),
+                start = _dateTimeHelper.ConvertToUserTime(appointment.StartTimeUtc, DateTimeKind.Utc).ToString("yyyy-MM-ddTHH:mm:ss"),
+                end = _dateTimeHelper.ConvertToUserTime(appointment.EndTimeUtc, DateTimeKind.Utc).ToString("yyyy-MM-ddTHH:mm:ss"),
+                resource = appointment.ResourceId.ToString()
+            };
+
+            return model;
+        }            
     }
 }
