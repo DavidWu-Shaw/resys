@@ -259,6 +259,8 @@ namespace Nop.Services.Catalog
         /// <returns>Products</returns>
         IList<Product> GetProductsBySku(string[] skuArray, int vendorId = 0);
 
+        IList<Product> GetProductsByVendor(int vendorId);
+
         /// <summary>
         /// Update HasTierPrices property (used for performance optimization)
         /// </summary>
