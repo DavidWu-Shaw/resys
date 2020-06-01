@@ -263,18 +263,13 @@ namespace Nop.Web.Controllers
 
         public virtual IActionResult GetResourcesByVendor(int vendorId)
         {
-            // TODO: get products by vendor
+            var products = _productService.GetProductsByVendor(vendorId);
+            // TODO: cache products
             var model = new List<VendorResourceModel>();
-            VendorResourceModel item1 = new VendorResourceModel { id = "1", name = "Court 1" };
-            VendorResourceModel item2 = new VendorResourceModel { id = "2", name = "Court 2" };
-            VendorResourceModel item3 = new VendorResourceModel { id = "3", name = "Court 3" };
-            VendorResourceModel item4 = new VendorResourceModel { id = "4", name = "Court 4" };
-            VendorResourceModel item5 = new VendorResourceModel { id = "5", name = "Court 5" };
-            model.Add(item1);
-            model.Add(item2);
-            model.Add(item3);
-            model.Add(item4);
-            model.Add(item5);
+            foreach (var product in products)
+            {
+                model.Add(new VendorResourceModel { id = product.Id.ToString(), name = product.Name });
+            }
 
             return Json(model);
         }
