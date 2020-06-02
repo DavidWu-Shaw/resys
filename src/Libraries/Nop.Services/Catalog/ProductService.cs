@@ -972,7 +972,7 @@ namespace Nop.Services.Catalog
 
         public IList<Product> GetProductsByVendor(int vendorId)
         {
-            var query = _productRepository.Table.Where(p => p.VendorId == vendorId);
+            var query = _productRepository.Table.Where(p => p.VendorId == vendorId).OrderBy(p => p.Name);
             return query.ToList();
         }
 
