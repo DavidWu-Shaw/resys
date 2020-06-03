@@ -970,6 +970,12 @@ namespace Nop.Services.Catalog
             return query.ToList();
         }
 
+        public IList<Product> GetProductsByVendor(int vendorId)
+        {
+            var query = _productRepository.Table.Where(p => p.VendorId == vendorId).OrderBy(p => p.Name);
+            return query.ToList();
+        }
+
         /// <summary>
         /// Update HasTierPrices property (used for performance optimization)
         /// </summary>

@@ -1,5 +1,4 @@
 ﻿@model ProductDetailsModel
-@inject Nop.Core.IWebHelper webHelper
 
 <div id="book-time" class="book-main">
     <div class="title">
@@ -63,7 +62,7 @@
     calendar.businessBeginsHour = 9;
     calendar.businessEndsHour = 18;
     calendar.dayBeginsHour = 9;
-    calendar.dayEndsHour = 18;
+    calendar.dayEndsHour = 21;
 
     calendar.onBeforeEventRender = function (args) {
         if (!args.data.tags) {

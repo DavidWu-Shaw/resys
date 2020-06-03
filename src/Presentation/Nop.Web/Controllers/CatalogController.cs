@@ -1,15 +1,20 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Nop.Core;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Media;
+using Nop.Core.Domain.Self;
 using Nop.Core.Domain.Vendors;
 using Nop.Services.Catalog;
 using Nop.Services.Common;
+using Nop.Services.Helpers;
 using Nop.Services.Localization;
 using Nop.Services.Logging;
 using Nop.Services.Security;
+using Nop.Services.Self;
 using Nop.Services.Stores;
 using Nop.Services.Vendors;
 using Nop.Web.Factories;
@@ -17,6 +22,7 @@ using Nop.Web.Framework;
 using Nop.Web.Framework.Mvc.Filters;
 using Nop.Web.Framework.Security;
 using Nop.Web.Models.Catalog;
+using Nop.Web.Models.Self;
 
 namespace Nop.Web.Controllers
 {
@@ -43,6 +49,9 @@ namespace Nop.Web.Controllers
         private readonly IWorkContext _workContext;
         private readonly MediaSettings _mediaSettings;
         private readonly VendorSettings _vendorSettings;
+        private readonly IAppointmentModelFactory _appointmentModelFactory;
+        private readonly IAppointmentService _appointmentService;
+        private readonly IDateTimeHelper _dateTimeHelper;
 
         #endregion
 
@@ -66,7 +75,10 @@ namespace Nop.Web.Controllers
             IWebHelper webHelper,
             IWorkContext workContext, 
             MediaSettings mediaSettings,
-            VendorSettings vendorSettings)
+            VendorSettings vendorSettings,
+            IDateTimeHelper dateTimeHelper,
+            IAppointmentModelFactory appointmentModelFactory,
+            IAppointmentService appointmentService)
         {
             _catalogSettings = catalogSettings;
             _aclService = aclService;
@@ -87,6 +99,9 @@ namespace Nop.Web.Controllers
             _workContext = workContext;
             _mediaSettings = mediaSettings;
             _vendorSettings = vendorSettings;
+            _dateTimeHelper = dateTimeHelper;
+            _appointmentService = appointmentService;
+            _appointmentModelFactory = appointmentModelFactory;
         }
 
         #endregion
@@ -244,8 +259,101 @@ namespace Nop.Web.Controllers
 
         #endregion
 
+        #region Vendor Appointments
+
+        public virtual IActionResult GetResourcesByVendor(int vendorId)
+        {
+            var products = _productService.GetProductsByVendor(vendorId);
+            // TODO: cache products
+            var model = new List<VendorResourceModel>();
+            foreach (var product in products)
+            {
+                model.Add(new VendorResourceModel { id = product.Id.ToString(), name = product.Name });
+            }
+
+            return Json(model);
+        }
+
+        [HttpPost]
+        public virtual IActionResult GetAppointmentsByVendor(int vendorId, DateTime start, DateTime end)
+        {
+            var startTimeUtc = _dateTimeHelper.ConvertToUtcTime(start);
+            var endTimeUtc = _dateTimeHelper.ConvertToUtcTime(end);
+            var events = _appointmentService.GetAppointmentsByVendor(vendorId, startTimeUtc, endTimeUtc);
+
+            var model = new List<VendorAppointmentInfoModel>();
+            foreach (var appointment in events)
+            {
+                var item = _appointmentModelFactory.PrepareVendorAppointmentInfoModel(appointment);
+                model.Add(item);
+                item.backColor = "#E69138";
+                item.bubbleHtml = "Not available";
+                item.moveDisabled = true;
+                item.resizeDisabled = true;
+                item.clickDisabled = true;
+                // TODO: remove customer name for non-admin user ?
+                if (appointment.Customer != null)
+                {
+                    item.text = appointment.Customer.Username;
+                };
+            }
+
+            return Json(model);
+        }
+
+        public virtual IActionResult RequestVendorAppointment(int vendorId, int resourceId, DateTime start, DateTime end)
+        {
+            if (_workContext.CurrentCustomer.IsGuest())
+            {
+                string statusText = _localizationService.GetResource("Product.AppointmentUpdate.LoginRequired");
+                return Json(new { status = false, message = statusText, data = 0 });
+            }
+
+            VendorAppointmentInfoModel model = new VendorAppointmentInfoModel();
+            model.vendorId = vendorId.ToString();
+            model.resource = resourceId.ToString();
+            model.resourceName = resourceId.ToString(); // TODO: get resource name 
+            model.start = start.ToString();
+            model.end = end.ToString();
+
+            return Json(new { status = true, data = model });
+        }
+
+        [HttpPost]
+        public virtual IActionResult SaveVendorAppointment(int vendorId, int resourceId, DateTime start, DateTime end)
+        {
+            if (_workContext.CurrentCustomer.IsGuest())
+            {
+                string statusText = _localizationService.GetResource("Product.AppointmentUpdate.LoginRequired");
+                return Json(new { status = false, message = statusText});
+            }
+
+            Appointment appointment = new Appointment
+            {
+                StartTimeUtc = start.ToUniversalTime(),
+                EndTimeUtc = end.ToUniversalTime(),
+                ResourceId = resourceId,
+                Status = AppointmentStatusType.Confirmed,
+                CustomerId = _workContext.CurrentCustomer.Id,
+                VendorId = vendorId
+            };
+            try
+            {
+                _appointmentService.InsertAppointment(appointment);
+                string statusText = _localizationService.GetResource("Product.AppointmentRequest.Sent");
+                return Json(new { status = true, message = statusText});
+            }
+            catch (Exception ex)
+            {
+                string statusText = $"{_localizationService.GetResource("Product.AppointmentRequest.Failed")}: {ex.Message}";
+                return Json(new { status = false, message = statusText });
+            }
+        }
+
+        #endregion Vendor Appointments
+
         #region Product tags
-        
+
         [HttpsRequirement(SslRequirement.No)]
         public virtual IActionResult ProductsByTag(int productTagId, CatalogPagingFilteringModel command)
         {

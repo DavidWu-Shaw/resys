@@ -6,5 +6,6 @@ namespace Nop.Web.Models.Self
     {
         AppointmentUpdateModel PrepareAppointmentUpdateModel(Appointment appointment);
         AppointmentInfoModel PrepareAppointmentInfoModel(Appointment appointment);
+        VendorAppointmentInfoModel PrepareVendorAppointmentInfoModel(Appointment appointment);
     };
 }
