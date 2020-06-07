@@ -73,74 +73,75 @@
 </script>
 
 <div class="panel-body">
-    @(Html.LocalizedEditor<ProductModel, ProductLocalizedModel>("product-info-localized",
+    @(
+                        Html.LocalizedEditor<ProductModel, ProductLocalizedModel>("product-info-localized",
+                            @<div>
+                                <div class="form-group">
+                                    <div class="col-md-3">
+                                        <nop-label asp-for="@Model.Locales[item].Name" />
+                                    </div>
+                                    <div class="col-md-9">
+                                        <nop-editor asp-for="@Model.Locales[item].Name" />
+                                        <span asp-validation-for="@Model.Locales[item].Name"></span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-3">
+                                        <nop-label asp-for="@Model.Locales[item].ShortDescription" />
+                                    </div>
+                                    <div class="col-md-9">
+                                        <nop-textarea asp-for="@Model.Locales[item].ShortDescription" />
+                                        <span asp-validation-for="@Model.Locales[item].ShortDescription"></span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-3">
+                                        <nop-label asp-for="@Model.Locales[item].FullDescription" />
+                                    </div>
+                                    <div class="col-md-9">
+                                        <nop-editor asp-for="@Model.Locales[item].FullDescription" asp-template="RichEditor" />
+                                        <span asp-validation-for="@Model.Locales[item].FullDescription"></span>
+                                    </div>
+                                </div>
+                                <input type="hidden" asp-for="@Model.Locales[item].LanguageId" />
+                            </div>,
                                                             @<div>
                                                                 <div class="form-group">
                                                                     <div class="col-md-3">
-                                                                        <nop-label asp-for="@Model.Locales[item].Name" />
+                                                                        <nop-label asp-for="Name" />
                                                                     </div>
                                                                     <div class="col-md-9">
-                                                                        <nop-editor asp-for="@Model.Locales[item].Name" />
-                                                                        <span asp-validation-for="@Model.Locales[item].Name"></span>
+                                                                        <nop-editor asp-for="Name" asp-required="true" />
+                                                                        <span asp-validation-for="Name"></span>
                                                                     </div>
                                                                 </div>
                                                                 <div class="form-group">
                                                                     <div class="col-md-3">
-                                                                        <nop-label asp-for="@Model.Locales[item].ShortDescription" />
+                                                                        <nop-label asp-for="ShortDescription" />
                                                                     </div>
                                                                     <div class="col-md-9">
-                                                                        <nop-textarea asp-for="@Model.Locales[item].ShortDescription" />
-                                                                        <span asp-validation-for="@Model.Locales[item].ShortDescription"></span>
+                                                                        <nop-textarea asp-for="ShortDescription" />
+                                                                        <span asp-validation-for="ShortDescription"></span>
                                                                     </div>
                                                                 </div>
                                                                 <div class="form-group">
                                                                     <div class="col-md-3">
-                                                                        <nop-label asp-for="@Model.Locales[item].FullDescription" />
+                                                                        <nop-label asp-for="FullDescription" />
                                                                     </div>
                                                                     <div class="col-md-9">
-                                                                        <nop-editor asp-for="@Model.Locales[item].FullDescription" asp-template="RichEditor" />
-                                                                        <span asp-validation-for="@Model.Locales[item].FullDescription"></span>
+                                                                        <nop-editor asp-for="FullDescription" asp-template="RichEditor" />
+                                                                        <span asp-validation-for="FullDescription"></span>
                                                                     </div>
                                                                 </div>
-
-                                                                <input type="hidden" asp-for="@Model.Locales[item].LanguageId" />
-                                                            </div>
-                                                                                                                ,@<div>
-                                                                                                                    <div class="form-group">
-                                                                                                                        <div class="col-md-3">
-                                                                                                                            <nop-label asp-for="Name" />
-                                                                                                                        </div>
-                                                                                                                        <div class="col-md-9">
-                                                                                                                            <nop-editor asp-for="Name" asp-required="true" />
-                                                                                                                            <span asp-validation-for="Name"></span>
-                                                                                                                        </div>
-                                                                                                                    </div>
-                                                                                                                    <div class="form-group">
-                                                                                                                        <div class="col-md-3">
-                                                                                                                            <nop-label asp-for="ShortDescription" />
-                                                                                                                        </div>
-                                                                                                                        <div class="col-md-9">
-                                                                                                                            <nop-textarea asp-for="ShortDescription" />
-                                                                                                                            <span asp-validation-for="ShortDescription"></span>
-                                                                                                                        </div>
-                                                                                                                    </div>
-                                                                                                                    <div class="form-group">
-                                                                                                                        <div class="col-md-3">
-                                                                                                                            <nop-label asp-for="FullDescription" />
-                                                                                                                        </div>
-                                                                                                                        <div class="col-md-9">
-                                                                                                                            <nop-editor asp-for="FullDescription" asp-template="RichEditor" />
-                                                                                                                            <span asp-validation-for="FullDescription"></span>
-                                                                                                                        </div>
-                                                                                                                    </div>
-                                                                                                                </div>))
-    <div class="form-group">
+                                                            </div>)
+    )
+    <div class="form-group @(Model.ProductEditorSettingsModel.Vendor ? null : "advanced-setting")" @(Model.IsLoggedInAsVendor ? Html.Raw("style='display: none;'") : null)>
         <div class="col-md-3">
-            <nop-label asp-for="Sku" />
+            <nop-label asp-for="VendorId" />
         </div>
         <div class="col-md-9">
-            <nop-editor asp-for="Sku" />
-            <span asp-validation-for="Sku"></span>
+            <nop-select asp-for="VendorId" asp-items="Model.AvailableVendors" />
+            <span asp-validation-for="VendorId"></span>
         </div>
     </div>
     <div class="form-group">
@@ -150,25 +151,25 @@
         <div class="col-md-9">
             <nop-select asp-for="SelectedCategoryIds" asp-items="Model.AvailableCategories" asp-multiple="true" />
             <script>
-                                $(document).ready(function() {
-                                    var categoryIdsInput = $('#@Html.IdFor(model => model.SelectedCategoryIds)').data("kendoMultiSelect");
-                                    categoryIdsInput.setOptions({
-                                        autoClose: false,
-                                        filter: "contains"
-                                    });
+                    $(document).ready(function() {
+                        var categoryIdsInput = $('#@Html.IdFor(model => model.SelectedCategoryIds)').data("kendoMultiSelect");
+                        categoryIdsInput.setOptions({
+                            autoClose: false,
+                            filter: "contains"
+                        });
 
-                                    @if (Model.AvailableCategories.Count == 0)
-                            {
-                                <text>
-                                    categoryIdsInput.setOptions({
-                                        enable: false,
-                                        placeholder: '@T("Admin.Catalog.Products.Fields.Categories.NoCategoriesAvailable")'
-                                    });
-                                    categoryIdsInput._placeholder();
-                                    categoryIdsInput._enable();
-                                    </text>
-                            }
+                        @if (Model.AvailableCategories.Count == 0)
+                        {
+                            <text>
+                                categoryIdsInput.setOptions({
+                                    enable: false,
+                                    placeholder: '@T("Admin.Catalog.Products.Fields.Categories.NoCategoriesAvailable")'
                                 });
+                                categoryIdsInput._placeholder();
+                                categoryIdsInput._enable();
+                                </text>
+                        }
+                    });
             </script>
         </div>
     </div>
@@ -210,13 +211,13 @@
             </div>
         </div>
     </nop-nested-setting>
-    <div class="form-group @(Model.ProductEditorSettingsModel.Vendor ? null : "advanced-setting")" @(Model.IsLoggedInAsVendor ? Html.Raw("style='display: none;'") : null)>
+    <div class="form-group">
         <div class="col-md-3">
-            <nop-label asp-for="VendorId" />
+            <nop-label asp-for="Sku" />
         </div>
         <div class="col-md-9">
-            <nop-select asp-for="VendorId" asp-items="Model.AvailableVendors" />
-            <span asp-validation-for="VendorId"></span>
+            <nop-editor asp-for="Sku" />
+            <span asp-validation-for="Sku"></span>
         </div>
     </div>
     <div class="form-group @(Model.ProductEditorSettingsModel.AllowCustomerReviews ? null : "advanced-setting")">
