@@ -1,7 +1,6 @@
 ﻿{
   "InstalledPluginNames": [
     "Payments.Moneris",
-    "Shipping.FixedByWeightByTotal",
     "Tax.FixedOrByCountryStateZip"
   ],
   "PluginNamesToUninstall": [],

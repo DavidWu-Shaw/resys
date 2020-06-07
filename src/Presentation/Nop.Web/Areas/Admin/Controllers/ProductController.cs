@@ -1137,15 +1137,6 @@ namespace Nop.Web.Areas.Admin.Controllers
             if (_workContext.CurrentVendor != null && product.VendorId != _workContext.CurrentVendor.Id)
                 return RedirectToAction("List");
 
-            //check if the product quantity has been changed while we were editing the product
-            //and if it has been changed then we show error notification
-            //and redirect on the editing page without data saving
-            if (product.StockQuantity != model.LastStockQuantity)
-            {
-                _notificationService.ErrorNotification(_localizationService.GetResource("Admin.Catalog.Products.Fields.StockQuantity.ChangedWarning"));
-                return RedirectToAction("Edit", new { id = product.Id });
-            }
-
             if (ModelState.IsValid)
             {
                 //a vendor should have access only to his products
@@ -1156,13 +1147,6 @@ namespace Nop.Web.Areas.Admin.Controllers
                 //vendors cannot edit "Show on home page" property
                 if (_workContext.CurrentVendor != null && model.ShowOnHomepage != product.ShowOnHomepage)
                     model.ShowOnHomepage = product.ShowOnHomepage;
-
-                //some previously used values
-                var prevTotalStockQuantity = _productService.GetTotalStockQuantity(product);
-                var prevDownloadId = product.DownloadId;
-                var prevSampleDownloadId = product.SampleDownloadId;
-                var previousStockQuantity = product.StockQuantity;
-                var previousWarehouseId = product.WarehouseId;
 
                 //product
                 product = model.ToEntity(product);
@@ -1180,96 +1164,16 @@ namespace Nop.Web.Areas.Admin.Controllers
                 //tags
                 _productTagService.UpdateProductTags(product, ParseProductTags(model.ProductTags));
 
-                //warehouses
-                SaveProductWarehouseInventory(product, model);
-
                 //categories
                 SaveCategoryMappings(product, model);
 
-                //manufacturers
-                SaveManufacturerMappings(product, model);
-
-                //ACL (customer roles)
-                SaveProductAcl(product, model);
-
-                //stores
-                _productService.UpdateProductStoreMappings(product, model.SelectedStoreIds);
-
-                //discounts
-                SaveDiscountMappings(product, model);
-
                 //picture seo names
                 UpdatePictureSeoNames(product);
-
-                //back in stock notifications
-                if (product.ManageInventoryMethod == ManageInventoryMethod.ManageStock &&
-                    product.BackorderMode == BackorderMode.NoBackorders &&
-                    product.AllowBackInStockSubscriptions &&
-                    _productService.GetTotalStockQuantity(product) > 0 &&
-                    prevTotalStockQuantity <= 0 &&
-                    product.Published &&
-                    !product.Deleted)
-                {
-                    _backInStockSubscriptionService.SendNotificationsToSubscribers(product);
-                }
-
-                //delete an old "download" file (if deleted or updated)
-                if (prevDownloadId > 0 && prevDownloadId != product.DownloadId)
-                {
-                    var prevDownload = _downloadService.GetDownloadById(prevDownloadId);
-                    if (prevDownload != null)
-                        _downloadService.DeleteDownload(prevDownload);
-                }
-
-                //delete an old "sample download" file (if deleted or updated)
-                if (prevSampleDownloadId > 0 && prevSampleDownloadId != product.SampleDownloadId)
-                {
-                    var prevSampleDownload = _downloadService.GetDownloadById(prevSampleDownloadId);
-                    if (prevSampleDownload != null)
-                        _downloadService.DeleteDownload(prevSampleDownload);
-                }
-
-                //quantity change history
-                if (previousWarehouseId != product.WarehouseId)
-                {
-                    //warehouse is changed 
-                    //compose a message
-                    var oldWarehouseMessage = string.Empty;
-                    if (previousWarehouseId > 0)
-                    {
-                        var oldWarehouse = _shippingService.GetWarehouseById(previousWarehouseId);
-                        if (oldWarehouse != null)
-                            oldWarehouseMessage = string.Format(_localizationService.GetResource("Admin.StockQuantityHistory.Messages.EditWarehouse.Old"), oldWarehouse.Name);
-                    }
-
-                    var newWarehouseMessage = string.Empty;
-                    if (product.WarehouseId > 0)
-                    {
-                        var newWarehouse = _shippingService.GetWarehouseById(product.WarehouseId);
-                        if (newWarehouse != null)
-                            newWarehouseMessage = string.Format(_localizationService.GetResource("Admin.StockQuantityHistory.Messages.EditWarehouse.New"), newWarehouse.Name);
-                    }
-
-                    var message = string.Format(_localizationService.GetResource("Admin.StockQuantityHistory.Messages.EditWarehouse"), oldWarehouseMessage, newWarehouseMessage);
-
-                    //record history
-                    _productService.AddStockQuantityHistoryEntry(product, -previousStockQuantity, 0, previousWarehouseId, message);
-                    _productService.AddStockQuantityHistoryEntry(product, product.StockQuantity, product.StockQuantity, product.WarehouseId, message);
-                }
-                else
-                {
-                    _productService.AddStockQuantityHistoryEntry(product, product.StockQuantity - previousStockQuantity, product.StockQuantity,
-                        product.WarehouseId, _localizationService.GetResource("Admin.StockQuantityHistory.Messages.Edit"));
-                }
-
                 //activity log
                 _customerActivityService.InsertActivity("EditProduct",
                     string.Format(_localizationService.GetResource("ActivityLog.EditProduct"), product.Name), product);
 
                 _notificationService.SuccessNotification(_localizationService.GetResource("Admin.Catalog.Products.Updated"));
-
-                if (!continueEditing)
-                    return RedirectToAction("List");
                 
                 return RedirectToAction("Edit", new { id = product.Id });
             }
