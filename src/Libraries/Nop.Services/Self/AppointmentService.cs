@@ -73,6 +73,8 @@ namespace Nop.Services.Self
             _eventPublisher.EntityDeleted(appointment);
         }
 
+        #region Tennis court booking
+
         public virtual List<Appointment> GetAppointmentsByResource(DateTime startTimeUtc, DateTime endTimeUtc, int resourceId)
         {
             var query = _appointmentRepository.Table
@@ -100,5 +102,12 @@ namespace Nop.Services.Self
 
             return query.ToList();
         }
+
+        public virtual bool IsTaken(int resourceId, DateTime startTimeUtc, DateTime endTimeUtc)
+        {
+            return true;
+        }
+
+        #endregion Tennis court booking
     }
 }
