@@ -1,15 +1,25 @@
-﻿using Nop.Core.Domain.Self;
+﻿using Nop.Core.Caching;
+using Nop.Core.Domain.Self;
+using Nop.Services.Catalog;
 using Nop.Services.Helpers;
 using System;
+using System.Collections.Generic;
+using Nop.Web.Infrastructure.Cache;
 
 namespace Nop.Web.Models.Self
 {
     public partial class AppointmentModelFactory : IAppointmentModelFactory
     {
+        private readonly IProductService _productService;
         private readonly IDateTimeHelper _dateTimeHelper;
+        private readonly IStaticCacheManager _cacheManager;
 
-        public AppointmentModelFactory(IDateTimeHelper dateTimeHelper)
+        public AppointmentModelFactory(IProductService productService,
+            IStaticCacheManager cacheManager,
+            IDateTimeHelper dateTimeHelper)
         {
+            _productService = productService;
+            _cacheManager = cacheManager;
             _dateTimeHelper = dateTimeHelper;
         }
 
@@ -62,6 +72,24 @@ namespace Nop.Web.Models.Self
             };
 
             return model;
-        }            
+        }
+
+        public virtual List<VendorResourceModel> PrepareVendorResourcesModel(int vendorId)
+        {
+            var cacheKey = string.Format(NopModelCacheDefaults.VendorProductsCacheKeyById, vendorId);
+            var cachedModel = _cacheManager.Get(cacheKey, () =>
+            {
+                var products = _productService.GetProductsByVendor(vendorId);
+                var model = new List<VendorResourceModel>();
+                foreach (var product in products)
+                {
+                    model.Add(new VendorResourceModel { id = product.Id.ToString(), name = product.Name });
+                }
+
+                return model;
+            });
+
+            return cachedModel;
+        }
     }
 }

@@ -106,10 +106,10 @@
 <script type="text/javascript">
     var nav = new DayPilot.Navigator("nav");
     nav.selectMode = "week";
-    nav.showMonths = 2;
+    nav.showMonths = 1;
     nav.skipMonths = 1;
     nav.onTimeRangeSelected = function (args) {
-        loadEvents(args.start.firstDayOfWeek(), args.start.addDays(7));
+        loadEvents(args.day);
     };
     nav.init();
 
@@ -176,15 +176,18 @@
     loadEvents();
 
     function loadEvents(day) {
-        var start = nav.visibleStart();
+        if (day == null){
+            day = new DayPilot.Date()
+        };
+        var start = day.firstDayOfWeek();
         var params = {
             start: start.toString(),
-            end: nav.visibleEnd().toString(),
+            end: start.addDays(7).toString(),
             resourceId: @Model.Id
         };
 
         addAntiForgeryToken(params);
-        console.log(params);
+        console.log("loadEvents params = ", params);
         $.ajax({
             url: "@Url.Action("AppointmentList", "Product")",
             type: "post",

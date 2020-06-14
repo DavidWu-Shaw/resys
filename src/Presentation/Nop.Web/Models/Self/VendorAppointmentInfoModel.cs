@@ -8,6 +8,7 @@ namespace Nop.Web.Models.Self
         public string text { get; set; }
         public string start { get; set; }
         public string end { get; set; }
+        public string timeRange { get; set; }
         public string resource { get; set; }
         public string resourceName { get; set; }
         public string backColor { get; set; }

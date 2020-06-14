@@ -10,8 +10,11 @@ namespace Nop.Services.Self
         void InsertAppointment(Appointment appointment);
         void UpdateAppointment(Appointment appointment);
         void DeleteAppointment(Appointment appointment);
+        #region Tennis court booking
         List<Appointment> GetAppointmentsByResource(DateTime startTimeUtc, DateTime endTimeUtc, int resourceId);
         List<Appointment> GetAppointmentsByVendor(int vendorId, DateTime startTimeUtc, DateTime endTimeUtc);
         List<Appointment> GetAvailableAppointmentsByCustomer(DateTime startTimeUtc, DateTime endTimeUtc, int resourceId, int customerId);
+        bool IsTaken(int resourceId, DateTime startTimeUtc, DateTime endTimeUtc);
+        #endregion Tennis court booking
     }
 }

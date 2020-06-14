@@ -657,13 +657,14 @@ namespace Nop.Web.Factories
                 ItemClass = "customer-addresses"
             });
 
-            model.CustomerNavigationItems.Add(new CustomerNavigationItemModel
-            {
-                RouteName = "CustomerOrders",
-                Title = _localizationService.GetResource("Account.CustomerOrders"),
-                Tab = CustomerNavigationEnum.Orders,
-                ItemClass = "customer-orders"
-            });
+            // Remove customer orders from My Account page -- David in Jun. 2020
+            //model.CustomerNavigationItems.Add(new CustomerNavigationItemModel
+            //{
+            //    RouteName = "CustomerOrders",
+            //    Title = _localizationService.GetResource("Account.CustomerOrders"),
+            //    Tab = CustomerNavigationEnum.Orders,
+            //    ItemClass = "customer-orders"
+            //});
 
             if (_orderSettings.ReturnRequestsEnabled &&
                 _returnRequestService.SearchReturnRequests(_storeContext.CurrentStore.Id,

@@ -263,14 +263,7 @@ namespace Nop.Web.Controllers
 
         public virtual IActionResult GetResourcesByVendor(int vendorId)
         {
-            var products = _productService.GetProductsByVendor(vendorId);
-            // TODO: cache products
-            var model = new List<VendorResourceModel>();
-            foreach (var product in products)
-            {
-                model.Add(new VendorResourceModel { id = product.Id.ToString(), name = product.Name });
-            }
-
+            var model = _appointmentModelFactory.PrepareVendorResourcesModel(vendorId);
             return Json(model);
         }
 
@@ -305,16 +298,18 @@ namespace Nop.Web.Controllers
         {
             if (_workContext.CurrentCustomer.IsGuest())
             {
-                string statusText = _localizationService.GetResource("Product.AppointmentUpdate.LoginRequired");
+                string statusText = _localizationService.GetResource("Catalog.RequestVendorAppointment.LoginRequired");
                 return Json(new { status = false, message = statusText, data = 0 });
             }
+
+            var vendorResources = _appointmentModelFactory.PrepareVendorResourcesModel(vendorId);
+            var vendorResource = vendorResources.FirstOrDefault(o => o.id == resourceId.ToString());
 
             VendorAppointmentInfoModel model = new VendorAppointmentInfoModel();
             model.vendorId = vendorId.ToString();
             model.resource = resourceId.ToString();
-            model.resourceName = resourceId.ToString(); // TODO: get resource name 
-            model.start = start.ToString();
-            model.end = end.ToString();
+            model.resourceName = vendorResource != null ? vendorResource.name : resourceId.ToString();
+            model.timeRange = $"{start.ToShortTimeString()} - {end.ToShortTimeString()}, {start.ToShortDateString()} {start.ToString("dddd")}";
 
             return Json(new { status = true, data = model });
         }
@@ -324,7 +319,7 @@ namespace Nop.Web.Controllers
         {
             if (_workContext.CurrentCustomer.IsGuest())
             {
-                string statusText = _localizationService.GetResource("Product.AppointmentUpdate.LoginRequired");
+                string statusText = _localizationService.GetResource("Catalog.RequestVendorAppointment.LoginRequired");
                 return Json(new { status = false, message = statusText});
             }
 
@@ -339,13 +334,21 @@ namespace Nop.Web.Controllers
             };
             try
             {
-                _appointmentService.InsertAppointment(appointment);
-                string statusText = _localizationService.GetResource("Product.AppointmentRequest.Sent");
-                return Json(new { status = true, message = statusText});
+                if (!_appointmentService.IsTaken(resourceId, start, end))
+                {
+                    _appointmentService.InsertAppointment(appointment);
+                    return Json(new { status = true });
+                }
+                else
+                {
+                    // Time slot is taken
+                    string statusText = _localizationService.GetResource("Catalog.VendorAppointment.TennisCourt.TimeTaken");
+                    return Json(new { status = false, message = statusText });
+                }
             }
             catch (Exception ex)
             {
-                string statusText = $"{_localizationService.GetResource("Product.AppointmentRequest.Failed")}: {ex.Message}";
+                string statusText = $"{_localizationService.GetResource("Catalog.VendorAppointment.TennisCourt.Failed")}: {ex.Message}";
                 return Json(new { status = false, message = statusText });
             }
         }

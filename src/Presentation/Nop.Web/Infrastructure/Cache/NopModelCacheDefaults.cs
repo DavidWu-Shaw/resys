@@ -425,6 +425,7 @@
         public static string VendorPictureModelKey => "Nop.pres.vendor.picture-{0}-{1}-{2}-{3}-{4}-{5}";
         public static string VendorPicturePrefixCacheKey => "Nop.pres.vendor.picture";
         public static string VendorPicturePrefixCacheKeyById => "Nop.pres.vendor.picture-{0}-";
+        public static string VendorProductsCacheKeyById => "Nop.pres.vendor.products-{0}";
 
         /// <summary>
         /// Key for cart picture caching

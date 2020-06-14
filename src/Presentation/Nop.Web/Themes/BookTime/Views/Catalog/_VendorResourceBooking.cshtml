@@ -2,6 +2,7 @@
 
 <div id="book-time" class="book-main">
     <div class="fieldset">
+        <h3>@T("Catalog.VendorAppointment.TennisCourt")</h3>
         <div class="form-fields" id="booking-calendar">
             <div class="column-left">
                 <div id="navigator"></div>
@@ -12,28 +13,24 @@
         </div>
         <div class="form-fields" id="booking-form">
             <div class="inputs">
-                <label for="txtTimeSlot">@T("Catalog.RequestVendorAppointment.Resource"):</label>
+                <label for="txtResource">@T("Catalog.VendorAppointment.TennisCourt.Resource"):</label>
                 <input type="text" id="txtResource" name="txtResource" disabled />
             </div>
             <div class="inputs">
-                <label for="txtStatus">@T("Catalog.RequestVendorAppointment.Start"):</label>
-                <input type="text" id="txtStart" name="txtStart" disabled />
-            </div>
-            <div class="inputs">
-                <label for="txtStatus">@T("Catalog.RequestVendorAppointment.End"):</label>
-                <input type="text" id="txtEnd" name="txtEnd" disabled />
+                <label for="txtTimeSlot">@T("Catalog.VendorAppointment.TennisCourt.TimeSlot"):</label>
+                <input type="text" id="txtTimeSlot" name="txtTimeSlot" disabled />
             </div>
             <input type="hidden" id="resourceId" />
             <div class="buttons">
                 <button type="submit" name="btnRequestAppointment" id="btnRequestAppointment" class="button-base">
-                    @T("Catalog.RequestVendorAppointment.Confirm")
+                    @T("Catalog.VendorAppointment.TennisCourt.Confirm")
                 </button>
                 <button type="submit" name="btnBackToCalendar" id="btnBackToCalendar" class="button-base">
-                    @T("Catalog.RequestVendorAppointment.Close")
+                    @T("Catalog.VendorAppointment.TennisCourt.BackToCalendar")
                 </button>
             </div>
+            <p class="message" id="rMessage"></p>
         </div>
-        <p class="message" id="rMessage"></p>
     </div>
 </div>
 
@@ -247,8 +244,7 @@
         if (response.status) {
             $("#resourceId").val(response.data.resource);
             $("#txtResource").val(response.data.resourceName);
-            $("#txtStart").val(response.data.start);
-            $("#txtEnd").val(response.data.end);
+            $("#txtTimeSlot").val(response.data.timeRange);
         }
         if (response.message) {
             $("#rMessage").text(response.message);
