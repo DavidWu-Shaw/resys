@@ -263,14 +263,7 @@ namespace Nop.Web.Controllers
 
         public virtual IActionResult GetResourcesByVendor(int vendorId)
         {
-            var products = _productService.GetProductsByVendor(vendorId);
-            // TODO: cache products
-            var model = new List<VendorResourceModel>();
-            foreach (var product in products)
-            {
-                model.Add(new VendorResourceModel { id = product.Id.ToString(), name = product.Name });
-            }
-
+            var model = _appointmentModelFactory.PrepareVendorResourcesModel(vendorId);
             return Json(model);
         }
 
@@ -309,10 +302,13 @@ namespace Nop.Web.Controllers
                 return Json(new { status = false, message = statusText, data = 0 });
             }
 
+            var vendorResources = _appointmentModelFactory.PrepareVendorResourcesModel(vendorId);
+            var vendorResource = vendorResources.FirstOrDefault(o => o.id == resourceId.ToString());
+
             VendorAppointmentInfoModel model = new VendorAppointmentInfoModel();
             model.vendorId = vendorId.ToString();
             model.resource = resourceId.ToString();
-            model.resourceName = resourceId.ToString(); // TODO: get resource name 
+            model.resourceName = vendorResource != null ? vendorResource.name : resourceId.ToString();
             model.start = start.ToString();
             model.end = end.ToString();
 
