@@ -3,7 +3,7 @@
 @inject Nop.Core.IWebHelper webHelper
 @inject SeoSettings seoSettings
 @{
-    Layout = "_ColumnsOne";
+    Layout = "_ColumnsTwo";
 
     //title
     Html.AddTitleParts(!string.IsNullOrEmpty(Model.MetaTitle) ? Model.MetaTitle : Model.Name);
