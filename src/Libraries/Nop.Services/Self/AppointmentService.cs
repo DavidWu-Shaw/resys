@@ -73,6 +73,16 @@ namespace Nop.Services.Self
             _eventPublisher.EntityDeleted(appointment);
         }
 
+        public virtual List<Appointment> GetAvailableAppointmentsByCustomer(DateTime startTimeUtc, DateTime endTimeUtc, int resourceId, int customerId)
+        {
+            var query = _appointmentRepository.Table
+                .Where(x => x.ResourceId == resourceId)
+                .Where(x => x.CustomerId == 0 || x.CustomerId == customerId)
+                .Where(x => x.StartTimeUtc >= startTimeUtc && x.StartTimeUtc < endTimeUtc);
+
+            return query.ToList();
+        }
+
         #region Tennis court booking
 
         public virtual List<Appointment> GetAppointmentsByResource(DateTime startTimeUtc, DateTime endTimeUtc, int resourceId)
@@ -84,28 +94,32 @@ namespace Nop.Services.Self
             return query.ToList();
         }
 
-        public virtual List<Appointment> GetAppointmentsByVendor(int vendorId, DateTime startTimeUtc, DateTime endTimeUtc)
+        /// <summary>
+        /// Get appointments of grouped products by parent product id
+        /// </summary>
+        /// <param name="parentProductId"></param>
+        /// <param name="startTimeUtc"></param>
+        /// <param name="endTimeUtc"></param>
+        /// <returns></returns>
+        public virtual List<Appointment> GetAppointmentsByParent(int parentProductId, DateTime startTimeUtc, DateTime endTimeUtc)
         {
             var query = _appointmentRepository.Table
-                .Where(x => x.VendorId == vendorId)
+                .Where(x => x.ParentProductId == parentProductId)
                 .Where(x => x.StartTimeUtc >= startTimeUtc && x.StartTimeUtc < endTimeUtc);
 
             return query.ToList();
         }
-        
-        public virtual List<Appointment> GetAvailableAppointmentsByCustomer(DateTime startTimeUtc, DateTime endTimeUtc, int resourceId, int customerId)
-        {
-            var query = _appointmentRepository.Table
-                .Where(x => x.ResourceId == resourceId)
-                .Where(x => x.CustomerId == 0 || x.CustomerId == customerId)
-                .Where(x => x.StartTimeUtc >= startTimeUtc && x.StartTimeUtc < endTimeUtc);
 
-            return query.ToList();
-        }
-
+        /// <summary>
+        /// Check if an appointment of a resource has been created for centain time slot
+        /// </summary>
+        /// <param name="resourceId"></param>
+        /// <param name="startTimeUtc"></param>
+        /// <param name="endTimeUtc"></param>
+        /// <returns></returns>
         public virtual bool IsTaken(int resourceId, DateTime startTimeUtc, DateTime endTimeUtc)
         {
-            return true;
+            return false;
         }
 
         #endregion Tennis court booking

@@ -1746,8 +1746,8 @@ label, label + * {
 .gallery .picture img,
 .gallery .picture-thumbs img,
 .variant-picture img {
-    width: 550px;
-    height: 400px;
+    width: 440px;
+    height: 300px;
 }
 .gallery .picture-thumbs {
 	overflow: hidden;
@@ -6652,14 +6652,14 @@ pre {
 
 .gallery {
 	float: left;
-	width: 46%;
+	width: 38%;
 }
 .gallery .picture {
 	width: auto;
 }
 .overview {
 	float: right;
-	width: 52%;
+	width: 60%;
 }
 .rental-attributes {
 	overflow: hidden;
