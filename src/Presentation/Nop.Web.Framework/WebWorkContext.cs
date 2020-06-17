@@ -236,7 +236,8 @@ namespace Nop.Web.Framework
                         if (Guid.TryParse(customerCookie, out Guid customerGuid))
                         {
                             //get customer from cookie (should not be registered)
-                            var customerByCookie = _customerService.GetCustomerByGuid(customerGuid);
+                            //var customerByCookie = _customerService.GetCustomerByGuid(customerGuid);
+                            var customerByCookie = _customerService.GetGuestCustomer(customerGuid);
                             if (customerByCookie != null && !customerByCookie.IsRegistered())
                                 customer = customerByCookie;
                         }
@@ -246,7 +247,8 @@ namespace Nop.Web.Framework
                 if (customer == null || customer.Deleted || !customer.Active || customer.RequireReLogin)
                 {
                     //create guest if not exists
-                    customer = _customerService.InsertGuestCustomer();
+                    //customer = _customerService.InsertGuestCustomer();
+                    customer = _customerService.GetGuestCustomer(null);
                 }
 
                 if (!customer.Deleted && customer.Active && !customer.RequireReLogin)

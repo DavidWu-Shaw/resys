@@ -126,6 +126,8 @@ namespace Nop.Services.Customers
         /// <returns>Customer</returns>
         Customer InsertGuestCustomer();
 
+        Customer GetGuestCustomer(Guid? guid);
+
         /// <summary>
         /// Insert a customer
         /// </summary>
