@@ -1,6 +1,6 @@
 ﻿@model ProductDetailsModel
-@using Nop.Core.Domain.Seo;
-@inject Nop.Core.IWebHelper webHelper 
+@using Nop.Core.Domain.Seo
+@inject Nop.Core.IWebHelper webHelper
 @inject SeoSettings seoSettings
 @{
     Layout = "_ColumnsOne";
@@ -45,7 +45,7 @@
 }
 <!--product breadcrumb-->
 @section Breadcrumb
-{
+    {
     @await Html.PartialAsync("_ProductBreadcrumb", Model.Breadcrumb)
 }
 @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductDetailsAfterBreadcrumb, additionalData = Model })
@@ -59,16 +59,11 @@
                     <!--product pictures-->
                     @await Html.PartialAsync("_ProductDetailsPictures", Model)
                     <div class="overview">
-                        @await Html.PartialAsync("_Discontinued", Model)
                         <div class="product-name">
                             <h1 itemprop="name">
                                 @Model.Name
                             </h1>
-                            <a id="book-button" href="#book-time" class="button-1 add-to-cart-button anchor-button">@T("Product.BookTime")</a>
-                            @if (!string.IsNullOrEmpty(Model.ManageCalendarUrl))
-                            {
-                                <a href="@Model.ManageCalendarUrl" class="add-to-cart-button anchor-button">@T("Admin.Common.Calendar")</a>
-                            }
+                            <a id="book-button" href="#book-time" class="button-1 add-to-cart-button anchor-button">@T("Product.BookCourt")</a>
                         </div>
                         @if (!string.IsNullOrEmpty(Model.ShortDescription))
                         {
@@ -79,7 +74,6 @@
                         @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductDetailsOverviewTop, additionalData = Model })
                         <!--product reviews-->
                         @await Html.PartialAsync("_ProductReviewOverview", Model.ProductReviewOverview)
-                        <!--product vendor-->
                         <div class="additional-details">
                             @if (Model.ShowVendor)
                             {
@@ -89,16 +83,19 @@
                                 </div>
                             }
                         </div>
-                        <!--wishlist, compare, email a friend-->
+                        <!--compare, email a friend-->
                         <div class="overview-buttons">
+                            @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductDetailsInsideOverviewButtonsBefore, additionalData = Model })
                             @await Html.PartialAsync("_ProductEmailAFriendButton", Model)
                             @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductDetailsInsideOverviewButtonsAfter, additionalData = Model })
                         </div>
+                        @await Html.PartialAsync("_ShareButton", Model)
                         @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductDetailsOverviewBottom, additionalData = Model })
                     </div>
                     @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductDetailsEssentialBottom, additionalData = Model })
                 </div>
-                @await Html.PartialAsync("_SimpleProductBooking", Model)
+                @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductDetailsBeforeCollateral, additionalData = Model })
+                @await Html.PartialAsync("_GroupedProductsBooking", Model)
                 @await Component.InvokeAsync("RelatedProducts", new { productId = Model.Id })
             </div>
         </form>

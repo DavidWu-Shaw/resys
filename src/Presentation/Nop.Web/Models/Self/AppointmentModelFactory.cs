@@ -74,14 +74,14 @@ namespace Nop.Web.Models.Self
             return model;
         }
 
-        public virtual List<VendorResourceModel> PrepareVendorResourcesModel(int vendorId)
+        public virtual List<VendorResourceModel> PrepareVendorResourcesModel(int parentProductId)
         {
-            var cacheKey = string.Format(NopModelCacheDefaults.VendorProductsCacheKeyById, vendorId);
+            var cacheKey = string.Format(NopModelCacheDefaults.VendorProductsCacheKeyById, parentProductId);
             var cachedModel = _cacheManager.Get(cacheKey, () =>
             {
-                var products = _productService.GetProductsByVendor(vendorId);
+                var associatedProducts = _productService.GetAssociatedProducts(parentProductId);
                 var model = new List<VendorResourceModel>();
-                foreach (var product in products)
+                foreach (var product in associatedProducts)
                 {
                     model.Add(new VendorResourceModel { id = product.Id.ToString(), name = product.Name });
                 }

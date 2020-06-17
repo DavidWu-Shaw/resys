@@ -13,7 +13,7 @@ namespace Nop.Web.Models.Self
         public string resourceName { get; set; }
         public string backColor { get; set; }
         public string bubbleHtml { get; set; }
-        public string vendorId { get; set; }
+        public string parentProductId { get; set; }
         public bool moveDisabled { get; set; }
         public bool resizeDisabled { get; set; }
         public bool clickDisabled { get; set; }

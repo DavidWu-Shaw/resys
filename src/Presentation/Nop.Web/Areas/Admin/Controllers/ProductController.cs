@@ -1147,8 +1147,6 @@ namespace Nop.Web.Areas.Admin.Controllers
                 //vendors cannot edit "Show on home page" property
                 if (_workContext.CurrentVendor != null && model.ShowOnHomepage != product.ShowOnHomepage)
                     model.ShowOnHomepage = product.ShowOnHomepage;
-                // set VisibleIndividually to true - David in Jun,2020
-                model.VisibleIndividually = true;
                 //product
                 product = model.ToEntity(product);
 

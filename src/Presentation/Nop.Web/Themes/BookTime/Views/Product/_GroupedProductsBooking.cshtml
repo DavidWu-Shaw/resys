@@ -1,8 +1,10 @@
-﻿@model VendorModel
+﻿@model ProductDetailsModel
 
 <div id="book-time" class="book-main">
-    <div class="fieldset">
+    <div class="title">
         <h3>@T("Catalog.VendorAppointment.TennisCourt")</h3>
+    </div>
+    <div class="fieldset">
         <div class="form-fields" id="booking-calendar">
             <div class="column-left">
                 <div id="navigator"></div>
@@ -21,6 +23,8 @@
                 <input type="text" id="txtTimeSlot" name="txtTimeSlot" disabled />
             </div>
             <input type="hidden" id="resourceId" />
+            <input type="hidden" id="txtStart" name="txtStart" />
+            <input type="hidden" id="txtEnd" name="txtEnd" />
             <div class="buttons">
                 <button type="submit" name="btnRequestAppointment" id="btnRequestAppointment" class="button-base">
                     @T("Catalog.VendorAppointment.TennisCourt.Confirm")
@@ -118,7 +122,7 @@
     // http://api.daypilot.org/daypilot-scheduler-ontimerangeselected/
     dp.onTimeRangeSelected = function (args) {
         var params = {
-            vendorId: "@Model.Id",
+            parentProductId: "@Model.Id",
             resourceId: args.resource,
             start: args.start.toString(),
             end: args.end.toString(),
@@ -127,7 +131,7 @@
         console.log("params=", params);
 
         $.ajax({
-            url: "@Url.Action("RequestVendorAppointment", "Catalog")",
+            url: "@Url.Action("RequestVendorAppointment", "Product")",
             type: "get",
             data: params,
             cache: false
@@ -160,7 +164,7 @@
     loadEvents();
 
     function loadResources() {
-        var url = "@Url.Action("GetResourcesByVendor", "Catalog")" + "?vendorId=@Model.Id";
+        var url = "@Url.Action("GetResourcesByParent", "Product")" + "?parentProductId=@Model.Id";
         console.log(url);
         dp.rows.load(url);
     }
@@ -171,12 +175,12 @@
         var params = {
             start: start.toString(),
             end: end.toString(),
-            vendorId: @Model.Id
+            parentProductId: @Model.Id
         };
         console.log("params=", params);
 
         $.ajax({
-            url: "@Url.Action("GetAppointmentsByVendor", "Catalog")",
+            url: "@Url.Action("GetAppointmentsByParent", "Product")",
             type: "post",
             data: params,
             cache: false
@@ -209,11 +213,11 @@
                 resourceId: $("#resourceId").val(),
                 start: $("#txtStart").val(),
                 end: $("#txtEnd").val(),
-                vendorId: "@Model.Id",
+                parentProductId: "@Model.Id",
             };
             console.log("params=", params);
             $.ajax({
-                url: "@Url.Action("SaveVendorAppointment", "Catalog")",
+                url: "@Url.Action("SaveVendorAppointment", "Product")",
                 type: "post",
                 datatype: "json",
                 data: params,
@@ -227,7 +231,7 @@
                 }
                 else {
                     DisplaySelectedSlot(response);
-                }                
+                }
             })
             .fail(function (xhr, ajaxOptions, thrownError) {
                 // Error
@@ -245,6 +249,8 @@
             $("#resourceId").val(response.data.resource);
             $("#txtResource").val(response.data.resourceName);
             $("#txtTimeSlot").val(response.data.timeRange);
+            $("#txtStart").val(response.data.start);
+            $("#txtEnd").val(response.data.end);
         }
         if (response.message) {
             $("#rMessage").text(response.message);

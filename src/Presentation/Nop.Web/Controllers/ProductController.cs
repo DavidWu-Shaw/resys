@@ -220,6 +220,109 @@ namespace Nop.Web.Controllers
 
         #endregion Appointment Methods
 
+        #region Grouped Products Appointments
+
+        public virtual IActionResult GetResourcesByParent(int parentProductId)
+        {
+            var model = _appointmentModelFactory.PrepareVendorResourcesModel(parentProductId);
+            return Json(model);
+        }
+
+        [HttpPost]
+        public virtual IActionResult GetAppointmentsByParent(int parentProductId, DateTime start, DateTime end)
+        {
+            var startTimeUtc = _dateTimeHelper.ConvertToUtcTime(start);
+            var endTimeUtc = _dateTimeHelper.ConvertToUtcTime(end);
+            var events = _appointmentService.GetAppointmentsByParent(parentProductId, startTimeUtc, endTimeUtc);
+
+            var model = new List<VendorAppointmentInfoModel>();
+            foreach (var appointment in events)
+            {
+                var item = _appointmentModelFactory.PrepareVendorAppointmentInfoModel(appointment);
+                model.Add(item);
+                item.backColor = "#E69138";
+                item.bubbleHtml = "Not available";
+                item.moveDisabled = true;
+                item.resizeDisabled = true;
+                item.clickDisabled = true;
+                // TODO: remove customer name for non-admin user ?
+                if (appointment.Customer != null)
+                {
+                    item.text = appointment.Customer.Username;
+                };
+            }
+
+            return Json(model);
+        }
+
+        public virtual IActionResult RequestVendorAppointment(int parentProductId, int resourceId, DateTime start, DateTime end)
+        {
+            if (_workContext.CurrentCustomer.IsGuest())
+            {
+                string statusText = _localizationService.GetResource("Catalog.RequestVendorAppointment.LoginRequired");
+                return Json(new { status = false, message = statusText, data = 0 });
+            }
+
+            var vendorResources = _appointmentModelFactory.PrepareVendorResourcesModel(parentProductId);
+            var vendorResource = vendorResources.FirstOrDefault(o => o.id == resourceId.ToString());
+
+            VendorAppointmentInfoModel model = new VendorAppointmentInfoModel();
+            model.parentProductId = parentProductId.ToString();
+            model.resource = resourceId.ToString();
+            model.resourceName = vendorResource != null ? vendorResource.name : resourceId.ToString();
+            model.timeRange = $"{start.ToShortTimeString()} - {end.ToShortTimeString()}, {start.ToShortDateString()} {start.ToString("dddd")}";
+            model.start = start.ToString("yyyy-MM-ddTHH:mm:ss");
+            model.end = end.ToString("yyyy-MM-ddTHH:mm:ss"); ;
+
+            return Json(new { status = true, data = model });
+        }
+
+        [HttpPost]
+        public virtual IActionResult SaveVendorAppointment(int parentProductId, int resourceId, DateTime start, DateTime end)
+        {
+            if (_workContext.CurrentCustomer.IsGuest())
+            {
+                string statusText = _localizationService.GetResource("Catalog.RequestVendorAppointment.LoginRequired");
+                return Json(new { status = false, message = statusText });
+            }
+
+            // Convert local time to UTC time
+            var startTimeUtc = _dateTimeHelper.ConvertToUtcTime(start);
+            var endTimeUtc = _dateTimeHelper.ConvertToUtcTime(end);
+
+            try
+            {
+                // Check if the requested time slot is taken already 
+                if (!_appointmentService.IsTaken(resourceId, startTimeUtc, endTimeUtc))
+                {
+                    Appointment appointment = new Appointment
+                    {
+                        StartTimeUtc = startTimeUtc,
+                        EndTimeUtc = endTimeUtc,
+                        ResourceId = resourceId,
+                        Status = AppointmentStatusType.Confirmed,
+                        CustomerId = _workContext.CurrentCustomer.Id,
+                        ParentProductId = parentProductId
+                    };
+                    _appointmentService.InsertAppointment(appointment);
+                    return Json(new { status = true });
+                }
+                else
+                {
+                    // Time slot is taken, show error message
+                    string statusText = _localizationService.GetResource("Catalog.VendorAppointment.TennisCourt.TimeTaken");
+                    return Json(new { status = false, message = statusText });
+                }
+            }
+            catch (Exception ex)
+            {
+                string statusText = $"{_localizationService.GetResource("Catalog.VendorAppointment.TennisCourt.Failed")}: {ex.Message}";
+                return Json(new { status = false, message = statusText });
+            }
+        }
+
+        #endregion Grouped Products Appointments
+
         #region Product details page
 
         [HttpsRequirement(SslRequirement.No)]
