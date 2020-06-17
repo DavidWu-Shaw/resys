@@ -24,43 +24,36 @@
         <h1>@Model.Name</h1>
     </div>
     <div class="page-body">
-        @if (Model.Name.Contains("tennis", StringComparison.CurrentCultureIgnoreCase))
+        @if (!string.IsNullOrWhiteSpace(Model.Description))
         {
-            @await Html.PartialAsync("_VendorResourceBooking", Model)
+            <div class="vendor-description">
+                @Html.Raw(Model.Description)
+            </div>
         }
-        else
+        @*contact vendor*@
+        @if (Model.AllowCustomersToContactVendors)
         {
-            @if (!string.IsNullOrWhiteSpace(Model.Description))
-            {
-                <div class="vendor-description">
-                    @Html.Raw(Model.Description)
+            <div class="contact-vendor">
+                <input type="button" value="@T("ContactVendor")" class="button-2 contact-vendor-button" onclick="setLocation('@Url.RouteUrl("ContactVendor", new { vendorId = Model.Id })')" />
+            </div>
+        }
+        @if (Model.Products.Count > 0)
+        {
+            @await Html.PartialAsync("_CatalogSelectors", Model.PagingFilteringContext)
+        }
+        @*product list*@
+        @if (Model.Products.Count > 0)
+        {
+            <div class="@(Model.PagingFilteringContext.ViewMode == "list" ? "product-list" : "product-grid")">
+                <div class="item-grid">
+                    @foreach (var product in Model.Products)
+                    {
+                        <div class="item-box">
+                            @await Html.PartialAsync("_ProductBox", product)
+                        </div>
+                    }
                 </div>
-            }
-            @*contact vendor*@
-            @if (Model.AllowCustomersToContactVendors)
-            {
-                <div class="contact-vendor">
-                    <input type="button" value="@T("ContactVendor")" class="button-2 contact-vendor-button" onclick="setLocation('@Url.RouteUrl("ContactVendor", new { vendorId = Model.Id })')" />
-                </div>
-            }
-            @if (Model.Products.Count > 0)
-            {
-                @await Html.PartialAsync("_CatalogSelectors", Model.PagingFilteringContext)
-            }
-            @*product list*@
-            @if (Model.Products.Count > 0)
-            {
-                <div class="@(Model.PagingFilteringContext.ViewMode == "list" ? "product-list" : "product-grid")">
-                    <div class="item-grid">
-                        @foreach (var product in Model.Products)
-                        {
-                            <div class="item-box">
-                                @await Html.PartialAsync("_ProductBox", product)
-                            </div>
-                        }
-                    </div>
-                </div>
-            }
+            </div>
         }
     </div>
 </div>
