@@ -111,7 +111,7 @@ namespace Nop.Services.Self
         }
 
         /// <summary>
-        /// Check if an appointment of a resource has been created for centain time slot
+        /// Check if an appointment record has been created for the resource and the time slot
         /// </summary>
         /// <param name="resourceId"></param>
         /// <param name="startTimeUtc"></param>
@@ -119,7 +119,13 @@ namespace Nop.Services.Self
         /// <returns></returns>
         public virtual bool IsTaken(int resourceId, DateTime startTimeUtc, DateTime endTimeUtc)
         {
-            return false;
+            var query = _appointmentRepository.Table
+                .Where(x => x.ResourceId == resourceId)
+                .Where(x => (x.StartTimeUtc >= startTimeUtc && x.StartTimeUtc < endTimeUtc) 
+                            || (x.EndTimeUtc > startTimeUtc && x.EndTimeUtc <= endTimeUtc)
+                            || (x.StartTimeUtc < startTimeUtc && x.EndTimeUtc > endTimeUtc));
+            int count = query.Count();
+            return count > 0;
         }
 
         #endregion Tennis court booking

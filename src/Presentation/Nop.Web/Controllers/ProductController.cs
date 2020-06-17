@@ -286,25 +286,30 @@ namespace Nop.Web.Controllers
                 return Json(new { status = false, message = statusText });
             }
 
-            Appointment appointment = new Appointment
-            {
-                StartTimeUtc = start.ToUniversalTime(),
-                EndTimeUtc = end.ToUniversalTime(),
-                ResourceId = resourceId,
-                Status = AppointmentStatusType.Confirmed,
-                CustomerId = _workContext.CurrentCustomer.Id,
-                ParentProductId = parentProductId
-            };
+            // Convert local time to UTC time
+            var startTimeUtc = _dateTimeHelper.ConvertToUtcTime(start);
+            var endTimeUtc = _dateTimeHelper.ConvertToUtcTime(end);
+
             try
             {
-                if (!_appointmentService.IsTaken(resourceId, start, end))
+                // Check if the requested time slot is taken already 
+                if (!_appointmentService.IsTaken(resourceId, startTimeUtc, endTimeUtc))
                 {
+                    Appointment appointment = new Appointment
+                    {
+                        StartTimeUtc = startTimeUtc,
+                        EndTimeUtc = endTimeUtc,
+                        ResourceId = resourceId,
+                        Status = AppointmentStatusType.Confirmed,
+                        CustomerId = _workContext.CurrentCustomer.Id,
+                        ParentProductId = parentProductId
+                    };
                     _appointmentService.InsertAppointment(appointment);
                     return Json(new { status = true });
                 }
                 else
                 {
-                    // Time slot is taken
+                    // Time slot is taken, show error message
                     string statusText = _localizationService.GetResource("Catalog.VendorAppointment.TennisCourt.TimeTaken");
                     return Json(new { status = false, message = statusText });
                 }
