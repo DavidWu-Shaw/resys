@@ -257,15 +257,6 @@
     {
         @await Html.PartialAsync("_CustomerAttributes", Model.CustomerAttributes)
     }
-    <div class="form-group">
-        <div class="col-md-3">
-            <nop-label asp-for="IsTaxExempt" />
-        </div>
-        <div class="col-md-9">
-            <nop-editor asp-for="IsTaxExempt" />
-            <span asp-validation-for="IsTaxExempt"></span>
-        </div>
-    </div>
     @if (Model.DisplayVatNumber)
     {
         <div class="form-group">
