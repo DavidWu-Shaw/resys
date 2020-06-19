@@ -1,9 +1,9 @@
 ﻿{
   "InstalledPluginNames": [
-    "Payments.Moneris",
-    "Tax.FixedOrByCountryStateZip"
+    "Widgets.GoogleAnalytics"
   ],
   "PluginNamesToUninstall": [],
-  "PluginNamesToDelete": [],
+  "PluginNamesToDelete": [
+  ],
   "PluginNamesToInstall": []
 }
