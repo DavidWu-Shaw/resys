@@ -179,8 +179,7 @@ namespace Nop.Web.Controllers
 
                 var model = _appointmentModelFactory.PrepareAppointmentUpdateModel(appointment);
 
-                string statusText = _localizationService.GetResource("Product.AppointmentRequest.Sent");
-                return Json(new { status = true, message = statusText, data = model });
+                return Json(new { status = true });
             }
             else
             {
@@ -208,8 +207,7 @@ namespace Nop.Web.Controllers
 
                 var model = _appointmentModelFactory.PrepareAppointmentUpdateModel(appointment);
 
-                string statusText = _localizationService.GetResource("Product.AppointmentCancel.Cancelled");
-                return Json(new { status = true, message = statusText, data = model });
+                return Json(new { status = true });
             }
             else
             {
@@ -259,7 +257,7 @@ namespace Nop.Web.Controllers
         {
             if (_workContext.CurrentCustomer.IsGuest())
             {
-                string statusText = _localizationService.GetResource("Catalog.RequestVendorAppointment.LoginRequired");
+                string statusText = _localizationService.GetResource("GroupedProduct.RequestVendorAppointment.LoginRequired");
                 return Json(new { status = false, message = statusText, data = 0 });
             }
 
@@ -282,7 +280,7 @@ namespace Nop.Web.Controllers
         {
             if (_workContext.CurrentCustomer.IsGuest())
             {
-                string statusText = _localizationService.GetResource("Catalog.RequestVendorAppointment.LoginRequired");
+                string statusText = _localizationService.GetResource("GroupedProduct.RequestVendorAppointment.LoginRequired");
                 return Json(new { status = false, message = statusText });
             }
 
@@ -310,13 +308,13 @@ namespace Nop.Web.Controllers
                 else
                 {
                     // Time slot is taken, show error message
-                    string statusText = _localizationService.GetResource("Catalog.VendorAppointment.TennisCourt.TimeTaken");
+                    string statusText = _localizationService.GetResource("GroupedProduct.VendorAppointment.TimeTaken");
                     return Json(new { status = false, message = statusText });
                 }
             }
             catch (Exception ex)
             {
-                string statusText = $"{_localizationService.GetResource("Catalog.VendorAppointment.TennisCourt.Failed")}: {ex.Message}";
+                string statusText = $"{_localizationService.GetResource("GroupedProduct.VendorAppointment.Failed")}: {ex.Message}";
                 return Json(new { status = false, message = statusText });
             }
         }
