@@ -45,6 +45,12 @@ namespace Nop.Services.Self
             _eventPublisher.EntityInserted(appointment);
         }
 
+        public virtual void InsertAppointments(List<Appointment> appointments)
+        {
+            //insert
+            _appointmentRepository.Insert(appointments);
+        }
+
         /// <summary>
         /// Updates the appointment
         /// </summary>
@@ -77,7 +83,7 @@ namespace Nop.Services.Self
         {
             var query = _appointmentRepository.Table
                 .Where(x => x.ResourceId == resourceId)
-                .Where(x => x.CustomerId == 0 || x.CustomerId == customerId)
+                .Where(x => !x.CustomerId.HasValue || x.CustomerId == customerId)
                 .Where(x => x.StartTimeUtc >= startTimeUtc && x.StartTimeUtc < endTimeUtc);
 
             return query.ToList();

@@ -8,6 +8,7 @@ namespace Nop.Services.Self
     {
         Appointment GetAppointmentById(int appointmentId);
         void InsertAppointment(Appointment appointment);
+        void InsertAppointments(List<Appointment> appointments);
         void UpdateAppointment(Appointment appointment);
         void DeleteAppointment(Appointment appointment);
         #region Tennis court booking

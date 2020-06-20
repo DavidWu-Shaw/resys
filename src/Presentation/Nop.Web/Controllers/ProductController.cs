@@ -147,7 +147,7 @@ namespace Nop.Web.Controllers
             }
 
             var appointment = _appointmentService.GetAppointmentById(id);
-            if (appointment != null && (appointment.CustomerId == 0 || appointment.CustomerId == _workContext.CurrentCustomer.Id))
+            if (appointment != null && (!appointment.CustomerId.HasValue || appointment.CustomerId == _workContext.CurrentCustomer.Id))
             {
                 //prepare model
                 var model = _appointmentModelFactory.PrepareAppointmentUpdateModel(appointment);
@@ -202,7 +202,7 @@ namespace Nop.Web.Controllers
             if (appointment != null && appointment.CustomerId == _workContext.CurrentCustomer.Id && appointment.Status == AppointmentStatusType.Waiting)
             {
                 appointment.Status = AppointmentStatusType.Free;
-                appointment.CustomerId = 0;
+                appointment.CustomerId = null;
                 appointment.Notes = "";
                 _appointmentService.UpdateAppointment(appointment);
 
