@@ -43,9 +43,3 @@
     @await Html.PartialAsync("_CreateOrUpdate", Model)
 </form>
 <nop-delete-confirmation asp-model-id="@Model.Id" asp-button-id="product-delete" />
-
-@if (!Model.IsLoggedInAsVendor)
-{
-    //product editor settings modal
-    @await Html.PartialAsync("_ProductEditorSettingsModal", Model)
-}
