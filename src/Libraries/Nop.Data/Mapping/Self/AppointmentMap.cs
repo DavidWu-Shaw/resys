@@ -24,8 +24,7 @@ namespace Nop.Data.Mapping.Self
 
             builder.HasOne(productAppointment => productAppointment.Customer)
                 .WithMany()
-                .HasForeignKey(productAppointment => productAppointment.CustomerId)
-                .IsRequired();
+                .HasForeignKey(productAppointment => productAppointment.CustomerId);
 
             builder.Ignore(a => a.Status);
 

@@ -24,7 +24,7 @@ namespace Nop.Web.Areas.Admin.Models.Self
                 model.TimeSlot = $"{start.ToShortTimeString()} - {end.ToShortTimeString()}, {start.ToShortDateString()} {start.ToString("dddd")}";
                 model.Status = appointment.Status;
                 model.Notes = appointment.Notes;
-                model.CustomerId = appointment.CustomerId;
+                model.CustomerId = appointment.CustomerId ?? 0;
                 if (appointment.Customer != null)
                 {
                     model.CustomerFullName = appointment.Customer.Email;

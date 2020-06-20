@@ -817,6 +817,7 @@ namespace Nop.Web.Areas.Admin.Controllers
                 return AccessDeniedView();
 
             var timeSlots = GetSlots(start, end, scale);
+            var appointments = new List<Appointment>();
             foreach (var slot in timeSlots)
             {
                 Appointment appointment = new Appointment
@@ -824,12 +825,12 @@ namespace Nop.Web.Areas.Admin.Controllers
                     StartTimeUtc = slot.Start.ToUniversalTime(),
                     EndTimeUtc = slot.End.ToUniversalTime(),
                     ResourceId = resourceId,
-                    Notes = string.Empty,
                     Status = AppointmentStatusType.Free
                 };
-
-                _appointmentService.InsertAppointment(appointment);
+                appointments.Add(appointment);
             }
+
+            _appointmentService.InsertAppointments(appointments);
 
             return Json(new { status = true, responseText = $"{timeSlots.Count} records created." });
         }
