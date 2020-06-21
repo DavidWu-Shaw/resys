@@ -364,21 +364,21 @@ namespace Nop.Web.Controllers
 
             //update existing shopping cart or wishlist  item?
             ShoppingCartItem updatecartitem = null;
-            if (_shoppingCartSettings.AllowCartItemEditing && updatecartitemid > 0)
-            {
-                var cart = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, storeId: _storeContext.CurrentStore.Id);
-                updatecartitem = cart.FirstOrDefault(x => x.Id == updatecartitemid);
-                //not found?
-                if (updatecartitem == null)
-                {
-                    return RedirectToRoute("Product", new { SeName = _urlRecordService.GetSeName(product) });
-                }
-                //is it this product?
-                if (product.Id != updatecartitem.ProductId)
-                {
-                    return RedirectToRoute("Product", new { SeName = _urlRecordService.GetSeName(product) });
-                }
-            }
+            //if (_shoppingCartSettings.AllowCartItemEditing && updatecartitemid > 0)
+            //{
+            //    var cart = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, storeId: _storeContext.CurrentStore.Id);
+            //    updatecartitem = cart.FirstOrDefault(x => x.Id == updatecartitemid);
+            //    //not found?
+            //    if (updatecartitem == null)
+            //    {
+            //        return RedirectToRoute("Product", new { SeName = _urlRecordService.GetSeName(product) });
+            //    }
+            //    //is it this product?
+            //    if (product.Id != updatecartitem.ProductId)
+            //    {
+            //        return RedirectToRoute("Product", new { SeName = _urlRecordService.GetSeName(product) });
+            //    }
+            //}
 
             //save as recently viewed
             //_recentlyViewedProductsService.AddProductToRecentlyViewedList(product.Id);
