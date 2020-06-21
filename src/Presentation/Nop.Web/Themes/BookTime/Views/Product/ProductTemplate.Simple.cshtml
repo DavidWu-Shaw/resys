@@ -64,7 +64,13 @@
                             <h1 itemprop="name">
                                 @Model.Name
                             </h1>
-                            <a id="book-button" href="#book-time" class="button-1 add-to-cart-button anchor-button">@T("Product.BookTime")</a>
+                            @if (Model.IsUserAuthorizedToBookTime)
+                            {
+                                <a id="book-button" href="#book-time" class="button-1 add-to-cart-button anchor-button">@T("Product.BookTime")</a>
+                            }
+                            else
+                            {
+                            }
                             @if (!string.IsNullOrEmpty(Model.ManageCalendarUrl))
                             {
                                 <a href="@Model.ManageCalendarUrl" class="add-to-cart-button anchor-button">@T("Admin.Common.Calendar")</a>
@@ -98,7 +104,10 @@
                     </div>
                     @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductDetailsEssentialBottom, additionalData = Model })
                 </div>
-                @await Html.PartialAsync("_SimpleProductBooking", Model)
+                @if (Model.IsUserAuthorizedToBookTime)
+                {
+                    @await Html.PartialAsync("_SimpleProductBooking", Model)
+                }
                 @await Component.InvokeAsync("RelatedProducts", new { productId = Model.Id })
             </div>
         </form>
