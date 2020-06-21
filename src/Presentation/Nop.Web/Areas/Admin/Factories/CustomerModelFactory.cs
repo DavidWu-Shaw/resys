@@ -30,6 +30,7 @@ using Nop.Services.Tax;
 using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Common;
 using Nop.Web.Areas.Admin.Models.Customers;
+using Nop.Web.Areas.Admin.Models.Self;
 using Nop.Web.Areas.Admin.Models.ShoppingCart;
 using Nop.Web.Framework.Factories;
 using Nop.Web.Framework.Models.Extensions;
@@ -722,6 +723,19 @@ namespace Nop.Web.Areas.Admin.Factories
                         model.SelectedNewsletterSubscriptionStoreIds = _storeService.GetAllStores()
                             .Where(store => _newsLetterSubscriptionService.GetNewsLetterSubscriptionByEmailAndStoreId(customer.Email, store.Id) != null)
                             .Select(store => store.Id).ToList();
+                    }
+                    // Prepare CustomerVendorModel
+                    foreach (var item in customer.CustomerVendors)
+                    {
+                        var customerVendorModel = new CustomerVendorModel
+                        {
+                            CustomerId = item.Id,
+                            VendorId = item.VendorId,
+                            VendorName = item.Vendor.Name,
+                            IsApproved = item.IsApproved,
+                            IsFirstVendor = item.IsFirstVendor
+                        };
+                        model.CustomerVendorsModel.Add(customerVendorModel);
                     }
                 }
                 //prepare reward points model
