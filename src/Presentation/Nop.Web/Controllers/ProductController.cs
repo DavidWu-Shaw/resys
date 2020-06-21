@@ -50,7 +50,7 @@ namespace Nop.Web.Controllers
         private readonly IAppointmentModelFactory _appointmentModelFactory;
         private readonly IProductService _productService;
         private readonly IAppointmentService _appointmentService;
-        private readonly IRecentlyViewedProductsService _recentlyViewedProductsService;
+        //private readonly IRecentlyViewedProductsService _recentlyViewedProductsService;
         private readonly IShoppingCartService _shoppingCartService;
         private readonly IStoreContext _storeContext;
         private readonly IStoreMappingService _storeMappingService;
@@ -79,7 +79,7 @@ namespace Nop.Web.Controllers
             IAppointmentModelFactory appointmentModelFactory,
             IProductService productService,
             IAppointmentService appointmentService,
-            IRecentlyViewedProductsService recentlyViewedProductsService,
+            //IRecentlyViewedProductsService recentlyViewedProductsService,
             IShoppingCartService shoppingCartService,
             IStoreContext storeContext,
             IStoreMappingService storeMappingService,
@@ -104,7 +104,7 @@ namespace Nop.Web.Controllers
             _appointmentModelFactory = appointmentModelFactory;
             _productService = productService;
             _appointmentService = appointmentService;
-            _recentlyViewedProductsService = recentlyViewedProductsService;
+            //_recentlyViewedProductsService = recentlyViewedProductsService;
             _shoppingCartService = shoppingCartService;
             _storeContext = storeContext;
             _storeMappingService = storeMappingService;
@@ -381,7 +381,7 @@ namespace Nop.Web.Controllers
             }
 
             //save as recently viewed
-            _recentlyViewedProductsService.AddProductToRecentlyViewedList(product.Id);
+            //_recentlyViewedProductsService.AddProductToRecentlyViewedList(product.Id);
 
             //display "edit" (manage) link and manage calendar link
             string manageCalendarUrl = string.Empty;
@@ -414,19 +414,19 @@ namespace Nop.Web.Controllers
 
         #region Recently viewed products
 
-        [HttpsRequirement(SslRequirement.No)]
-        public virtual IActionResult RecentlyViewedProducts()
-        {
-            if (!_catalogSettings.RecentlyViewedProductsEnabled)
-                return Content("");
+        //[HttpsRequirement(SslRequirement.No)]
+        //public virtual IActionResult RecentlyViewedProducts()
+        //{
+        //    if (!_catalogSettings.RecentlyViewedProductsEnabled)
+        //        return Content("");
 
-            var products = _recentlyViewedProductsService.GetRecentlyViewedProducts(_catalogSettings.RecentlyViewedProductsNumber);
+        //    var products = _recentlyViewedProductsService.GetRecentlyViewedProducts(_catalogSettings.RecentlyViewedProductsNumber);
 
-            var model = new List<ProductOverviewModel>();
-            model.AddRange(_productModelFactory.PrepareProductOverviewModels(products));
+        //    var model = new List<ProductOverviewModel>();
+        //    model.AddRange(_productModelFactory.PrepareProductOverviewModels(products));
 
-            return View(model);
-        }
+        //    return View(model);
+        //}
 
         #endregion
 
