@@ -170,6 +170,8 @@ namespace Nop.Web.Controllers
             }
 
             var appointment = _appointmentService.GetAppointmentById(id);
+            // TODO: Check business logic by Product
+            // Check if CurrentCustomer is a member of Vendor 
             if (appointment != null && appointment.Status == AppointmentStatusType.Free)
             {
                 appointment.CustomerId = _workContext.CurrentCustomer.Id;
@@ -283,6 +285,10 @@ namespace Nop.Web.Controllers
                 string statusText = _localizationService.GetResource("GroupedProduct.RequestVendorAppointment.LoginRequired");
                 return Json(new { status = false, message = statusText });
             }
+
+            // TODO: Get Product by parentProductId
+            // Check business logic by Product
+            // Check if CurrentCustomer is a member of Vendor 
 
             // Convert local time to UTC time
             var startTimeUtc = _dateTimeHelper.ConvertToUtcTime(start);

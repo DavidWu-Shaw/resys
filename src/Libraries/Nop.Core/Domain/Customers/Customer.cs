@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Nop.Core.Domain.Common;
 using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.Self;
 
 namespace Nop.Core.Domain.Customers
 {
@@ -17,6 +18,7 @@ namespace Nop.Core.Domain.Customers
         private ICollection<ReturnRequest> _returnRequests;
         protected ICollection<CustomerAddressMapping> _customerAddressMappings;
         private IList<CustomerRole> _customerRoles;
+        private ICollection<CustomerVendor> _customerVendors;
 
         public Customer()
         {
@@ -235,6 +237,12 @@ namespace Nop.Core.Domain.Customers
         {
             CustomerCustomerRoleMappings.Remove(role);
             _customerRoles = null;
+        }
+
+        public virtual ICollection<CustomerVendor> CustomerVendors
+        {
+            get => _customerVendors ?? (_customerVendors = new List<CustomerVendor>());
+            protected set => _customerVendors = value;
         }
 
         #endregion
