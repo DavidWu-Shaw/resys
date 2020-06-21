@@ -1118,11 +1118,14 @@ namespace Nop.Web.Factories
                         (!product.MarkAsNewEndDateTimeUtc.HasValue || product.MarkAsNewEndDateTimeUtc.Value > DateTime.UtcNow)
                 };
 
+                // Check if current customer is authorized to book time for this product
+                model.IsUserAuthorizedToBookTime = _workContext.CurrentCustomer.IsAdmin() || _workContext.CurrentCustomer.CustomerVendors.Any(v => v.VendorId == product.VendorId);
+
                 //price
-                if (preparePriceModel)
-                {
-                    model.ProductPrice = PrepareProductOverviewPriceModel(product, forceRedirectionAfterAddingToCart);
-                }
+                //if (preparePriceModel)
+                //{
+                //    model.ProductPrice = PrepareProductOverviewPriceModel(product, forceRedirectionAfterAddingToCart);
+                //}
 
                 //picture
                 if (preparePictureModel)
@@ -1131,10 +1134,10 @@ namespace Nop.Web.Factories
                 }
 
                 //specs
-                if (prepareSpecificationAttributes)
-                {
-                    model.SpecificationAttributeModels = PrepareProductSpecificationModel(product);
-                }
+                //if (prepareSpecificationAttributes)
+                //{
+                //    model.SpecificationAttributeModels = PrepareProductSpecificationModel(product);
+                //}
 
                 //reviews
                 model.ReviewOverviewModel = PrepareProductReviewOverviewModel(product);
@@ -1181,6 +1184,9 @@ namespace Nop.Web.Factories
                 HasSampleDownload = product.IsDownload && product.HasSampleDownload,
                 DisplayDiscontinuedMessage = !product.Published && _catalogSettings.DisplayDiscontinuedMessageForUnpublishedProducts
             };
+
+            // Check if current customer is authorized to book time for this product
+            model.IsUserAuthorizedToBookTime = _workContext.CurrentCustomer.IsAdmin() || _workContext.CurrentCustomer.CustomerVendors.Any(v => v.VendorId == product.VendorId);
 
             //automatically generate product description?
             if (_seoSettings.GenerateProductMetaDescription && string.IsNullOrEmpty(model.MetaDescription))

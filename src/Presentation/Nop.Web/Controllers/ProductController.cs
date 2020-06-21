@@ -404,8 +404,6 @@ namespace Nop.Web.Controllers
             var model = _productModelFactory.PrepareProductDetailsModel(product, updatecartitem, false);
             model.IsUserAuthenticated = _workContext.CurrentCustomer.IsRegistered();
             model.ManageCalendarUrl = manageCalendarUrl;
-            // Check if current customer is authorized to book time for this product
-            model.IsUserAuthorizedToBookTime = _workContext.CurrentCustomer.IsAdmin() || _workContext.CurrentCustomer.CustomerVendors.Any(v => v.VendorId == product.VendorId);
             //template
             var productTemplateViewPath = _productModelFactory.PrepareProductTemplateViewPath(product);
 
