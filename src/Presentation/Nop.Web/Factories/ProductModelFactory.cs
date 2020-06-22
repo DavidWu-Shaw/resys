@@ -1119,7 +1119,7 @@ namespace Nop.Web.Factories
                 };
 
                 // Check if current customer is authorized to book time for this product
-                model.IsUserAuthorizedToBookTime = _workContext.CurrentCustomer.IsAdmin() || _workContext.CurrentCustomer.CustomerVendors.Any(v => v.VendorId == product.VendorId);
+                model.IsUserAuthorizedToBookTime = _workContext.CurrentCustomer.IsAdmin() || _workContext.CurrentCustomer.CustomerVendors.Any(cv => cv.VendorId == product.VendorId && cv.IsApproved);
 
                 //price
                 //if (preparePriceModel)
@@ -1186,7 +1186,7 @@ namespace Nop.Web.Factories
             };
 
             // Check if current customer is authorized to book time for this product
-            model.IsUserAuthorizedToBookTime = _workContext.CurrentCustomer.IsAdmin() || _workContext.CurrentCustomer.CustomerVendors.Any(v => v.VendorId == product.VendorId);
+            model.IsUserAuthorizedToBookTime = _workContext.CurrentCustomer.IsAdmin() || _workContext.CurrentCustomer.CustomerVendors.Any(cv => cv.VendorId == product.VendorId && cv.IsApproved);
 
             //automatically generate product description?
             if (_seoSettings.GenerateProductMetaDescription && string.IsNullOrEmpty(model.MetaDescription))
