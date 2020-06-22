@@ -72,6 +72,7 @@ namespace Nop.Web.Areas.Admin.Factories
         private readonly IProductAttributeFormatter _productAttributeFormatter;
         private readonly IRewardPointService _rewardPointService;
         private readonly IStoreContext _storeContext;
+        private readonly IWorkContext _workContext;
         private readonly IStoreService _storeService;
         private readonly ITaxService _taxService;
         private readonly MediaSettings _mediaSettings;
@@ -110,6 +111,7 @@ namespace Nop.Web.Areas.Admin.Factories
             IProductAttributeFormatter productAttributeFormatter,
             IRewardPointService rewardPointService,
             IStoreContext storeContext,
+            IWorkContext workContext,
             IStoreService storeService,
             ITaxService taxService,
             MediaSettings mediaSettings,
@@ -145,6 +147,7 @@ namespace Nop.Web.Areas.Admin.Factories
             _rewardPointService = rewardPointService;
             _storeContext = storeContext;
             _storeService = storeService;
+            _workContext = workContext;
             _taxService = taxService;
             _mediaSettings = mediaSettings;
             _rewardPointsSettings = rewardPointsSettings;
@@ -764,6 +767,7 @@ namespace Nop.Web.Areas.Admin.Factories
                 }
             }
 
+            model.IsLoggedInAsVendor = _workContext.CurrentVendor != null;
             model.UsernamesEnabled = _customerSettings.UsernamesEnabled;
             model.AllowCustomersToSetTimeZone = _dateTimeSettings.AllowCustomersToSetTimeZone;
             model.GenderEnabled = _customerSettings.GenderEnabled;

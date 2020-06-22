@@ -244,7 +244,6 @@ namespace Nop.Web.Areas.Admin.Models.Customers
 
         public CustomerAssociatedExternalAuthRecordsSearchModel CustomerAssociatedExternalAuthRecordsSearchModel { get; set; }
 
-        public IList<CustomerVendorModel> CustomerVendorsModel { get; set; }
         #endregion
 
         #region Nested classes
