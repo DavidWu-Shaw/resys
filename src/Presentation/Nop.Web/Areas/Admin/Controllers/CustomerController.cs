@@ -535,6 +535,12 @@ namespace Nop.Web.Areas.Admin.Controllers
             if (customer == null || customer.Deleted)
                 return RedirectToAction("List");
 
+            //a vendor should have access only to his customers
+            if (_workContext.CurrentVendor != null && !customer.CustomerVendorMappings.Any(cv => cv.IsApproved && cv.VendorId == _workContext.CurrentVendor.Id))
+            {
+                return RedirectToAction("List");
+            }
+
             //prepare model
             var model = _customerModelFactory.PrepareCustomerModel(null, customer);
 
@@ -552,6 +558,12 @@ namespace Nop.Web.Areas.Admin.Controllers
             var customer = _customerService.GetCustomerById(model.Id);
             if (customer == null || customer.Deleted)
                 return RedirectToAction("List");
+
+            //a vendor should have access only to his customers
+            if (_workContext.CurrentVendor != null && !customer.CustomerVendorMappings.Any(cv => cv.IsApproved && cv.VendorId == _workContext.CurrentVendor.Id))
+            {
+                return RedirectToAction("List");
+            }
 
             //validate customer roles
             var allCustomerRoles = _customerService.GetAllCustomerRoles(true);
