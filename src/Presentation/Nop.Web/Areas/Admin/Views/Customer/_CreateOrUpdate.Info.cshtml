@@ -309,20 +309,18 @@
                 </div>
             </div>
         }
-        @if (!Model.IsLoggedInAsVendor)
-        {
-            <div class="form-group">
-                <div class="col-md-3">
-                    <nop-label asp-for="SelectedCustomerRoleIds" />
-                </div>
-                <div class="col-md-9">
-                    <div class="input-group input-group-required">
-                        <nop-select asp-for="SelectedCustomerRoleIds" asp-items="Model.AvailableCustomerRoles" asp-multiple="true" />
-                        <div class="input-group-btn">
-                            <nop-required />
-                        </div>
+        <div class="form-group" @(Model.IsLoggedInAsVendor ? Html.Raw("style='display: none;'") : null)>
+            <div class="col-md-3">
+                <nop-label asp-for="SelectedCustomerRoleIds" />
+            </div>
+            <div class="col-md-9">
+                <div class="input-group input-group-required">
+                    <nop-select asp-for="SelectedCustomerRoleIds" asp-items="Model.AvailableCustomerRoles" asp-multiple="true" />
+                    <div class="input-group-btn">
+                        <nop-required />
                     </div>
-                    <script>
+                </div>
+                <script>
                 $(document).ready(function() {
                     var customerRolesIdsInput = $('#@Html.IdFor(model => model.SelectedCustomerRoleIds)').data("kendoMultiSelect");
                     customerRolesIdsInput.setOptions({
@@ -342,17 +340,28 @@
                         </text>
                     }
                 });
-                    </script>
-                </div>
+                </script>
             </div>
+        </div>
+        <div class="form-group" @(Model.IsLoggedInAsVendor ? Html.Raw("style='display: none;'") : null)>
+            <div class="col-md-3">
+                <nop-label asp-for="VendorId" />
+            </div>
+            <div class="col-md-9">
+                <nop-select asp-for="VendorId" asp-items="Model.AvailableVendors" />
+                <span asp-validation-for="VendorId"></span>
+                <em>@T("Admin.Customers.Customers.VendorShouldBeInVendorsRole")</em>
+            </div>
+        </div>
+        @if (!Model.IsLoggedInAsVendor)
+        {
             <div class="form-group">
                 <div class="col-md-3">
-                    <nop-label asp-for="VendorId" />
+                    <nop-label asp-for="MemberOfVendorId" />
                 </div>
                 <div class="col-md-9">
-                    <nop-select asp-for="VendorId" asp-items="Model.AvailableVendors" />
-                    <span asp-validation-for="VendorId"></span>
-                    <em>@T("Admin.Customers.Customers.VendorShouldBeInVendorsRole")</em>
+                    <nop-select asp-for="MemberOfVendorId" asp-items="Model.AvailableVendors" />
+                    <span asp-validation-for="MemberOfVendorId"></span>
                 </div>
             </div>
         }

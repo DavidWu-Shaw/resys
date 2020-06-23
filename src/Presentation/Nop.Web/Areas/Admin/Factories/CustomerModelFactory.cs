@@ -728,7 +728,7 @@ namespace Nop.Web.Areas.Admin.Factories
                             .Select(store => store.Id).ToList();
                     }
                     // Prepare CustomerVendorModel
-                    foreach (var item in customer.CustomerVendors)
+                    foreach (var item in customer.CustomerVendorMappings)
                     {
                         var customerVendorModel = new CustomerVendorModel
                         {

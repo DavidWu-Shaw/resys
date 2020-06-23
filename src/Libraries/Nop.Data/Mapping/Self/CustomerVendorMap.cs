@@ -7,7 +7,7 @@ namespace Nop.Data.Mapping.Self
     /// <summary>
     /// Represents a product category mapping configuration
     /// </summary>
-    public partial class CustomerVendorMap : NopEntityTypeConfiguration<CustomerVendor>
+    public partial class CustomerVendorMap : NopEntityTypeConfiguration<CustomerVendorMapping>
     {
         #region Methods
 
@@ -15,7 +15,7 @@ namespace Nop.Data.Mapping.Self
         /// Configures the entity
         /// </summary>
         /// <param name="builder">The builder to be used to configure the entity</param>
-        public override void Configure(EntityTypeBuilder<CustomerVendor> builder)
+        public override void Configure(EntityTypeBuilder<CustomerVendorMapping> builder)
         {
             builder.ToTable(NopMappingDefaults.CustomerVendorTable);
             builder.HasKey(CustomerVendor => CustomerVendor.Id);
@@ -26,7 +26,7 @@ namespace Nop.Data.Mapping.Self
                 .IsRequired();
 
             builder.HasOne(CustomerVendor => CustomerVendor.Customer)
-                .WithMany(c => c.CustomerVendors)
+                .WithMany(c => c.CustomerVendorMappings)
                 .HasForeignKey(CustomerVendor => CustomerVendor.CustomerId)
                 .IsRequired();
 

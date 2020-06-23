@@ -13,6 +13,7 @@ using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Forums;
 using Nop.Core.Domain.Gdpr;
 using Nop.Core.Domain.Messages;
+using Nop.Core.Domain.Self;
 using Nop.Core.Domain.Tax;
 using Nop.Services.Common;
 using Nop.Services.Customers;
@@ -319,6 +320,12 @@ namespace Nop.Web.Areas.Admin.Controllers
                 ModelState.AddModelError(string.Empty, "Username is already registered");
             }
 
+            //For Vendor, this Customer is automatically a member of this Vendor
+            if (_workContext.CurrentVendor != null)
+            {
+                model.MemberOfVendorId = _workContext.CurrentVendor.Id;
+            }
+
             //validate customer roles
             var allCustomerRoles = _customerService.GetAllCustomerRoles(true);
             var newCustomerRoles = new List<CustomerRole>();
@@ -453,7 +460,14 @@ namespace Nop.Web.Areas.Admin.Controllers
 
                     customer.AddCustomerRoleMapping(new CustomerCustomerRoleMapping { CustomerRole = customerRole });
                 }
-
+                // customer vendors, while Vendor creating its customer
+                var customerVendorMapping = new CustomerVendorMapping
+                {
+                    VendorId = model.MemberOfVendorId,
+                    IsFirstVendor = true,
+                    IsApproved = true
+                };
+                customer.AddCustomerVendorMapping(customerVendorMapping);
                 _customerService.UpdateCustomer(customer);
 
                 //ensure that a customer with a vendor associated is not in "Administrators" role
