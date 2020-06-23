@@ -320,12 +320,6 @@ namespace Nop.Web.Areas.Admin.Controllers
                 ModelState.AddModelError(string.Empty, "Username is already registered");
             }
 
-            //For Vendor, this Customer is automatically a member of this Vendor
-            if (_workContext.CurrentVendor != null)
-            {
-                model.MemberOfVendorId = _workContext.CurrentVendor.Id;
-            }
-
             //validate customer roles
             var allCustomerRoles = _customerService.GetAllCustomerRoles(true);
             var newCustomerRoles = new List<CustomerRole>();
@@ -460,14 +454,32 @@ namespace Nop.Web.Areas.Admin.Controllers
 
                     customer.AddCustomerRoleMapping(new CustomerCustomerRoleMapping { CustomerRole = customerRole });
                 }
-                // customer vendors, while Vendor creating its customer
-                var customerVendorMapping = new CustomerVendorMapping
+                // customer vendors
+                if (_workContext.CurrentVendor != null)
                 {
-                    VendorId = model.MemberOfVendorId,
-                    IsFirstVendor = true,
-                    IsApproved = true
-                };
-                customer.AddCustomerVendorMapping(customerVendorMapping);
+                    // this Customer is automatically a member of the Vendor while Vendor creating a customer
+                    var customerVendorMapping = new CustomerVendorMapping
+                    {
+                        VendorId = _workContext.CurrentVendor.Id,
+                        IsFirstVendor = true,
+                        IsApproved = true
+                    };
+                    customer.AddCustomerVendorMapping(customerVendorMapping);
+                }
+                else
+                {
+                    // Admin is creating customers
+                    foreach (var vendorId in model.SelectedVendorIds)
+                    {
+                        var customerVendorMapping = new CustomerVendorMapping
+                        {
+                            VendorId = vendorId,
+                            IsFirstVendor = false,
+                            IsApproved = true
+                        };
+                        customer.AddCustomerVendorMapping(customerVendorMapping);
+                    }
+                }
                 _customerService.UpdateCustomer(customer);
 
                 //ensure that a customer with a vendor associated is not in "Administrators" role

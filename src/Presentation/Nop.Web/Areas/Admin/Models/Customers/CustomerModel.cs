@@ -40,6 +40,7 @@ namespace Nop.Web.Areas.Admin.Models.Customers
             CustomerBackInStockSubscriptionSearchModel = new CustomerBackInStockSubscriptionSearchModel();
             CustomerAssociatedExternalAuthRecordsSearchModel = new CustomerAssociatedExternalAuthRecordsSearchModel();
             CustomerVendorsModel = new List<CustomerVendorModel>();
+            SelectedVendorIds = new List<int>();
         }
 
         #endregion

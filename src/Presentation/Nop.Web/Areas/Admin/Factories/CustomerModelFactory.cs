@@ -709,6 +709,7 @@ namespace Nop.Web.Areas.Admin.Factories
                     model.LastIpAddress = customer.LastIpAddress;
                     model.LastVisitedPage = _genericAttributeService.GetAttribute<string>(customer, NopCustomerDefaults.LastVisitedPageAttribute);
                     model.SelectedCustomerRoleIds = customer.CustomerCustomerRoleMappings.Select(mapping => mapping.CustomerRoleId).ToList();
+                    model.SelectedVendorIds = customer.CustomerVendorMappings.Select(cv => cv.VendorId).ToList();
                     model.RegisteredInStore = _storeService.GetAllStores()
                         .FirstOrDefault(store => store.Id == customer.RegisteredInStoreId)?.Name ?? string.Empty;
 

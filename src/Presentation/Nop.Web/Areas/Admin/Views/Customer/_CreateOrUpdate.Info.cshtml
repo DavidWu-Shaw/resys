@@ -353,18 +353,40 @@
                 <em>@T("Admin.Customers.Customers.VendorShouldBeInVendorsRole")</em>
             </div>
         </div>
-        @if (!Model.IsLoggedInAsVendor)
-        {
-            <div class="form-group">
-                <div class="col-md-3">
-                    <nop-label asp-for="MemberOfVendorId" />
-                </div>
-                <div class="col-md-9">
-                    <nop-select asp-for="MemberOfVendorId" asp-items="Model.AvailableVendors" />
-                    <span asp-validation-for="MemberOfVendorId"></span>
-                </div>
+        <div class="form-group" @(Model.IsLoggedInAsVendor ? Html.Raw("style='display: none;'") : null)>
+            <div class="col-md-3">
+                <nop-label asp-for="SelectedVendorIds" />
             </div>
-        }
+            <div class="col-md-9">
+                <div class="input-group input-group-required">
+                    <nop-select asp-for="SelectedVendorIds" asp-items="Model.AvailableVendors" asp-multiple="true" />
+                    <div class="input-group-btn">
+                        <nop-required />
+                    </div>
+                </div>
+                <script>
+                $(document).ready(function() {
+                    var customerVendorsIdsInput = $('#@Html.IdFor(model => model.SelectedVendorIds)').data("kendoMultiSelect");
+                    customerVendorsIdsInput.setOptions({
+                        customerVendorsIdsInput: false,
+                        filter: "contains"
+                    });
+
+                    @if (Model.AvailableVendors.Count == 0)
+                    {
+                        <text>
+                            customerVendorsIdsInput.setOptions({
+                                enable: false,
+                                placeholder: '@T("Admin.Customers.Customers.Fields.CustomerVendors.NoVendors")'
+                            });
+                            customerVendorsIdsInput._placeholder();
+                            customerVendorsIdsInput._enable();
+                        </text>
+                    }
+                });
+                </script>
+            </div>
+        </div>
         @if (Model.AffiliateId > 0)
         {
             <div class="form-group">
