@@ -16,6 +16,7 @@ namespace Nop.Web.Areas.Admin.Models.Customers
         {
             SelectedCustomerRoleIds = new List<int>();
             AvailableCustomerRoles = new List<SelectListItem>();
+            AvailableVendors = new List<SelectListItem>();
         }
 
         #endregion

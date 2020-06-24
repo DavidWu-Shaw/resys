@@ -572,6 +572,9 @@ namespace Nop.Web.Areas.Admin.Factories
             if (searchModel == null)
                 throw new ArgumentNullException(nameof(searchModel));
 
+            //a vendor should have access only to his customers
+            searchModel.IsLoggedInAsVendor = _workContext.CurrentVendor != null;
+
             searchModel.UsernamesEnabled = _customerSettings.UsernamesEnabled;
             searchModel.AvatarEnabled = _customerSettings.AllowCustomersToUploadAvatars;
             searchModel.DateOfBirthEnabled = _customerSettings.DateOfBirthEnabled;
@@ -586,6 +589,9 @@ namespace Nop.Web.Areas.Admin.Factories
 
             //prepare available customer roles
             _aclSupportedModelFactory.PrepareModelCustomerRoles(searchModel);
+
+            //prepare available vendors
+            _baseAdminModelFactory.PrepareVendors(searchModel.AvailableVendors);
 
             //prepare page parameters
             searchModel.SetGridPageSize();
