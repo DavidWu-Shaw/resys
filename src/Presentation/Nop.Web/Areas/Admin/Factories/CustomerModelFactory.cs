@@ -613,8 +613,15 @@ namespace Nop.Web.Areas.Admin.Factories
             int.TryParse(searchModel.SearchDayOfBirth, out var dayOfBirth);
             int.TryParse(searchModel.SearchMonthOfBirth, out var monthOfBirth);
 
+            if (_workContext.CurrentVendor != null)
+            {
+                // Logged in as vendor, set the vendorid value to current vendor
+                searchModel.SearchMemberOfVendorId = _workContext.CurrentVendor.Id;
+            }
+
             //get customers
             var customers = _customerService.GetAllCustomers(customerRoleIds: searchModel.SelectedCustomerRoleIds.ToArray(),
+                memberOfVendorId: searchModel.SearchMemberOfVendorId,
                 email: searchModel.SearchEmail,
                 username: searchModel.SearchUsername,
                 firstName: searchModel.SearchFirstName,

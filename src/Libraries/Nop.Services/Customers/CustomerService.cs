@@ -106,7 +106,7 @@ namespace Nop.Services.Customers
         /// <param name="getOnlyTotalCount">A value in indicating whether you want to load only total number of records. Set to "true" if you don't want to load data from database</param>
         /// <returns>Customers</returns>
         public virtual IPagedList<Customer> GetAllCustomers(DateTime? createdFromUtc = null, DateTime? createdToUtc = null,
-            int affiliateId = 0, int vendorId = 0, int[] customerRoleIds = null,
+            int affiliateId = 0, int vendorId = 0, int[] customerRoleIds = null, int memberOfVendorId = 0,
             string email = null, string username = null, string firstName = null, string lastName = null,
             int dayOfBirth = 0, int monthOfBirth = 0,
             string company = null, string phone = null, string zipPostalCode = null, string ipAddress = null,
@@ -130,6 +130,11 @@ namespace Nop.Services.Customers
                     .Where(z => customerRoleIds.Contains(z.Mapping.CustomerRoleId))
                     .Select(z => z.Customer)
                     .Distinct();
+            }
+
+            if (memberOfVendorId != 0)
+            {
+                query = query.Where(c => c.CustomerVendorMappings.Any(cv => cv.IsApproved && cv.VendorId == memberOfVendorId));
             }
 
             if (!string.IsNullOrWhiteSpace(email))
