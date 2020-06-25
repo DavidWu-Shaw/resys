@@ -1006,6 +1006,10 @@ namespace Nop.Web.Areas.Admin.Controllers
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageProducts))
                 return AccessDeniedView();
 
+            // a vendor can't create product
+            if (_workContext.CurrentVendor != null)
+                return RedirectToAction("List");
+
             //validate maximum number of products per vendor
             if (_vendorSettings.MaximumProductNumber > 0 && _workContext.CurrentVendor != null
                 && _productService.GetNumberOfProductsByVendorId(_workContext.CurrentVendor.Id) >= _vendorSettings.MaximumProductNumber)
@@ -1026,6 +1030,10 @@ namespace Nop.Web.Areas.Admin.Controllers
         {
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageProducts))
                 return AccessDeniedView();
+
+            // a vendor can't create product
+            if (_workContext.CurrentVendor != null)
+                return RedirectToAction("List");
 
             //validate maximum number of products per vendor
             if (_vendorSettings.MaximumProductNumber > 0 && _workContext.CurrentVendor != null
@@ -1114,7 +1122,8 @@ namespace Nop.Web.Areas.Admin.Controllers
                 return RedirectToAction("List");
 
             //a vendor should have access only to his products
-            if (_workContext.CurrentVendor != null && product.VendorId != _workContext.CurrentVendor.Id)
+            // a vendor can't edit product
+            if (_workContext.CurrentVendor != null)
                 return RedirectToAction("List");
 
             //prepare model
@@ -1135,7 +1144,8 @@ namespace Nop.Web.Areas.Admin.Controllers
                 return RedirectToAction("List");
 
             //a vendor should have access only to his products
-            if (_workContext.CurrentVendor != null && product.VendorId != _workContext.CurrentVendor.Id)
+            // a vendor can't edit product
+            if (_workContext.CurrentVendor != null)
                 return RedirectToAction("List");
 
             if (ModelState.IsValid)
