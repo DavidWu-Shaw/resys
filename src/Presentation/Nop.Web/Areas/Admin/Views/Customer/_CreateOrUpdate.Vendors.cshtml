@@ -1,0 +1,34 @@
+@model CustomerModel
+
+<div class="panel-body">
+    <table class="table table-hover table-bordered">
+        <tbody>
+            <tr>
+                <th scope="col">
+                    <strong>@T("Admin.Customer.CustomerVendors.Fields.VendorName")</strong>
+                </th>
+                <th scope="col">
+                    <strong>@T("Admin.Customer.CustomerVendors.Fields.IsFirstVendor")</strong>
+                </th>
+                <th scope="col">
+                    <strong>@T("Admin.Customer.CustomerVendors.Fields.IsApproved")</strong>
+                </th>
+            </tr>
+            @foreach (var c in Model.CustomerVendorsModel)
+            {
+            <tr>
+                <td>
+                    <span>@c.VendorName</span>
+                </td>
+                <td>
+                    <span>@c.IsFirstVendor</span>
+                </td>
+                <td>
+                    <span>@c.IsApproved</span>
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
+</div>
+

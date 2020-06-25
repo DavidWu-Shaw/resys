@@ -8,5 +8,6 @@ namespace Nop.Web.Models.Catalog
         //public AppointmentUpdateModel AppointmentUpdateModel { get; set; }
         public bool IsUserAuthenticated { get; set; }
         public string ManageCalendarUrl { get; set; }
+        public bool IsUserAuthorizedToBookTime { get; set; }
     }
 }

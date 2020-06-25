@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Core.Domain.Catalog;
 using Nop.Web.Framework.Mvc.ModelBinding;
 using Nop.Web.Framework.Models;
+using Nop.Web.Areas.Admin.Models.Self;
 
 namespace Nop.Web.Areas.Admin.Models.Customers
 {
@@ -38,6 +39,8 @@ namespace Nop.Web.Areas.Admin.Models.Customers
             CustomerActivityLogSearchModel = new CustomerActivityLogSearchModel();
             CustomerBackInStockSubscriptionSearchModel = new CustomerBackInStockSubscriptionSearchModel();
             CustomerAssociatedExternalAuthRecordsSearchModel = new CustomerAssociatedExternalAuthRecordsSearchModel();
+            CustomerVendorsModel = new List<CustomerVendorModel>();
+            SelectedVendorIds = new List<int>();
         }
 
         #endregion

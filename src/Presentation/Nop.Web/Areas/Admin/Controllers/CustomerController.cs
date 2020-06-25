@@ -13,6 +13,7 @@ using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Forums;
 using Nop.Core.Domain.Gdpr;
 using Nop.Core.Domain.Messages;
+using Nop.Core.Domain.Self;
 using Nop.Core.Domain.Tax;
 using Nop.Services.Common;
 using Nop.Services.Customers;
@@ -453,7 +454,32 @@ namespace Nop.Web.Areas.Admin.Controllers
 
                     customer.AddCustomerRoleMapping(new CustomerCustomerRoleMapping { CustomerRole = customerRole });
                 }
-
+                // customer vendors
+                if (_workContext.CurrentVendor != null)
+                {
+                    // this Customer is automatically a member of the Vendor while Vendor creating a customer
+                    var customerVendorMapping = new CustomerVendorMapping
+                    {
+                        VendorId = _workContext.CurrentVendor.Id,
+                        IsFirstVendor = true,
+                        IsApproved = true
+                    };
+                    customer.AddCustomerVendorMapping(customerVendorMapping);
+                }
+                else
+                {
+                    // Admin is creating customers
+                    foreach (var vendorId in model.SelectedVendorIds)
+                    {
+                        var customerVendorMapping = new CustomerVendorMapping
+                        {
+                            VendorId = vendorId,
+                            IsFirstVendor = false,
+                            IsApproved = true
+                        };
+                        customer.AddCustomerVendorMapping(customerVendorMapping);
+                    }
+                }
                 _customerService.UpdateCustomer(customer);
 
                 //ensure that a customer with a vendor associated is not in "Administrators" role
@@ -509,6 +535,12 @@ namespace Nop.Web.Areas.Admin.Controllers
             if (customer == null || customer.Deleted)
                 return RedirectToAction("List");
 
+            //a vendor should have access only to his customers
+            if (_workContext.CurrentVendor != null && !customer.CustomerVendorMappings.Any(cv => cv.IsApproved && cv.VendorId == _workContext.CurrentVendor.Id))
+            {
+                return RedirectToAction("List");
+            }
+
             //prepare model
             var model = _customerModelFactory.PrepareCustomerModel(null, customer);
 
@@ -526,6 +558,12 @@ namespace Nop.Web.Areas.Admin.Controllers
             var customer = _customerService.GetCustomerById(model.Id);
             if (customer == null || customer.Deleted)
                 return RedirectToAction("List");
+
+            //a vendor should have access only to his customers
+            if (_workContext.CurrentVendor != null && !customer.CustomerVendorMappings.Any(cv => cv.IsApproved && cv.VendorId == _workContext.CurrentVendor.Id))
+            {
+                return RedirectToAction("List");
+            }
 
             //validate customer roles
             var allCustomerRoles = _customerService.GetAllCustomerRoles(true);

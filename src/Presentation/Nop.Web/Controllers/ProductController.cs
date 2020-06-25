@@ -50,7 +50,7 @@ namespace Nop.Web.Controllers
         private readonly IAppointmentModelFactory _appointmentModelFactory;
         private readonly IProductService _productService;
         private readonly IAppointmentService _appointmentService;
-        private readonly IRecentlyViewedProductsService _recentlyViewedProductsService;
+        //private readonly IRecentlyViewedProductsService _recentlyViewedProductsService;
         private readonly IShoppingCartService _shoppingCartService;
         private readonly IStoreContext _storeContext;
         private readonly IStoreMappingService _storeMappingService;
@@ -79,7 +79,7 @@ namespace Nop.Web.Controllers
             IAppointmentModelFactory appointmentModelFactory,
             IProductService productService,
             IAppointmentService appointmentService,
-            IRecentlyViewedProductsService recentlyViewedProductsService,
+            //IRecentlyViewedProductsService recentlyViewedProductsService,
             IShoppingCartService shoppingCartService,
             IStoreContext storeContext,
             IStoreMappingService storeMappingService,
@@ -104,7 +104,7 @@ namespace Nop.Web.Controllers
             _appointmentModelFactory = appointmentModelFactory;
             _productService = productService;
             _appointmentService = appointmentService;
-            _recentlyViewedProductsService = recentlyViewedProductsService;
+            //_recentlyViewedProductsService = recentlyViewedProductsService;
             _shoppingCartService = shoppingCartService;
             _storeContext = storeContext;
             _storeMappingService = storeMappingService;
@@ -170,6 +170,8 @@ namespace Nop.Web.Controllers
             }
 
             var appointment = _appointmentService.GetAppointmentById(id);
+            // TODO: Check business logic by Product
+            // Check if CurrentCustomer is a member of Vendor 
             if (appointment != null && appointment.Status == AppointmentStatusType.Free)
             {
                 appointment.CustomerId = _workContext.CurrentCustomer.Id;
@@ -284,6 +286,10 @@ namespace Nop.Web.Controllers
                 return Json(new { status = false, message = statusText });
             }
 
+            // TODO: Get Product by parentProductId
+            // Check business logic by Product
+            // Check if CurrentCustomer is a member of Vendor 
+
             // Convert local time to UTC time
             var startTimeUtc = _dateTimeHelper.ConvertToUtcTime(start);
             var endTimeUtc = _dateTimeHelper.ConvertToUtcTime(end);
@@ -358,24 +364,24 @@ namespace Nop.Web.Controllers
 
             //update existing shopping cart or wishlist  item?
             ShoppingCartItem updatecartitem = null;
-            if (_shoppingCartSettings.AllowCartItemEditing && updatecartitemid > 0)
-            {
-                var cart = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, storeId: _storeContext.CurrentStore.Id);
-                updatecartitem = cart.FirstOrDefault(x => x.Id == updatecartitemid);
-                //not found?
-                if (updatecartitem == null)
-                {
-                    return RedirectToRoute("Product", new { SeName = _urlRecordService.GetSeName(product) });
-                }
-                //is it this product?
-                if (product.Id != updatecartitem.ProductId)
-                {
-                    return RedirectToRoute("Product", new { SeName = _urlRecordService.GetSeName(product) });
-                }
-            }
+            //if (_shoppingCartSettings.AllowCartItemEditing && updatecartitemid > 0)
+            //{
+            //    var cart = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, storeId: _storeContext.CurrentStore.Id);
+            //    updatecartitem = cart.FirstOrDefault(x => x.Id == updatecartitemid);
+            //    //not found?
+            //    if (updatecartitem == null)
+            //    {
+            //        return RedirectToRoute("Product", new { SeName = _urlRecordService.GetSeName(product) });
+            //    }
+            //    //is it this product?
+            //    if (product.Id != updatecartitem.ProductId)
+            //    {
+            //        return RedirectToRoute("Product", new { SeName = _urlRecordService.GetSeName(product) });
+            //    }
+            //}
 
             //save as recently viewed
-            _recentlyViewedProductsService.AddProductToRecentlyViewedList(product.Id);
+            //_recentlyViewedProductsService.AddProductToRecentlyViewedList(product.Id);
 
             //display "edit" (manage) link and manage calendar link
             string manageCalendarUrl = string.Empty;
@@ -408,19 +414,19 @@ namespace Nop.Web.Controllers
 
         #region Recently viewed products
 
-        [HttpsRequirement(SslRequirement.No)]
-        public virtual IActionResult RecentlyViewedProducts()
-        {
-            if (!_catalogSettings.RecentlyViewedProductsEnabled)
-                return Content("");
+        //[HttpsRequirement(SslRequirement.No)]
+        //public virtual IActionResult RecentlyViewedProducts()
+        //{
+        //    if (!_catalogSettings.RecentlyViewedProductsEnabled)
+        //        return Content("");
 
-            var products = _recentlyViewedProductsService.GetRecentlyViewedProducts(_catalogSettings.RecentlyViewedProductsNumber);
+        //    var products = _recentlyViewedProductsService.GetRecentlyViewedProducts(_catalogSettings.RecentlyViewedProductsNumber);
 
-            var model = new List<ProductOverviewModel>();
-            model.AddRange(_productModelFactory.PrepareProductOverviewModels(products));
+        //    var model = new List<ProductOverviewModel>();
+        //    model.AddRange(_productModelFactory.PrepareProductOverviewModels(products));
 
-            return View(model);
-        }
+        //    return View(model);
+        //}
 
         #endregion
 

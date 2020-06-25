@@ -30,6 +30,7 @@ using Nop.Services.Tax;
 using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Common;
 using Nop.Web.Areas.Admin.Models.Customers;
+using Nop.Web.Areas.Admin.Models.Self;
 using Nop.Web.Areas.Admin.Models.ShoppingCart;
 using Nop.Web.Framework.Factories;
 using Nop.Web.Framework.Models.Extensions;
@@ -71,6 +72,7 @@ namespace Nop.Web.Areas.Admin.Factories
         private readonly IProductAttributeFormatter _productAttributeFormatter;
         private readonly IRewardPointService _rewardPointService;
         private readonly IStoreContext _storeContext;
+        private readonly IWorkContext _workContext;
         private readonly IStoreService _storeService;
         private readonly ITaxService _taxService;
         private readonly MediaSettings _mediaSettings;
@@ -109,6 +111,7 @@ namespace Nop.Web.Areas.Admin.Factories
             IProductAttributeFormatter productAttributeFormatter,
             IRewardPointService rewardPointService,
             IStoreContext storeContext,
+            IWorkContext workContext,
             IStoreService storeService,
             ITaxService taxService,
             MediaSettings mediaSettings,
@@ -144,6 +147,7 @@ namespace Nop.Web.Areas.Admin.Factories
             _rewardPointService = rewardPointService;
             _storeContext = storeContext;
             _storeService = storeService;
+            _workContext = workContext;
             _taxService = taxService;
             _mediaSettings = mediaSettings;
             _rewardPointsSettings = rewardPointsSettings;
@@ -568,6 +572,9 @@ namespace Nop.Web.Areas.Admin.Factories
             if (searchModel == null)
                 throw new ArgumentNullException(nameof(searchModel));
 
+            //a vendor should have access only to his customers
+            searchModel.IsLoggedInAsVendor = _workContext.CurrentVendor != null;
+
             searchModel.UsernamesEnabled = _customerSettings.UsernamesEnabled;
             searchModel.AvatarEnabled = _customerSettings.AllowCustomersToUploadAvatars;
             searchModel.DateOfBirthEnabled = _customerSettings.DateOfBirthEnabled;
@@ -582,6 +589,9 @@ namespace Nop.Web.Areas.Admin.Factories
 
             //prepare available customer roles
             _aclSupportedModelFactory.PrepareModelCustomerRoles(searchModel);
+
+            //prepare available vendors
+            _baseAdminModelFactory.PrepareVendors(searchModel.AvailableVendors);
 
             //prepare page parameters
             searchModel.SetGridPageSize();
@@ -603,8 +613,15 @@ namespace Nop.Web.Areas.Admin.Factories
             int.TryParse(searchModel.SearchDayOfBirth, out var dayOfBirth);
             int.TryParse(searchModel.SearchMonthOfBirth, out var monthOfBirth);
 
+            if (_workContext.CurrentVendor != null)
+            {
+                // Logged in as vendor, set the vendorid value to current vendor
+                searchModel.SearchMemberOfVendorId = _workContext.CurrentVendor.Id;
+            }
+
             //get customers
             var customers = _customerService.GetAllCustomers(customerRoleIds: searchModel.SelectedCustomerRoleIds.ToArray(),
+                memberOfVendorId: searchModel.SearchMemberOfVendorId,
                 email: searchModel.SearchEmail,
                 username: searchModel.SearchUsername,
                 firstName: searchModel.SearchFirstName,
@@ -705,6 +722,7 @@ namespace Nop.Web.Areas.Admin.Factories
                     model.LastIpAddress = customer.LastIpAddress;
                     model.LastVisitedPage = _genericAttributeService.GetAttribute<string>(customer, NopCustomerDefaults.LastVisitedPageAttribute);
                     model.SelectedCustomerRoleIds = customer.CustomerCustomerRoleMappings.Select(mapping => mapping.CustomerRoleId).ToList();
+                    model.SelectedVendorIds = customer.CustomerVendorMappings.Select(cv => cv.VendorId).ToList();
                     model.RegisteredInStore = _storeService.GetAllStores()
                         .FirstOrDefault(store => store.Id == customer.RegisteredInStoreId)?.Name ?? string.Empty;
 
@@ -722,6 +740,19 @@ namespace Nop.Web.Areas.Admin.Factories
                         model.SelectedNewsletterSubscriptionStoreIds = _storeService.GetAllStores()
                             .Where(store => _newsLetterSubscriptionService.GetNewsLetterSubscriptionByEmailAndStoreId(customer.Email, store.Id) != null)
                             .Select(store => store.Id).ToList();
+                    }
+                    // Prepare CustomerVendorModel
+                    foreach (var item in customer.CustomerVendorMappings)
+                    {
+                        var customerVendorModel = new CustomerVendorModel
+                        {
+                            CustomerId = item.Id,
+                            VendorId = item.VendorId,
+                            VendorName = item.Vendor.Name,
+                            IsApproved = item.IsApproved,
+                            IsFirstVendor = item.IsFirstVendor
+                        };
+                        model.CustomerVendorsModel.Add(customerVendorModel);
                     }
                 }
                 //prepare reward points model
@@ -750,6 +781,7 @@ namespace Nop.Web.Areas.Admin.Factories
                 }
             }
 
+            model.IsLoggedInAsVendor = _workContext.CurrentVendor != null;
             model.UsernamesEnabled = _customerSettings.UsernamesEnabled;
             model.AllowCustomersToSetTimeZone = _dateTimeSettings.AllowCustomersToSetTimeZone;
             model.GenderEnabled = _customerSettings.GenderEnabled;

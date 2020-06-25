@@ -148,6 +148,14 @@
                                             </div>
                                         </div>
                                     }
+                                    <div class="form-group" @(Model.AvailableVendors.SelectionIsNotPossible() || Model.IsLoggedInAsVendor ? Html.Raw("style='display: none;'") : null)>
+                                        <div class="col-md-4">
+                                            <nop-label asp-for="SearchMemberOfVendorId" />
+                                        </div>
+                                        <div class="col-md-8">
+                                            <nop-select asp-for="SearchMemberOfVendorId" asp-items="Model.AvailableVendors" />
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="col-md-7">
                                     @if (Model.CompanyEnabled)
@@ -183,7 +191,7 @@
                                             </div>
                                         </div>
                                     }
-                                    <div class="form-group">
+                                    <div class="form-group" @(Model.IsLoggedInAsVendor ? Html.Raw("style='display: none;'") : null)>
                                         <div class="col-md-4">
                                             <nop-label asp-for="SearchIpAddress" />
                                         </div>
@@ -191,7 +199,7 @@
                                             <nop-editor asp-for="SearchIpAddress" />
                                         </div>
                                     </div>
-                                    <div class="form-group">
+                                    <div class="form-group" @(Model.IsLoggedInAsVendor ? Html.Raw("style='display: none;'") : null)>
                                         <div class="col-md-4">
                                             <nop-label asp-for="SelectedCustomerRoleIds" />
                                         </div>
@@ -254,6 +262,7 @@
                                     new FilterParameter(nameof(Model.SearchUsername)),
                                     new FilterParameter(nameof(Model.SearchFirstName)),
                                     new FilterParameter(nameof(Model.SearchLastName)),
+                                    new FilterParameter(nameof(Model.SearchMemberOfVendorId)),
                                     new FilterParameter(nameof(Model.SearchDayOfBirth)),
                                     new FilterParameter(nameof(Model.SearchMonthOfBirth)),
                                     new FilterParameter(nameof(Model.SearchCompany)),
