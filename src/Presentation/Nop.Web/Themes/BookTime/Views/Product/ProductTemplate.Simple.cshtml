@@ -68,8 +68,9 @@
                             {
                                 <a id="book-button" href="#book-time" class="button-1 add-to-cart-button anchor-button">@T("Product.BookTime")</a>
                             }
-                            else
+                            else if (Model.IsUserAuthenticated)
                             {
+                                <a id="join-button" href="#request-join" class="button-1 add-to-cart-button anchor-button">@T("Product.RequestToJoin")</a>
                             }
                             @if (!string.IsNullOrEmpty(Model.ManageCalendarUrl))
                             {

@@ -26,15 +26,5 @@
         <div class="description">
             @Html.Raw(Model.ShortDescription)
         </div>
-        <div class="add-info">
-            @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductBoxAddinfoBefore, additionalData = Model })
-            <div class="buttons">
-                @if (Model.IsUserAuthorizedToBookTime)
-                {
-                    <a href="@Url.RouteUrl("Product", new {SeName = Model.SeName})#book-time" class="button-2 book-button product-box-add-to-cart-button">@T("Product.BookTime")</a>
-                }
-            </div>
-            @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductBoxAddinfoAfter, additionalData = Model })
-        </div>
     </div>
 </div>
