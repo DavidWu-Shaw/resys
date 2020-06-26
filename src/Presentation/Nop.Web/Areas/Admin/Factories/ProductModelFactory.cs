@@ -773,9 +773,9 @@ namespace Nop.Web.Areas.Admin.Factories
                     model.AssociatedToProductName = parentGroupedProduct.Name;
                 }
 
-                model.LastStockQuantity = product.StockQuantity;
+                //model.LastStockQuantity = product.StockQuantity;
                 model.ProductTags = string.Join(", ", _productTagService.GetAllProductTagsByProductId(product.Id).Select(tag => tag.Name));
-                model.ProductAttributesExist = _productAttributeService.GetAllProductAttributes().Any();
+                //model.ProductAttributesExist = _productAttributeService.GetAllProductAttributes().Any();
 
                 if (!excludeProperties)
                 {
@@ -786,19 +786,19 @@ namespace Nop.Web.Areas.Admin.Factories
                 }
 
                 //prepare copy product model
-                PrepareCopyProductModel(model.CopyProductModel, product);
+                //PrepareCopyProductModel(model.CopyProductModel, product);
 
                 //prepare nested search model
                 PrepareRelatedProductSearchModel(model.RelatedProductSearchModel, product);
-                PrepareCrossSellProductSearchModel(model.CrossSellProductSearchModel, product);
+                //PrepareCrossSellProductSearchModel(model.CrossSellProductSearchModel, product);
                 PrepareAssociatedProductSearchModel(model.AssociatedProductSearchModel, product);
                 PrepareProductPictureSearchModel(model.ProductPictureSearchModel, product);
-                PrepareProductSpecificationAttributeSearchModel(model.ProductSpecificationAttributeSearchModel, product);
-                PrepareProductOrderSearchModel(model.ProductOrderSearchModel, product);
-                PrepareTierPriceSearchModel(model.TierPriceSearchModel, product);
-                PrepareStockQuantityHistorySearchModel(model.StockQuantityHistorySearchModel, product);
-                PrepareProductAttributeMappingSearchModel(model.ProductAttributeMappingSearchModel, product);
-                PrepareProductAttributeCombinationSearchModel(model.ProductAttributeCombinationSearchModel, product);
+                //PrepareProductSpecificationAttributeSearchModel(model.ProductSpecificationAttributeSearchModel, product);
+                //PrepareProductOrderSearchModel(model.ProductOrderSearchModel, product);
+                //PrepareTierPriceSearchModel(model.TierPriceSearchModel, product);
+                //PrepareStockQuantityHistorySearchModel(model.StockQuantityHistorySearchModel, product);
+                //PrepareProductAttributeMappingSearchModel(model.ProductAttributeMappingSearchModel, product);
+                //PrepareProductAttributeCombinationSearchModel(model.ProductAttributeCombinationSearchModel, product);
 
                 //define localized model configuration action
                 localizedModelConfiguration = (locale, languageId) =>
@@ -833,23 +833,24 @@ namespace Nop.Web.Areas.Admin.Factories
                 model.VisibleIndividually = true;
             }
 
-            model.PrimaryStoreCurrencyCode = _currencyService.GetCurrencyById(_currencySettings.PrimaryStoreCurrencyId).CurrencyCode;
-            model.BaseWeightIn = _measureService.GetMeasureWeightById(_measureSettings.BaseWeightId).Name;
-            model.BaseDimensionIn = _measureService.GetMeasureDimensionById(_measureSettings.BaseDimensionId).Name;
             model.IsLoggedInAsVendor = _workContext.CurrentVendor != null;
-            model.HasAvailableSpecificationAttributes = _cacheManager.Get(NopModelCacheDefaults.SpecAttributesModelKey, () =>
-            {
-                return _specificationAttributeService.GetSpecificationAttributesWithOptions()
-                    .Select(attributeWithOption => new SelectListItem(attributeWithOption.Name, attributeWithOption.Id.ToString()))
-                    .ToList();
-            }).Any();
+
+            //model.PrimaryStoreCurrencyCode = _currencyService.GetCurrencyById(_currencySettings.PrimaryStoreCurrencyId).CurrencyCode;
+            //model.BaseWeightIn = _measureService.GetMeasureWeightById(_measureSettings.BaseWeightId).Name;
+            //model.BaseDimensionIn = _measureService.GetMeasureDimensionById(_measureSettings.BaseDimensionId).Name;
+            //model.HasAvailableSpecificationAttributes = _cacheManager.Get(NopModelCacheDefaults.SpecAttributesModelKey, () =>
+            //{
+            //    return _specificationAttributeService.GetSpecificationAttributesWithOptions()
+            //        .Select(attributeWithOption => new SelectListItem(attributeWithOption.Name, attributeWithOption.Id.ToString()))
+            //        .ToList();
+            //}).Any();
 
             //prepare localized models
             if (!excludeProperties)
                 model.Locales = _localizedModelFactory.PrepareLocalizedModels(localizedModelConfiguration);
 
             //prepare editor settings
-            model.ProductEditorSettingsModel = _settingModelFactory.PrepareProductEditorSettingsModel();
+            //model.ProductEditorSettingsModel = _settingModelFactory.PrepareProductEditorSettingsModel();
 
             //prepare available product templates
             _baseAdminModelFactory.PrepareProductTemplates(model.AvailableProductTemplates, false);
@@ -873,31 +874,31 @@ namespace Nop.Web.Areas.Admin.Factories
                 }
             }
 
-            //prepare available delivery dates
-            _baseAdminModelFactory.PrepareDeliveryDates(model.AvailableDeliveryDates,
-                defaultItemText: _localizationService.GetResource("Admin.Catalog.Products.Fields.DeliveryDate.None"));
-
-            //prepare available product availability ranges
-            _baseAdminModelFactory.PrepareProductAvailabilityRanges(model.AvailableProductAvailabilityRanges,
-                defaultItemText: _localizationService.GetResource("Admin.Catalog.Products.Fields.ProductAvailabilityRange.None"));
-
             //prepare available vendors
             _baseAdminModelFactory.PrepareVendors(model.AvailableVendors,
                 defaultItemText: _localizationService.GetResource("Admin.Catalog.Products.Fields.Vendor.None"));
 
-            //prepare available tax categories
-            _baseAdminModelFactory.PrepareTaxCategories(model.AvailableTaxCategories);
+            ////prepare available delivery dates
+            //_baseAdminModelFactory.PrepareDeliveryDates(model.AvailableDeliveryDates,
+            //    defaultItemText: _localizationService.GetResource("Admin.Catalog.Products.Fields.DeliveryDate.None"));
 
-            //prepare available warehouses
-            _baseAdminModelFactory.PrepareWarehouses(model.AvailableWarehouses,
-                defaultItemText: _localizationService.GetResource("Admin.Catalog.Products.Fields.Warehouse.None"));
-            PrepareProductWarehouseInventoryModels(model.ProductWarehouseInventoryModels, product);
+            ////prepare available product availability ranges
+            //_baseAdminModelFactory.PrepareProductAvailabilityRanges(model.AvailableProductAvailabilityRanges,
+            //    defaultItemText: _localizationService.GetResource("Admin.Catalog.Products.Fields.ProductAvailabilityRange.None"));
 
-            //prepare available base price units
-            var availableMeasureWeights = _measureService.GetAllMeasureWeights()
-                .Select(weight => new SelectListItem { Text = weight.Name, Value = weight.Id.ToString() }).ToList();
-            model.AvailableBasepriceUnits = availableMeasureWeights;
-            model.AvailableBasepriceBaseUnits = availableMeasureWeights;
+            ////prepare available tax categories
+            //_baseAdminModelFactory.PrepareTaxCategories(model.AvailableTaxCategories);
+
+            ////prepare available warehouses
+            //_baseAdminModelFactory.PrepareWarehouses(model.AvailableWarehouses,
+            //    defaultItemText: _localizationService.GetResource("Admin.Catalog.Products.Fields.Warehouse.None"));
+            //PrepareProductWarehouseInventoryModels(model.ProductWarehouseInventoryModels, product);
+
+            ////prepare available base price units
+            //var availableMeasureWeights = _measureService.GetAllMeasureWeights()
+            //    .Select(weight => new SelectListItem { Text = weight.Name, Value = weight.Id.ToString() }).ToList();
+            //model.AvailableBasepriceUnits = availableMeasureWeights;
+            //model.AvailableBasepriceBaseUnits = availableMeasureWeights;
 
             //prepare model categories
             _baseAdminModelFactory.PrepareCategories(model.AvailableCategories, false);
@@ -907,17 +908,17 @@ namespace Nop.Web.Areas.Admin.Factories
                     && model.SelectedCategoryIds.Contains(categoryId);
             }
 
-            //prepare model manufacturers
-            _baseAdminModelFactory.PrepareManufacturers(model.AvailableManufacturers, false);
-            foreach (var manufacturerItem in model.AvailableManufacturers)
-            {
-                manufacturerItem.Selected = int.TryParse(manufacturerItem.Value, out var manufacturerId)
-                    && model.SelectedManufacturerIds.Contains(manufacturerId);
-            }
+            ////prepare model manufacturers
+            //_baseAdminModelFactory.PrepareManufacturers(model.AvailableManufacturers, false);
+            //foreach (var manufacturerItem in model.AvailableManufacturers)
+            //{
+            //    manufacturerItem.Selected = int.TryParse(manufacturerItem.Value, out var manufacturerId)
+            //        && model.SelectedManufacturerIds.Contains(manufacturerId);
+            //}
 
-            //prepare model discounts
-            var availableDiscounts = _discountService.GetAllDiscounts(DiscountType.AssignedToSkus, showHidden: true);
-            _discountSupportedModelFactory.PrepareModelDiscounts(model, product, availableDiscounts, excludeProperties);
+            ////prepare model discounts
+            //var availableDiscounts = _discountService.GetAllDiscounts(DiscountType.AssignedToSkus, showHidden: true);
+            //_discountSupportedModelFactory.PrepareModelDiscounts(model, product, availableDiscounts, excludeProperties);
 
             //prepare model customer roles
             _aclSupportedModelFactory.PrepareModelCustomerRoles(model, product, excludeProperties);
