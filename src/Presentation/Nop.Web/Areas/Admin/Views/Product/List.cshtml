@@ -225,10 +225,10 @@
                             }
                             columnCollection.Add(new ColumnProperty(nameof(ProductModel.Id))
                             {
-                                Title = T("Admin.Common.Schedule").Text,
+                                Title = T("Admin.Common.Calendar").Text,
                                 Width = "100",
                                 ClassName = NopColumnClassDefaults.Button,
-                                Render = new RenderButtonEdit(new DataUrl("AppointmentSchedule"))
+                                Render = new RenderButtonEdit(new DataUrl("AppointmentCalendar"))
                             });
 
                             @await Html.PartialAsync("Table", new DataTablesModel

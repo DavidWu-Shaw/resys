@@ -15,14 +15,20 @@
             </small>
         </h1>
         <div class="pull-right">
-            <a asp-action="AppointmentSchedule" asp-route-id="@Model.Id" class="btn bg-blue">
-                <i class="fa fa-edit"></i>
-                @T("Admin.Common.Schedule")
-            </a>
-            <button type="button" onclick="javascript:OpenWindow('@Url.RouteUrl("Product", new {SeName = Model.SeName})', 800, 600, true); return false;" class="btn bg-purple">
-                <i class="fa fa-eye"></i>
-                @T("Admin.Common.Preview")
-            </button>
+            @if (Model.ShowSchedule)
+            {
+                <a asp-action="AppointmentSchedule" asp-route-id="@Model.Id" class="btn bg-blue">
+                    <i class="fa fa-edit"></i>
+                    @T("Admin.Common.Schedule")
+                </a>
+            }
+            @if (!Model.IsLoggedInAsVendor)
+            {
+                <button type="button" onclick="javascript:OpenWindow('@Url.RouteUrl("Product", new {SeName = Model.SeName})', 800, 600, true); return false;" class="btn bg-purple">
+                    <i class="fa fa-eye"></i>
+                    @T("Admin.Common.Preview")
+                </button>
+            }
         </div>
     </div>
     <div class="content">

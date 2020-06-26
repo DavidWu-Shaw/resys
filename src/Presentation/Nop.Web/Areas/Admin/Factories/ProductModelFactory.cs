@@ -762,6 +762,10 @@ namespace Nop.Web.Areas.Admin.Factories
                     model.SeName = _urlRecordService.GetSeName(product, 0, true, false);
                 }
 
+                model.ShowCalendar = true;
+                // Child product or parent product can't edit schedule
+                model.ShowSchedule = product.ParentGroupedProductId == 0 && product.ProductType == ProductType.SimpleProduct;
+
                 var parentGroupedProduct = _productService.GetProductById(product.ParentGroupedProductId);
                 if (parentGroupedProduct != null)
                 {

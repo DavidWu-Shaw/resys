@@ -1122,8 +1122,7 @@ namespace Nop.Web.Areas.Admin.Controllers
                 return RedirectToAction("List");
 
             //a vendor should have access only to his products
-            // a vendor can't edit product
-            if (_workContext.CurrentVendor != null)
+            if (_workContext.CurrentVendor != null && product.VendorId != _workContext.CurrentVendor.Id)
                 return RedirectToAction("List");
 
             //prepare model
@@ -1145,7 +1144,7 @@ namespace Nop.Web.Areas.Admin.Controllers
 
             //a vendor should have access only to his products
             // a vendor can't edit product
-            if (_workContext.CurrentVendor != null)
+            if (_workContext.CurrentVendor != null && product.VendorId != _workContext.CurrentVendor.Id)
                 return RedirectToAction("List");
 
             if (ModelState.IsValid)
