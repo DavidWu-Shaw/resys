@@ -787,7 +787,6 @@ namespace Nop.Web.Areas.Admin.Factories
 
                 //prepare copy product model
                 PrepareCopyProductModel(model.CopyProductModel, product);
-                PrepareProductScheduleModel(model.ProductScheduleModel, product);
 
                 //prepare nested search model
                 PrepareRelatedProductSearchModel(model.RelatedProductSearchModel, product);

@@ -762,7 +762,7 @@ namespace Nop.Web.Areas.Admin.Controllers
                 return RedirectToAction("List");
 
             //prepare model
-            var model = _productModelFactory.PrepareProductModel(null, product);
+            var model = _appointmentModelFactory.PrepareProductCalendarModel(new ProductCalendarModel(), product);
 
             return View(model);
         }
@@ -787,7 +787,7 @@ namespace Nop.Web.Areas.Admin.Controllers
                 return RedirectToAction("List");
 
             //prepare model
-            var model = _productModelFactory.PrepareProductModel(null, product);
+            var model = _appointmentModelFactory.PrepareProductCalendarModel(new ProductCalendarModel(), product);
 
             return View(model);
         }

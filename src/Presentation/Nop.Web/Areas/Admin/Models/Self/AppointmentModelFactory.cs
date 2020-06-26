@@ -1,5 +1,7 @@
-﻿using Nop.Core.Domain.Self;
+﻿using Nop.Core.Domain.Catalog;
+using Nop.Core.Domain.Self;
 using Nop.Services.Helpers;
+using Nop.Web.Areas.Admin.Models.Catalog;
 using System;
 
 namespace Nop.Web.Areas.Admin.Models.Self
@@ -58,6 +60,27 @@ namespace Nop.Web.Areas.Admin.Models.Self
             {
                 model.text = appointment.Customer.Username;
             };
+
+            return model;
+        }
+
+        public ProductCalendarModel PrepareProductCalendarModel(ProductCalendarModel model, Product product)
+        {
+            if (model == null)
+                throw new ArgumentNullException(nameof(model));
+
+            model.Id = product.Id;
+            model.ProductName = product.Name;
+            model.IsParentProduct = product.ProductType == ProductType.GroupedProduct;
+            model.ShowCalendar = true;
+            // Child product or parent product can't edit schedule
+            model.ShowSchedule = product.ParentGroupedProductId == 0 && product.ProductType == ProductType.SimpleProduct;
+
+            model.BusinessBeginsHour = 9;
+            model.BusinessEndsHour = 21;
+            model.BusinessMorningShiftEndsHour = 12;
+            model.BusinessAfternoonShiftBeginsHour = 13;
+            model.BusinessOnWeekends = true;
 
             return model;
         }
