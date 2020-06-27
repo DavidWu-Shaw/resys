@@ -24,5 +24,12 @@
             }
         </div>
     </div>
-    @await Html.PartialAsync("_SimpleProductCalendar", Model)
+    @if (Model.IsParentProduct)
+    {
+        @await Html.PartialAsync("_GroupedProductCalendar", Model)
+    }
+    else
+    {
+        @await Html.PartialAsync("_SimpleProductCalendar", Model)
+    }
 </form>
