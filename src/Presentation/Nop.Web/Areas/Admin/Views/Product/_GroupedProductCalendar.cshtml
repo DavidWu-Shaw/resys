@@ -9,27 +9,40 @@
             <div id="calendar"></div>
         </div>
     </div>
-    <div id="booking-form"  class="panel-body">
-        <div class="inputs">
-            <label for="txtResource">@T("GroupedProduct.BookTime.SelectedResource"):</label>
-            <input type="text" id="txtResource" name="txtResource" disabled />
+    <div id="booking-form" class="panel-body">
+        <div class="form-group">
+            <div class="col-sm-3">
+                @T("GroupedProduct.BookTime.SelectedResource")
+            </div>
+            <div class="col-sm-9">
+                <input type="text" id="txtResource" name="txtResource" disabled />
+            </div>
         </div>
-        <div class="inputs">
-            <label for="txtTimeSlot">@T("GroupedProduct.BookTime.SelectedTimeSlot"):</label>
-            <input type="text" id="txtTimeSlot" name="txtTimeSlot" disabled />
+        <div class="form-group">
+            <div class="col-sm-3">
+                @T("GroupedProduct.BookTime.SelectedTimeSlot")
+            </div>
+            <div class="col-sm-9">
+                <input type="text" id="txtTimeSlot" name="txtTimeSlot" disabled />
+            </div>
         </div>
         <input type="hidden" id="resourceId" />
         <input type="hidden" id="txtStart" name="txtStart" />
         <input type="hidden" id="txtEnd" name="txtEnd" />
-        <div class="buttons">
-            <button type="submit" name="btnRequestAppointment" id="btnRequestAppointment" class="button-base">
-                @T("GroupedProduct.BookTime.Confirm")
-            </button>
-            <button type="submit" name="btnBackToCalendar" id="btnBackToCalendar" class="button-base">
-                @T("GroupedProduct.BookTime.BackToCalendar")
-            </button>
+        <div class="form-group">
+            <div class="col-sm-9 col-sm-offset-3">
+                <button type="submit" name="btnRequestAppointment" id="btnRequestAppointment" class="btn btn-primary">
+                    @T("GroupedProduct.BookTime.Confirm")
+                </button>
+                <button type="submit" name="btnBackToCalendar" id="btnBackToCalendar" class="btn bg-teal">
+                    @T("GroupedProduct.BookTime.BackToCalendar")
+                </button>
+            </div>
         </div>
-        <p class="message" id="rMessage"></p>
+    </div>
+    <div class="form-group">
+        <div class="col-sm-12" id="rMessage">
+        </div>
     </div>
 </div>
 
@@ -192,9 +205,9 @@
             DisplayError(xhr, thrownError);
         });
     }
-</script>
+        </script>
 
-<script type="text/javascript">
+        <script type="text/javascript">
 
     $(document).ready(function () {
 
@@ -269,4 +282,4 @@
     function DisplayError(response, thrownError) {
         $("#rMessage").text(thrownError + "\r\n" + response.status + "\r\n" + response.statusText);
     }
-</script>
+        </script>
