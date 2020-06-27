@@ -8,6 +8,6 @@ namespace Nop.Web.Models.Self
         AppointmentUpdateModel PrepareAppointmentUpdateModel(Appointment appointment);
         AppointmentInfoModel PrepareAppointmentInfoModel(Appointment appointment);
         VendorAppointmentInfoModel PrepareVendorAppointmentInfoModel(Appointment appointment);
-        List<VendorResourceModel> PrepareVendorResourcesModel(int vendorId);
+        List<VendorResourceModel> PrepareVendorResourcesModel(int parentProductId);
     };
 }

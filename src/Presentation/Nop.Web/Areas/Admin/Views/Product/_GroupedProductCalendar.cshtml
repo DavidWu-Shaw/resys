@@ -160,11 +160,12 @@
 
     function loadResources() {
         var url = "@Url.Action("GetResourcesByParent", "Product")" + "?parentProductId=@Model.Id";
-        console.log(url);
+        console.log("loadResources url=", url);
         dp.rows.load(url);
     }
 
     function loadEvents() {
+        console.log("Entering loadEvents()...")
         var start = dp.startDate;
         var end = dp.startDate.addDays(dp.days);
         var params = {
@@ -172,7 +173,9 @@
             end: end.toString(),
             parentProductId: @Model.Id
         };
-        console.log("params=", params);
+
+        addAntiForgeryToken(params);
+        console.log("loadEvents params = ", params);
 
         $.ajax({
             url: "@Url.Action("GetAppointmentsByParent", "Product")",
@@ -210,6 +213,7 @@
                 end: $("#txtEnd").val(),
                 parentProductId: "@Model.Id",
             };
+            addAntiForgeryToken(params);
             console.log("params=", params);
             $.ajax({
                 url: "@Url.Action("SaveVendorAppointment", "Product")",
