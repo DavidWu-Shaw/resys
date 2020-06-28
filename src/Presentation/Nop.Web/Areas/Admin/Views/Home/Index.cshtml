@@ -8,6 +8,8 @@
     ViewBag.Title = T("Admin.Dashboard").Text;
 
     var canManageCustomers = permissionService.Authorize(StandardPermissionProvider.ManageCustomers);
+    var canManageOrders = permissionService.Authorize(StandardPermissionProvider.ManageOrders);
+    var canManageProducts = permissionService.Authorize(StandardPermissionProvider.ManageProducts);
 }
 <nop-antiforgery-token />
 <div class="content-header">
@@ -22,10 +24,13 @@
             @if (!Model.IsLoggedInAsVendor && canManageCustomers)
             {
                 <div class="row">
-                    @if (!Model.IsLoggedInAsVendor && canManageCustomers)
+                    <div class="col-md-6">
+                        @await Html.PartialAsync("_CustomerStatistics")
+                    </div>
+                    @if (canManageOrders)
                     {
                         <div class="col-md-6">
-                            @await Html.PartialAsync("_CustomerStatistics")
+                            @await Html.PartialAsync("_BestsellersBriefReportByQuantity", Model.BestsellersByQuantity)
                         </div>
                     }
                 </div>

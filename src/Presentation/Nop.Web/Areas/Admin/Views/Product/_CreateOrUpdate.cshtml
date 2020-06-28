@@ -29,9 +29,12 @@
         
         <nop-panels id="product-panels">
             <nop-panel asp-name="product-info" asp-icon="fa fa-info" asp-title="@T("Admin.Catalog.Products.Info")" asp-hide-block-attribute-name="@hideInfoBlockAttributeName" asp-hide="@hideInfoBlock" asp-advanced="false">@await Html.PartialAsync("_CreateOrUpdate.Info", Model)</nop-panel>
-            <nop-panel asp-name="product-pictures" asp-icon="fa fa-picture-o" asp-title="@T("Admin.Catalog.Products.Pictures")" asp-hide-block-attribute-name="@hidePicturesBlockAttributeName" asp-hide="@hidePicturesBlock" asp-advanced="false">@await Html.PartialAsync("_CreateOrUpdate.Pictures", Model)</nop-panel>
-            <nop-panel asp-name="product-seo" asp-icon="fa fa-search-plus" asp-title="@T("Admin.Common.SEO")" asp-hide-block-attribute-name="@hideSeoBlockAttributeName" asp-hide="@hideSeoBlock" asp-advanced="@(!Model.ProductEditorSettingsModel.Seo)">@await Html.PartialAsync("_CreateOrUpdate.SEO", Model)</nop-panel>
-            <nop-panel asp-name="product-related-products" asp-icon="fa fa-object-group" asp-title="@T("Admin.Catalog.Products.RelatedProducts")" asp-hide-block-attribute-name="@hideRelatedProductsBlockAttributeName" asp-hide="@hideRelatedProductsBlock" asp-advanced="@(!Model.ProductEditorSettingsModel.RelatedProducts)">@await Html.PartialAsync("_CreateOrUpdate.RelatedProducts", Model)</nop-panel>
+            @if (!Model.IsLoggedInAsVendor)
+            {
+                <nop-panel asp-name="product-pictures" asp-icon="fa fa-picture-o" asp-title="@T("Admin.Catalog.Products.Pictures")" asp-hide-block-attribute-name="@hidePicturesBlockAttributeName" asp-hide="@hidePicturesBlock" asp-advanced="false">@await Html.PartialAsync("_CreateOrUpdate.Pictures", Model)</nop-panel>
+                <nop-panel asp-name="product-seo" asp-icon="fa fa-search-plus" asp-title="@T("Admin.Common.SEO")" asp-hide-block-attribute-name="@hideSeoBlockAttributeName" asp-hide="@hideSeoBlock" asp-advanced="@(!Model.ProductEditorSettingsModel.Seo)">@await Html.PartialAsync("_CreateOrUpdate.SEO", Model)</nop-panel>
+                <nop-panel asp-name="product-related-products" asp-icon="fa fa-object-group" asp-title="@T("Admin.Catalog.Products.RelatedProducts")" asp-hide-block-attribute-name="@hideRelatedProductsBlockAttributeName" asp-hide="@hideRelatedProductsBlock" asp-advanced="@(!Model.ProductEditorSettingsModel.RelatedProducts)">@await Html.PartialAsync("_CreateOrUpdate.RelatedProducts", Model)</nop-panel>
+            }
 
             @await Component.InvokeAsync("AdminWidget", new { widgetZone = AdminWidgetZones.ProductDetailsBlock, additionalData = Model })
         </nop-panels>

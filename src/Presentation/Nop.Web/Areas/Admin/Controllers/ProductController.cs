@@ -762,7 +762,7 @@ namespace Nop.Web.Areas.Admin.Controllers
                 return RedirectToAction("List");
 
             //prepare model
-            var model = _productModelFactory.PrepareProductModel(null, product);
+            var model = _appointmentModelFactory.PrepareProductCalendarModel(new ProductCalendarModel(), product);
 
             return View(model);
         }
@@ -787,7 +787,7 @@ namespace Nop.Web.Areas.Admin.Controllers
                 return RedirectToAction("List");
 
             //prepare model
-            var model = _productModelFactory.PrepareProductModel(null, product);
+            var model = _appointmentModelFactory.PrepareProductCalendarModel(new ProductCalendarModel(), product);
 
             return View(model);
         }
@@ -954,6 +954,102 @@ namespace Nop.Web.Areas.Admin.Controllers
 
         #endregion Appointment Methods
 
+        #region Grouped Products Appointments
+
+        public virtual IActionResult GetResourcesByParent(int parentProductId)
+        {
+            var model = _appointmentModelFactory.PrepareVendorResourcesModel(parentProductId);
+            return Json(model);
+        }
+
+        [HttpPost]
+        public virtual IActionResult GetAppointmentsByParent(int parentProductId, DateTime start, DateTime end)
+        {
+            var startTimeUtc = _dateTimeHelper.ConvertToUtcTime(start);
+            var endTimeUtc = _dateTimeHelper.ConvertToUtcTime(end);
+            var events = _appointmentService.GetAppointmentsByParent(parentProductId, startTimeUtc, endTimeUtc);
+
+            var model = new List<VendorAppointmentInfoModel>();
+            foreach (var appointment in events)
+            {
+                var item = _appointmentModelFactory.PrepareVendorAppointmentInfoModel(appointment);
+                model.Add(item);
+                item.backColor = "#E69138";
+                item.bubbleHtml = "Not available";
+                item.moveDisabled = true;
+                item.resizeDisabled = true;
+                item.clickDisabled = true;
+                // TODO: remove customer name for non-admin user ?
+                if (appointment.Customer != null)
+                {
+                    item.text = appointment.Customer.Username ?? appointment.Customer.Email;
+                };
+            }
+
+            return Json(model);
+        }
+
+        public virtual IActionResult RequestVendorAppointment(int parentProductId, int resourceId, DateTime start, DateTime end)
+        {
+            var vendorResources = _appointmentModelFactory.PrepareVendorResourcesModel(parentProductId);
+            var vendorResource = vendorResources.FirstOrDefault(o => o.id == resourceId.ToString());
+
+            VendorAppointmentInfoModel model = new VendorAppointmentInfoModel();
+            model.parentProductId = parentProductId.ToString();
+            model.resource = resourceId.ToString();
+            model.resourceName = vendorResource != null ? vendorResource.name : resourceId.ToString();
+            model.timeRange = $"{start.ToShortTimeString()} - {end.ToShortTimeString()}, {start.ToShortDateString()} {start.ToString("dddd")}";
+            model.start = start.ToString("yyyy-MM-ddTHH:mm:ss");
+            model.end = end.ToString("yyyy-MM-ddTHH:mm:ss"); ;
+
+            return Json(new { status = true, data = model });
+        }
+
+        [HttpPost]
+        public virtual IActionResult SaveVendorAppointment(int parentProductId, int resourceId, DateTime start, DateTime end)
+        {
+
+            // TODO: Get Product by parentProductId
+            // Check business logic by Product
+            // Check if CurrentCustomer is a member of Vendor 
+
+            // Convert local time to UTC time
+            var startTimeUtc = _dateTimeHelper.ConvertToUtcTime(start);
+            var endTimeUtc = _dateTimeHelper.ConvertToUtcTime(end);
+
+            try
+            {
+                // Check if the requested time slot is taken already 
+                if (!_appointmentService.IsTaken(resourceId, startTimeUtc, endTimeUtc))
+                {
+                    Appointment appointment = new Appointment
+                    {
+                        StartTimeUtc = startTimeUtc,
+                        EndTimeUtc = endTimeUtc,
+                        ResourceId = resourceId,
+                        Status = AppointmentStatusType.Confirmed,
+                        CustomerId = _workContext.CurrentCustomer.Id,
+                        ParentProductId = parentProductId
+                    };
+                    _appointmentService.InsertAppointment(appointment);
+                    return Json(new { status = true });
+                }
+                else
+                {
+                    // Time slot is taken, show error message
+                    string statusText = _localizationService.GetResource("GroupedProduct.VendorAppointment.TimeTaken");
+                    return Json(new { status = false, message = statusText });
+                }
+            }
+            catch (Exception ex)
+            {
+                string statusText = $"{_localizationService.GetResource("GroupedProduct.VendorAppointment.Failed")}: {ex.Message}";
+                return Json(new { status = false, message = statusText });
+            }
+        }
+
+        #endregion Grouped Products Appointments
+
         #region Methods
 
         #region Product list / create / edit / delete
@@ -1006,6 +1102,10 @@ namespace Nop.Web.Areas.Admin.Controllers
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageProducts))
                 return AccessDeniedView();
 
+            // a vendor can't create product
+            if (_workContext.CurrentVendor != null)
+                return RedirectToAction("List");
+
             //validate maximum number of products per vendor
             if (_vendorSettings.MaximumProductNumber > 0 && _workContext.CurrentVendor != null
                 && _productService.GetNumberOfProductsByVendorId(_workContext.CurrentVendor.Id) >= _vendorSettings.MaximumProductNumber)
@@ -1026,6 +1126,10 @@ namespace Nop.Web.Areas.Admin.Controllers
         {
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageProducts))
                 return AccessDeniedView();
+
+            // a vendor can't create product
+            if (_workContext.CurrentVendor != null)
+                return RedirectToAction("List");
 
             //validate maximum number of products per vendor
             if (_vendorSettings.MaximumProductNumber > 0 && _workContext.CurrentVendor != null
@@ -1135,6 +1239,7 @@ namespace Nop.Web.Areas.Admin.Controllers
                 return RedirectToAction("List");
 
             //a vendor should have access only to his products
+            // a vendor can't edit product
             if (_workContext.CurrentVendor != null && product.VendorId != _workContext.CurrentVendor.Id)
                 return RedirectToAction("List");
 

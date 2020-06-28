@@ -40,5 +40,7 @@
         /// </remarks>
         public static string VendorsListKey => "Nop.pres.admin.vendors.list-{0}";
         public static string VendorsListPrefixCacheKey => "Nop.pres.admin.vendors.list";
+
+        public static string VendorProductsCacheKeyById => "Nop.pres.admin.vendor.products-{0}";
     }
 }

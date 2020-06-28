@@ -1,16 +1,26 @@
-﻿using Nop.Core.Domain.Self;
+﻿using Nop.Core.Caching;
+using Nop.Core.Domain.Catalog;
+using Nop.Core.Domain.Self;
+using Nop.Services.Catalog;
 using Nop.Services.Helpers;
+using Nop.Web.Areas.Admin.Infrastructure.Cache;
+using Nop.Web.Areas.Admin.Models.Catalog;
 using System;
+using System.Collections.Generic;
 
 namespace Nop.Web.Areas.Admin.Models.Self
 {
     public partial class AppointmentModelFactory : IAppointmentModelFactory
     {
+        private readonly IProductService _productService;
         private readonly IDateTimeHelper _dateTimeHelper;
+        private readonly IStaticCacheManager _cacheManager;
 
-        public AppointmentModelFactory(IDateTimeHelper dateTimeHelper)
+        public AppointmentModelFactory(IProductService productService, IDateTimeHelper dateTimeHelper, IStaticCacheManager cacheManager)
         {
+            _productService = productService;
             _dateTimeHelper = dateTimeHelper;
+            _cacheManager = cacheManager;
         }
 
         public virtual AppointmentEditModel PrepareAppointmentEditModel(Appointment appointment)
@@ -60,6 +70,58 @@ namespace Nop.Web.Areas.Admin.Models.Self
             };
 
             return model;
+        }
+
+        public ProductCalendarModel PrepareProductCalendarModel(ProductCalendarModel model, Product product)
+        {
+            if (model == null)
+                throw new ArgumentNullException(nameof(model));
+
+            model.Id = product.Id;
+            model.ProductName = product.Name;
+            model.IsParentProduct = product.ProductType == ProductType.GroupedProduct;
+            model.ShowCalendar = true;
+            // Child product or parent product can't edit schedule
+            model.ShowSchedule = product.ParentGroupedProductId == 0 && product.ProductType == ProductType.SimpleProduct;
+
+            model.BusinessBeginsHour = 9;
+            model.BusinessEndsHour = 21;
+            model.BusinessMorningShiftEndsHour = 12;
+            model.BusinessAfternoonShiftBeginsHour = 13;
+            model.BusinessOnWeekends = true;
+
+            return model;
+        }
+
+        public virtual VendorAppointmentInfoModel PrepareVendorAppointmentInfoModel(Appointment appointment)
+        {
+            var model = new VendorAppointmentInfoModel
+            {
+                id = appointment.Id.ToString(),
+                start = _dateTimeHelper.ConvertToUserTime(appointment.StartTimeUtc, DateTimeKind.Utc).ToString("yyyy-MM-ddTHH:mm:ss"),
+                end = _dateTimeHelper.ConvertToUserTime(appointment.EndTimeUtc, DateTimeKind.Utc).ToString("yyyy-MM-ddTHH:mm:ss"),
+                resource = appointment.ResourceId.ToString()
+            };
+
+            return model;
+        }
+
+        public virtual List<VendorResourceModel> PrepareVendorResourcesModel(int parentProductId)
+        {
+            var cacheKey = string.Format(NopModelCacheDefaults.VendorProductsCacheKeyById, parentProductId);
+            var cachedModel = _cacheManager.Get(cacheKey, () =>
+            {
+                var associatedProducts = _productService.GetAssociatedProducts(parentProductId);
+                var model = new List<VendorResourceModel>();
+                foreach (var product in associatedProducts)
+                {
+                    model.Add(new VendorResourceModel { id = product.Id.ToString(), name = product.Name });
+                }
+
+                return model;
+            });
+
+            return cachedModel;
         }
     }
 }
