@@ -49,7 +49,8 @@
     nav.showMonths = 1;
     nav.skipMonths = 1;
     nav.onTimeRangeSelected = function (args) {
-        loadEvents(args.day);
+        console.log("onTimeRangeSelected args=", args);
+        loadEvents(args.start.firstDayOfWeek(DayPilot.Locale.find(nav.locale).weekStarts));
     };
     nav.init();
 
@@ -117,13 +118,12 @@
     loadEvents();
 
     function loadEvents(day) {
-        if (day == null){
-            day = new DayPilot.Date()
-        };
-        var start = day.firstDayOfWeek();
+        console.log("loadEvents day=", day);
+        var currentDate = new DayPilot.Date();
+        var startDate = nav.visibleStart() > currentDate ? nav.visibleStart() : currentDate;
         var params = {
-            start: start.toString(),
-            end: start.addDays(7).toString(),
+            start: startDate.toString(),
+            end: nav.visibleEnd().toString(),
             resourceId: @Model.Id
         };
 

@@ -83,7 +83,7 @@
     nav.showMonths = 1;
     nav.skipMonths = 1;
     nav.onTimeRangeSelected = function (args) {
-        loadEvents(args.day);
+        loadEvents(args.start.firstDayOfWeek(), args.start.addDays(7));
     };
     nav.init();
 
@@ -150,13 +150,10 @@
     loadEvents();
 
     function loadEvents(day) {
-        if (day == null){
-            day = new DayPilot.Date()
-        };
-        var start = day.firstDayOfWeek();
+        var start = nav.visibleStart();
         var params = {
             start: start.toString(),
-            end: start.addDays(7).toString(),
+            end: nav.visibleEnd().toString(),
             resourceId: @Model.Id
         };
 
