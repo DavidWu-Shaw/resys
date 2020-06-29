@@ -979,7 +979,6 @@ namespace Nop.Web.Areas.Admin.Controllers
                 item.moveDisabled = true;
                 item.resizeDisabled = true;
                 item.clickDisabled = true;
-                // TODO: remove customer name for non-admin user ?
                 if (appointment.Customer != null)
                 {
                     item.text = appointment.Customer.Username ?? appointment.Customer.Email;

@@ -248,7 +248,7 @@ namespace Nop.Web.Controllers
                 // TODO: remove customer name for non-admin user ?
                 if (appointment.Customer != null)
                 {
-                    item.text = appointment.Customer.Username;
+                    item.text = appointment.Customer.Username ?? appointment.Customer.Email;
                 };
             }
 
