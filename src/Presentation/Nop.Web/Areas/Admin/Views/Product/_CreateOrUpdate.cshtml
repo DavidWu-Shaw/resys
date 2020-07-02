@@ -19,14 +19,6 @@
 
 <div class="content">
     <div class="form-horizontal">
-        <div class="row">
-            <div class="col-md-12 clearfix">
-                <div class="pull-left">
-                    @await Component.InvokeAsync("SettingMode", new { modeName = "product-advanced-mode" })
-                </div>
-            </div>
-        </div>
-        
         <nop-panels id="product-panels">
             <nop-panel asp-name="product-info" asp-icon="fa fa-info" asp-title="@T("Admin.Catalog.Products.Info")" asp-hide-block-attribute-name="@hideInfoBlockAttributeName" asp-hide="@hideInfoBlock" asp-advanced="false">@await Html.PartialAsync("_CreateOrUpdate.Info", Model)</nop-panel>
             @if (!Model.IsLoggedInAsVendor)

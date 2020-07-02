@@ -974,15 +974,15 @@ namespace Nop.Web.Areas.Admin.Controllers
             {
                 var item = _appointmentModelFactory.PrepareVendorAppointmentInfoModel(appointment);
                 model.Add(item);
-                item.backColor = "#E69138";
-                item.bubbleHtml = "Not available";
-                item.moveDisabled = true;
-                item.resizeDisabled = true;
-                item.clickDisabled = true;
                 if (appointment.Customer != null)
                 {
                     item.text = appointment.Customer.Username ?? appointment.Customer.Email;
                 };
+                item.backColor = "#E69138";
+                item.bubbleHtml = item.text;
+                item.moveDisabled = false;
+                item.resizeDisabled = false;
+                item.clickDisabled = false;
             }
 
             return Json(model);

@@ -1747,7 +1747,7 @@ label, label + * {
 .gallery .picture-thumbs img,
 .variant-picture img {
     width: 440px;
-    height: 300px;
+    height: 250px;
 }
 .gallery .picture-thumbs {
 	overflow: hidden;
