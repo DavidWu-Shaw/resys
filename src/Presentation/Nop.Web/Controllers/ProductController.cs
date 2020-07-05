@@ -363,7 +363,7 @@ namespace Nop.Web.Controllers
             }
 
             //update existing shopping cart or wishlist  item?
-            ShoppingCartItem updatecartitem = null;
+            //ShoppingCartItem updatecartitem = null;
             //if (_shoppingCartSettings.AllowCartItemEditing && updatecartitemid > 0)
             //{
             //    var cart = _shoppingCartService.GetShoppingCart(_workContext.CurrentCustomer, storeId: _storeContext.CurrentStore.Id);
@@ -401,7 +401,7 @@ namespace Nop.Web.Controllers
                 string.Format(_localizationService.GetResource("ActivityLog.PublicStore.ViewProduct"), product.Name), product);
 
             //model
-            var model = _productModelFactory.PrepareProductDetailsModel(product, updatecartitem, false);
+            var model = _productModelFactory.PrepareProductDetailsModel(product);
             model.IsUserAuthenticated = _workContext.CurrentCustomer.IsRegistered();
             model.ManageCalendarUrl = manageCalendarUrl;
             //template
