@@ -1619,13 +1619,15 @@ label, label + * {
 .product-list {
 	margin: 0 0 50px;
 }
+
+.product-list .title, 
 .product-grid .title {
-	margin: 0 0 30px;
-	border-bottom: 1px solid #ddd;
-	padding: 0 0 15px;
-	font-size: 30px;
-	font-weight: normal;
-	color: #444;
+    margin: 0 0 30px;
+    border-bottom: 1px solid #ddd;
+    padding: 0 0 15px;
+    font-size: 30px;
+    font-weight: normal;
+    color: #444;
 }
 .product-grid .title strong {
 	font-weight: normal;
