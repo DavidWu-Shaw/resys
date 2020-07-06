@@ -129,10 +129,10 @@ namespace Nop.Web.Controllers
                 return InvokeHttp404();
 
             //'Continue shopping' URL
-            _genericAttributeService.SaveAttribute(_workContext.CurrentCustomer, 
-                NopCustomerDefaults.LastContinueShoppingPageAttribute, 
-                _webHelper.GetThisPageUrl(false),
-                _storeContext.CurrentStore.Id);
+            //_genericAttributeService.SaveAttribute(_workContext.CurrentCustomer, 
+            //    NopCustomerDefaults.LastContinueShoppingPageAttribute, 
+            //    _webHelper.GetThisPageUrl(false),
+            //    _storeContext.CurrentStore.Id);
 
             //display "edit" (manage) link
             if (_permissionService.Authorize(StandardPermissionProvider.AccessAdminPanel) && _permissionService.Authorize(StandardPermissionProvider.ManageCategories))
@@ -191,10 +191,10 @@ namespace Nop.Web.Controllers
                 return InvokeHttp404();
 
             //'Continue shopping' URL
-            _genericAttributeService.SaveAttribute(_workContext.CurrentCustomer, 
-                NopCustomerDefaults.LastContinueShoppingPageAttribute, 
-                _webHelper.GetThisPageUrl(false),
-                _storeContext.CurrentStore.Id);
+            //_genericAttributeService.SaveAttribute(_workContext.CurrentCustomer, 
+            //    NopCustomerDefaults.LastContinueShoppingPageAttribute, 
+            //    _webHelper.GetThisPageUrl(false),
+            //    _storeContext.CurrentStore.Id);
             
             //display "edit" (manage) link
             if (_permissionService.Authorize(StandardPermissionProvider.AccessAdminPanel) && _permissionService.Authorize(StandardPermissionProvider.ManageManufacturers))
@@ -231,10 +231,10 @@ namespace Nop.Web.Controllers
                 return InvokeHttp404();
 
             //'Continue shopping' URL
-            _genericAttributeService.SaveAttribute(_workContext.CurrentCustomer,
-                NopCustomerDefaults.LastContinueShoppingPageAttribute,
-                _webHelper.GetThisPageUrl(false),
-                _storeContext.CurrentStore.Id);
+            //_genericAttributeService.SaveAttribute(_workContext.CurrentCustomer,
+            //    NopCustomerDefaults.LastContinueShoppingPageAttribute,
+            //    _webHelper.GetThisPageUrl(false),
+            //    _storeContext.CurrentStore.Id);
             
             //display "edit" (manage) link
             if (_permissionService.Authorize(StandardPermissionProvider.AccessAdminPanel) && _permissionService.Authorize(StandardPermissionProvider.ManageVendors))
@@ -287,10 +287,10 @@ namespace Nop.Web.Controllers
         public virtual IActionResult Search(SearchModel model, CatalogPagingFilteringModel command)
         {
             //'Continue shopping' URL
-            _genericAttributeService.SaveAttribute(_workContext.CurrentCustomer,
-                NopCustomerDefaults.LastContinueShoppingPageAttribute,
-                _webHelper.GetThisPageUrl(true),
-                _storeContext.CurrentStore.Id);
+            //_genericAttributeService.SaveAttribute(_workContext.CurrentCustomer,
+            //    NopCustomerDefaults.LastContinueShoppingPageAttribute,
+            //    _webHelper.GetThisPageUrl(true),
+            //    _storeContext.CurrentStore.Id);
 
             if (model == null)
                 model = new SearchModel();
