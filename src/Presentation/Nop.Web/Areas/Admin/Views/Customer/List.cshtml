@@ -306,19 +306,6 @@
                                 Title = T("Admin.Customers.Customers.Fields.FullName").Text,
                                 Width = "200"
                             });
-                            gridModel.ColumnCollection.Add(new ColumnProperty(nameof(CustomerModel.CustomerRoleNames))
-                            {
-                                Title = T("Admin.Customers.Customers.Fields.CustomerRoles").Text,
-                                Width = "200"
-                            });
-                            if (Model.CompanyEnabled)
-                            {
-                                gridModel.ColumnCollection.Add(new ColumnProperty(nameof(CustomerModel.Company))
-                                {
-                                    Title = T("Admin.Customers.Customers.Fields.Company").Text,
-                                    Width = "200"
-                                });
-                            }
                             if (Model.PhoneEnabled)
                             {
                                 gridModel.ColumnCollection.Add(new ColumnProperty(nameof(CustomerModel.Phone))
@@ -327,6 +314,19 @@
                                     Width = "200"
                                 });
                             }
+                            if (Model.CompanyEnabled)
+                            {
+                                gridModel.ColumnCollection.Add(new ColumnProperty(nameof(CustomerModel.Company))
+                                {
+                                    Title = T("Admin.Customers.Customers.Fields.Company").Text,
+                                    Width = "200"
+                                });
+                            }
+                            gridModel.ColumnCollection.Add(new ColumnProperty(nameof(CustomerModel.StreetAddress))
+                            {
+                                Title = T("Admin.Customers.Customers.Fields.Address").Text,
+                                Width = "300"
+                            });
                             if (Model.ZipPostalCodeEnabled)
                             {
                                 gridModel.ColumnCollection.Add(new ColumnProperty(nameof(CustomerModel.ZipPostalCode))
@@ -335,19 +335,27 @@
                                     Width = "200"
                                 });
                             }
-                            gridModel.ColumnCollection.Add(new ColumnProperty(nameof(CustomerModel.Active))
+                            if (!Model.IsLoggedInAsVendor)
                             {
-                                Title = T("Admin.Customers.Customers.Fields.Active").Text,
-                                Width = "100",
-                                ClassName = NopColumnClassDefaults.CenterAll,
-                                Render = new RenderBoolean()
-                            });
-                            gridModel.ColumnCollection.Add(new ColumnProperty(nameof(CustomerModel.CreatedOn))
-                            {
-                                Title = T("Admin.Customers.Customers.Fields.CreatedOn").Text,
-                                Width = "200",
-                                Render = new RenderDate()
-                            });
+                                gridModel.ColumnCollection.Add(new ColumnProperty(nameof(CustomerModel.Active))
+                                {
+                                    Title = T("Admin.Customers.Customers.Fields.Active").Text,
+                                    Width = "100",
+                                    ClassName = NopColumnClassDefaults.CenterAll,
+                                    Render = new RenderBoolean()
+                                });
+                                gridModel.ColumnCollection.Add(new ColumnProperty(nameof(CustomerModel.CustomerRoleNames))
+                                {
+                                    Title = T("Admin.Customers.Customers.Fields.CustomerRoles").Text,
+                                    Width = "200"
+                                });
+                                gridModel.ColumnCollection.Add(new ColumnProperty(nameof(CustomerModel.CreatedOn))
+                                {
+                                    Title = T("Admin.Customers.Customers.Fields.CreatedOn").Text,
+                                    Width = "200",
+                                    Render = new RenderDate()
+                                });
+                            }
                             gridModel.ColumnCollection.Add(new ColumnProperty(nameof(CustomerModel.LastActivityDate))
                             {
                                 Title = T("Admin.Customers.Customers.Fields.LastActivityDate").Text,
