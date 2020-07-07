@@ -1228,7 +1228,8 @@ namespace Nop.Web.Areas.Admin.Controllers
                 return RedirectToAction("List");
 
             //a vendor should have access only to his products
-            if (_workContext.CurrentVendor != null && product.VendorId != _workContext.CurrentVendor.Id)
+            //if (_workContext.CurrentVendor != null && product.VendorId != _workContext.CurrentVendor.Id)
+            if (_workContext.CurrentVendor != null)
                 return RedirectToAction("List");
 
             //prepare model
@@ -1250,7 +1251,8 @@ namespace Nop.Web.Areas.Admin.Controllers
 
             //a vendor should have access only to his products
             // a vendor can't edit product
-            if (_workContext.CurrentVendor != null && product.VendorId != _workContext.CurrentVendor.Id)
+            //if (_workContext.CurrentVendor != null && product.VendorId != _workContext.CurrentVendor.Id)
+            if (_workContext.CurrentVendor != null)
                 return RedirectToAction("List");
 
             if (ModelState.IsValid)
@@ -1312,7 +1314,7 @@ namespace Nop.Web.Areas.Admin.Controllers
                 return RedirectToAction("List");
 
             //a vendor should have access only to his products
-            if (_workContext.CurrentVendor != null && product.VendorId != _workContext.CurrentVendor.Id)
+            if (_workContext.CurrentVendor != null)
                 return RedirectToAction("List");
 
             _productService.DeleteProduct(product);
