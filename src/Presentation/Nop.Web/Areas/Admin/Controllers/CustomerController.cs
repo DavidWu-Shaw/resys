@@ -469,12 +469,12 @@ namespace Nop.Web.Areas.Admin.Controllers
                 else
                 {
                     // Admin is creating customers
-                    foreach (var vendorId in model.SelectedVendorIds)
+                    if (model.MemberOfVendorId > 0)
                     {
                         var customerVendorMapping = new CustomerVendorMapping
                         {
-                            VendorId = vendorId,
-                            IsFirstVendor = false,
+                            VendorId = model.MemberOfVendorId,
+                            IsFirstVendor = true,
                             IsApproved = true
                         };
                         customer.AddCustomerVendorMapping(customerVendorMapping);
@@ -753,7 +753,22 @@ namespace Nop.Web.Areas.Admin.Controllers
                             }
                         }
                     }
-
+                    // Append memberOfVendor 
+                    if (_workContext.CurrentCustomer.IsAdmin() && model.MemberOfVendorId > 0)
+                    {
+                        // Admin is editing customer
+                        var existingVendor = customer.CustomerVendorMappings.FirstOrDefault(cv => cv.VendorId == model.MemberOfVendorId);
+                        if (existingVendor == null)
+                        {
+                            var customerVendorMapping = new CustomerVendorMapping
+                            {
+                                VendorId = model.MemberOfVendorId,
+                                IsFirstVendor = false,
+                                IsApproved = true
+                            };
+                            customer.AddCustomerVendorMapping(customerVendorMapping);
+                        }
+                    }
                     _customerService.UpdateCustomer(customer);
 
                     //ensure that a customer with a vendor associated is not in "Administrators" role
