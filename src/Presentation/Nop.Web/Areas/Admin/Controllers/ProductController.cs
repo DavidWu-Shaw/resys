@@ -760,7 +760,11 @@ namespace Nop.Web.Areas.Admin.Controllers
             //a vendor should have access only to his products
             if (_workContext.CurrentVendor != null && product.VendorId != _workContext.CurrentVendor.Id)
                 return RedirectToAction("List");
-
+            // exclude grouped product and child product
+            if (product.ProductType == ProductType.GroupedProduct || product.ParentGroupedProductId > 0)
+            {
+                return RedirectToAction("List");
+            }
             //prepare model
             var model = _appointmentModelFactory.PrepareProductCalendarModel(new ProductCalendarModel(), product);
 
@@ -786,6 +790,13 @@ namespace Nop.Web.Areas.Admin.Controllers
             if (_workContext.CurrentVendor != null && product.VendorId != _workContext.CurrentVendor.Id)
                 return RedirectToAction("List");
 
+            // load parent product if it's a child product -- By David in July 2020
+            if (product.ParentGroupedProductId > 0)
+            {
+                product = _productService.GetProductById(product.ParentGroupedProductId);
+                if (product == null || product.Deleted)
+                    return RedirectToAction("List");
+            }
             //prepare model
             var model = _appointmentModelFactory.PrepareProductCalendarModel(new ProductCalendarModel(), product);
 
