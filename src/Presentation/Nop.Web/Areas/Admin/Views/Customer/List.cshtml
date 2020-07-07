@@ -349,12 +349,6 @@
                                     Title = T("Admin.Customers.Customers.Fields.CustomerRoles").Text,
                                     Width = "200"
                                 });
-                                gridModel.ColumnCollection.Add(new ColumnProperty(nameof(CustomerModel.CreatedOn))
-                                {
-                                    Title = T("Admin.Customers.Customers.Fields.CreatedOn").Text,
-                                    Width = "200",
-                                    Render = new RenderDate()
-                                });
                             }
                             gridModel.ColumnCollection.Add(new ColumnProperty(nameof(CustomerModel.LastActivityDate))
                             {
