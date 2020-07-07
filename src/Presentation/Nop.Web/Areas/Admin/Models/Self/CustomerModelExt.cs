@@ -10,6 +10,6 @@ namespace Nop.Web.Areas.Admin.Models.Customers
         public bool IsLoggedInAsVendor { get; set; }
         // customer is a member of the vendor
         [NopResourceDisplayName("Admin.Customers.Customers.Fields.MemberOfVendors")]
-        public IList<int> SelectedVendorIds { get; set; }
+        public int MemberOfVendorId { get; set; }
     }
 }
