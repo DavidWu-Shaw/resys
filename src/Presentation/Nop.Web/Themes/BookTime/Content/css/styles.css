@@ -7102,6 +7102,10 @@ pre {
     padding: 10px;
 }
 
+.book-main textarea {
+    min-height: 70px;
+}
+
 .column-main {
     margin-left: 220px;
 }
