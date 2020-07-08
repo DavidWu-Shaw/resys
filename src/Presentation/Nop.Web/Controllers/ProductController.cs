@@ -388,10 +388,13 @@ namespace Nop.Web.Controllers
             if (_permissionService.Authorize(StandardPermissionProvider.AccessAdminPanel) &&
                 _permissionService.Authorize(StandardPermissionProvider.ManageProducts))
             {
-                //a vendor should have access only to his products
-                if (_workContext.CurrentVendor == null || _workContext.CurrentVendor.Id == product.VendorId)
+                if (_workContext.CurrentVendor == null)
                 {
                     DisplayEditLink(Url.Action("Edit", "Product", new { id = product.Id, area = AreaNames.Admin }));
+                }
+                else if (_workContext.CurrentVendor.Id == product.VendorId)
+                {
+                    //a vendor should have access only to his products
                     manageCalendarUrl = Url.Action("AppointmentCalendar", "Product", new { id = product.Id, area = AreaNames.Admin });
                 }
             }

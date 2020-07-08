@@ -1183,7 +1183,7 @@ namespace Nop.Web.Factories
             };
 
             // Check if current customer is authorized to book time for this product
-            model.IsUserAuthorizedToBookTime = _workContext.CurrentCustomer.IsAdmin() || _workContext.CurrentCustomer.CustomerVendorMappings.Any(cv => cv.VendorId == product.VendorId && cv.IsApproved);
+            model.IsUserAuthorizedToBookTime = _workContext.CurrentCustomer.CustomerVendorMappings.Any(cv => cv.VendorId == product.VendorId && cv.IsApproved);
 
             //automatically generate product description?
             if (_seoSettings.GenerateProductMetaDescription && string.IsNullOrEmpty(model.MetaDescription))
