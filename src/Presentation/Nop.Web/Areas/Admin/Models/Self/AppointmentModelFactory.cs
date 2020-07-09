@@ -35,6 +35,8 @@ namespace Nop.Web.Areas.Admin.Models.Self
             if (appointment != null)
             {
                 model.Id = appointment.Id;
+                model.ResourceName = appointment.Product.Name;
+                model.ResourceId = appointment.ResourceId;
                 var start = _dateTimeHelper.ConvertToUserTime(appointment.StartTimeUtc, DateTimeKind.Utc);
                 var end = _dateTimeHelper.ConvertToUserTime(appointment.EndTimeUtc, DateTimeKind.Utc);
                 model.TimeSlot = $"{start.ToShortTimeString()} - {end.ToShortTimeString()}, {start.ToShortDateString()} {start.ToString("dddd")}";

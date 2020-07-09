@@ -14,6 +14,14 @@
         <div id="booking-form" class="panel-body">
             <div class="form-group">
                 <div class="col-md-3">
+                    <nop-label asp-for="@Model.AppointmentEditModel.ResourceName" />
+                </div>
+                <div class="col-md-9">
+                    <nop-editor asp-for="@Model.AppointmentEditModel.ResourceName" asp-disabled="true" />
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-3">
                     <nop-label asp-for="@Model.AppointmentEditModel.TimeSlot" />
                 </div>
                 <div class="col-md-9">
@@ -277,8 +285,9 @@
         $("#booking-calendar").hide();
         $("#booking-form").show();
         if (response.status) {
-            $("#AppointmentEditModel_TimeSlot").val("N/A");
-            $("#AppointmentEditModel_Status").val("N/A");
+            $("#AppointmentEditModel_ResourceName").val("");
+            $("#AppointmentEditModel_TimeSlot").val("");
+            $("#AppointmentEditModel_Status").val("");
         }
         $("#btnDeleteAppointment").hide();
         $("#rMessage").text(response.message);
@@ -288,6 +297,7 @@
         $("#booking-calendar").hide();
         $("#booking-form").show();
         if (response.status) {
+            $("#AppointmentEditModel_ResourceName").val(response.data.ResourceName);
             $("#AppointmentEditModel_TimeSlot").val(response.data.TimeSlot);
             $("#appointmentId").val(response.data.Id);
             $("#AppointmentEditModel_CustomerEmail").val(response.data.CustomerEmail);

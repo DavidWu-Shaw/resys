@@ -1,12 +1,12 @@
-﻿using Nop.Core.Domain.Self;
-using Nop.Web.Framework.Models;
+﻿using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
-using System;
 
 namespace Nop.Web.Areas.Admin.Models.Self
 {
     public class AppointmentEditModel : BaseNopEntityModel
     {
+        [NopResourceDisplayName("Admin.Appointment.Fields.ResourceName")]
+        public string ResourceName { get; set; }
         [NopResourceDisplayName("Admin.Appointment.Fields.TimeSlot")]
         public string TimeSlot { get; set; }
         [NopResourceDisplayName("Admin.Appointment.Fields.Status")]
