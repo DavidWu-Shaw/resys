@@ -10,7 +10,7 @@ namespace Nop.Web.Areas.Admin.Models.Self
         [NopResourceDisplayName("Admin.Appointment.Fields.TimeSlot")]
         public string TimeSlot { get; set; }
         [NopResourceDisplayName("Admin.Appointment.Fields.Status")]
-        public AppointmentStatusType Status { get; set; }
+        public string Status { get; set; }
         [NopResourceDisplayName("Admin.Appointment.Fields.Notes")]
         public string Notes { get; set; }
         public int ResourceId { get; set; }

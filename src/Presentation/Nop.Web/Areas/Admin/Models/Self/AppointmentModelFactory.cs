@@ -2,6 +2,7 @@
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Self;
 using Nop.Services.Catalog;
+using Nop.Services.Customers;
 using Nop.Services.Helpers;
 using Nop.Web.Areas.Admin.Infrastructure.Cache;
 using Nop.Web.Areas.Admin.Models.Catalog;
@@ -13,12 +14,17 @@ namespace Nop.Web.Areas.Admin.Models.Self
     public partial class AppointmentModelFactory : IAppointmentModelFactory
     {
         private readonly IProductService _productService;
+        private readonly ICustomerService _customerService;
         private readonly IDateTimeHelper _dateTimeHelper;
         private readonly IStaticCacheManager _cacheManager;
 
-        public AppointmentModelFactory(IProductService productService, IDateTimeHelper dateTimeHelper, IStaticCacheManager cacheManager)
+        public AppointmentModelFactory(IProductService productService, 
+            ICustomerService customerService, 
+            IDateTimeHelper dateTimeHelper, 
+            IStaticCacheManager cacheManager)
         {
             _productService = productService;
+            _customerService = customerService;
             _dateTimeHelper = dateTimeHelper;
             _cacheManager = cacheManager;
         }
@@ -32,18 +38,13 @@ namespace Nop.Web.Areas.Admin.Models.Self
                 var start = _dateTimeHelper.ConvertToUserTime(appointment.StartTimeUtc, DateTimeKind.Utc);
                 var end = _dateTimeHelper.ConvertToUserTime(appointment.EndTimeUtc, DateTimeKind.Utc);
                 model.TimeSlot = $"{start.ToShortTimeString()} - {end.ToShortTimeString()}, {start.ToShortDateString()} {start.ToString("dddd")}";
-                model.Status = appointment.Status;
+                model.Status = appointment.Status.ToString();
                 model.Notes = appointment.Notes;
                 model.CustomerId = appointment.CustomerId ?? 0;
                 if (appointment.Customer != null)
                 {
-                    model.CustomerFullName = appointment.Customer.Email;
+                    model.CustomerFullName = _customerService.GetCustomerFullName(appointment.Customer);
                     model.CustomerEmail = appointment.Customer.Email;
-                }
-                else
-                {
-                    model.CustomerFullName = "N/A";
-                    model.CustomerEmail = "N/A";
                 }
             }
 
