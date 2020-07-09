@@ -1,47 +1,73 @@
 ﻿@model ProductCalendarModel
 
 <div class="content">
-    <div id="booking-calendar">
-        <div class="column-left">
-            <div id="navigator"></div>
+    <div class="form-horizontal">
+        <div id="booking-calendar">
+            <div class="column-left">
+                <div id="navigator"></div>
+            </div>
+            <div class="column-main">
+                <div id="calendar"></div>
+            </div>
         </div>
-        <div class="column-main">
-            <div id="calendar"></div>
+        <div id="booking-form" class="panel-body">
+            <div class="form-group">
+                <div class="col-md-3">
+                    <nop-label asp-for="@Model.AppointmentEditModel.ResourceName" />
+                </div>
+                <div class="col-md-9">
+                    <nop-editor asp-for="@Model.AppointmentEditModel.ResourceName" asp-disabled="true" />
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-3">
+                    <nop-label asp-for="@Model.AppointmentEditModel.TimeSlot" />
+                </div>
+                <div class="col-md-9">
+                    <nop-editor asp-for="@Model.AppointmentEditModel.TimeSlot" asp-disabled="true" />
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-3">
+                    <nop-label asp-for="@Model.AppointmentEditModel.Status" />
+                </div>
+                <div class="col-md-9">
+                    <nop-editor asp-for="@Model.AppointmentEditModel.Status" asp-disabled="true" asp-render-form-control-class="true" />
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-3">
+                    <nop-label asp-for="@Model.AppointmentEditModel.CustomerEmail" />
+                </div>
+                <div class="col-md-9">
+                    <nop-editor asp-for="@Model.AppointmentEditModel.CustomerEmail" asp-disabled="true" />
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-3">
+                    <nop-label asp-for="@Model.AppointmentEditModel.CustomerFullName" />
+                </div>
+                <div class="col-md-9">
+                    <nop-editor asp-for="@Model.AppointmentEditModel.CustomerFullName" asp-disabled="true" />
+                </div>
+            </div>
+            <input type="hidden" id="resourceId" />
+            <input type="hidden" id="txtStart" name="txtStart" />
+            <input type="hidden" id="txtEnd" name="txtEnd" />
+            <div class="form-group">
+                <div class="col-sm-9 col-sm-offset-3">
+                    <button type="submit" name="btnRequestAppointment" id="btnRequestAppointment" class="btn btn-primary">
+                        @T("GroupedProduct.BookTime.Confirm")
+                    </button>
+                    <button type="submit" name="btnBackToCalendar" id="btnBackToCalendar" class="btn bg-teal">
+                        @T("GroupedProduct.BookTime.BackToCalendar")
+                    </button>
+                </div>
+            </div>
         </div>
-    </div>
-    <div id="booking-form" class="panel-body">
         <div class="form-group">
-            <div class="col-sm-3">
-                @T("GroupedProduct.BookTime.SelectedResource")
+            <div class="col-sm-12" id="rMessage">
             </div>
-            <div class="col-sm-9">
-                <input type="text" id="txtResource" name="txtResource" disabled />
-            </div>
-        </div>
-        <div class="form-group">
-            <div class="col-sm-3">
-                @T("GroupedProduct.BookTime.SelectedTimeSlot")
-            </div>
-            <div class="col-sm-9">
-                <input type="text" id="txtTimeSlot" name="txtTimeSlot" disabled />
-            </div>
-        </div>
-        <input type="hidden" id="resourceId" />
-        <input type="hidden" id="txtStart" name="txtStart" />
-        <input type="hidden" id="txtEnd" name="txtEnd" />
-        <div class="form-group">
-            <div class="col-sm-9 col-sm-offset-3">
-                <button type="submit" name="btnRequestAppointment" id="btnRequestAppointment" class="btn btn-primary">
-                    @T("GroupedProduct.BookTime.Confirm")
-                </button>
-                <button type="submit" name="btnBackToCalendar" id="btnBackToCalendar" class="btn bg-teal">
-                    @T("GroupedProduct.BookTime.BackToCalendar")
-                </button>
-            </div>
-        </div>
-    </div>
-    <div class="form-group">
-        <div class="col-sm-12" id="rMessage">
         </div>
     </div>
 </div>
@@ -207,7 +233,7 @@
     }
         </script>
 
-        <script type="text/javascript">
+<script type="text/javascript">
 
     $(document).ready(function () {
 
@@ -258,9 +284,9 @@
         $("#booking-calendar").hide();
         $("#booking-form").show();
         if (response.status) {
+            $("#AppointmentEditModel_ResourceName").val(response.data.resourceName);
+            $("#AppointmentEditModel_TimeSlot").val(response.data.timeRange);
             $("#resourceId").val(response.data.resource);
-            $("#txtResource").val(response.data.resourceName);
-            $("#txtTimeSlot").val(response.data.timeRange);
             $("#txtStart").val(response.data.start);
             $("#txtEnd").val(response.data.end);
         }
@@ -282,4 +308,5 @@
     function DisplayError(response, thrownError) {
         $("#rMessage").text(thrownError + "\r\n" + response.status + "\r\n" + response.statusText);
     }
-        </script>
+
+</script>

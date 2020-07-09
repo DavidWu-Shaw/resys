@@ -927,7 +927,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             if (appointment != null && (appointment.Status == AppointmentStatusType.Waiting || appointment.Status == AppointmentStatusType.Confirmed))
             {
                 appointment.Status = AppointmentStatusType.Free;
-                appointment.CustomerId = 0;
+                appointment.CustomerId = null;
                 appointment.Notes = "";
                 _appointmentService.UpdateAppointment(appointment);
 
