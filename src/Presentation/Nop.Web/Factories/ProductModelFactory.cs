@@ -1118,6 +1118,9 @@ namespace Nop.Web.Factories
                         (!product.MarkAsNewEndDateTimeUtc.HasValue || product.MarkAsNewEndDateTimeUtc.Value > DateTime.UtcNow)
                 };
 
+                // Check if current customer is authorized to book time for this product
+                model.IsUserAuthorizedToBookTime = _workContext.CurrentCustomer.CustomerVendorMappings.Any(cv => cv.VendorId == product.VendorId && cv.IsApproved);
+
                 //price
                 //if (preparePriceModel)
                 //{
