@@ -183,7 +183,7 @@ namespace Nop.Web.Areas.Admin.Factories
                 throw new ArgumentNullException(nameof(model));
 
             model.BusinessBeginsHour = 9;
-            model.BusinessEndsHour = 21;
+            model.BusinessEndsHour = 23;
             model.BusinessMorningShiftEndsHour = 12;
             model.BusinessAfternoonShiftBeginsHour = 13;
             model.BusinessOnWeekends = true;

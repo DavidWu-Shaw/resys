@@ -120,9 +120,9 @@
         { groupBy: "Hour", format: "h tt" }
     ];
 
-    dp.businessBeginsHour = 6;
-    dp.businessEndsHour = 23;
-    dp.businessWeekends = true;
+    dp.businessBeginsHour = @Model.BusinessBeginsHour;
+    dp.businessEndsHour = @Model.BusinessEndsHour;
+    dp.businessWeekends = "@Model.BusinessOnWeekends";
     dp.showNonBusiness = false;
     dp.allowEventOverlap = false;
     //dp.cellWidthSpec = "Auto";
@@ -134,9 +134,9 @@
             args.right.html = "You can't create a reservation in the past";
             args.allowed = false;
         }
-        else if (args.duration.totalHours() > 2) {
+        else if (args.duration.totalHours() > @Model.MaxHoursAllowed) {
             args.right.enabled = true;
-            args.right.html = "You can only book up to 2 hours";
+            args.right.html = "Maximum hours of " + @Model.MaxHoursAllowed;
             args.allowed = false;
         }
     };

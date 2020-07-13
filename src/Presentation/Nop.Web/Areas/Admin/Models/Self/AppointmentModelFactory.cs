@@ -88,7 +88,7 @@ namespace Nop.Web.Areas.Admin.Models.Self
             model.ShowSchedule = product.ParentGroupedProductId == 0 && product.ProductType == ProductType.SimpleProduct;
 
             model.BusinessBeginsHour = 9;
-            model.BusinessEndsHour = 21;
+            model.BusinessEndsHour = 23;
             model.BusinessMorningShiftEndsHour = 12;
             model.BusinessAfternoonShiftBeginsHour = 13;
             model.BusinessOnWeekends = true;

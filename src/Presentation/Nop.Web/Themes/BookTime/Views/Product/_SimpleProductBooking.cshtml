@@ -60,10 +60,10 @@
     calendar.eventMoveHandling = "Disabled";
     calendar.eventResizeHandling = "Disabled";
     calendar.bubble = null;
-    calendar.businessBeginsHour = 9;
-    calendar.businessEndsHour = 18;
-    calendar.dayBeginsHour = 9;
-    calendar.dayEndsHour = 21;
+    //calendar.businessBeginsHour = 9;
+    //calendar.businessEndsHour = 18;
+    calendar.dayBeginsHour = @Model.BusinessBeginsHour;
+    calendar.dayEndsHour = @Model.BusinessEndsHour;
 
     calendar.onBeforeEventRender = function (args) {
         if (!args.data.tags) {
