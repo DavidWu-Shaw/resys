@@ -1191,6 +1191,7 @@ namespace Nop.Web.Factories
             model.BusinessBeginsHour = 9;
             model.BusinessEndsHour = 23;
             model.MaxHoursAllowed = 2;
+            model.MaxFutureDays = 7;
 
             //automatically generate product description?
             if (_seoSettings.GenerateProductMetaDescription && string.IsNullOrEmpty(model.MetaDescription))

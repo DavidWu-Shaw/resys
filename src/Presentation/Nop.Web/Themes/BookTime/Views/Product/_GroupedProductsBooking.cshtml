@@ -98,7 +98,7 @@
         if (args.cell.isParent) {
             return;
         }
-        if (args.cell.start < new DayPilot.Date()) {  // past
+        if (args.cell.start < new DayPilot.Date() || args.cell.start > new DayPilot.Date().addDays(7)) {  // past
             return;
         }
         if (args.cell.utilization() > 0) {
@@ -132,6 +132,11 @@
         if (args.start < new DayPilot.Date()) {
             args.right.enabled = true;
             args.right.html = "You can't create a reservation in the past";
+            args.allowed = false;
+        }
+        else if (args.start > new DayPilot.Date().addDays(@Model.MaxFutureDays)) {
+            args.right.enabled = true;
+            args.right.html = "Reservation is not available yet";
             args.allowed = false;
         }
         else if (args.duration.totalHours() > @Model.MaxHoursAllowed) {
