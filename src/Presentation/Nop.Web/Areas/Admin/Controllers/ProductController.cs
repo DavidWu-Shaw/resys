@@ -882,7 +882,7 @@ namespace Nop.Web.Areas.Admin.Controllers
                 //prepare model
                 var model = _appointmentModelFactory.PrepareAppointmentEditModel(appointment);
                 // TODO: remove admin user later
-                model.IsLoggedInAsVendor = _workContext.CurrentVendor != null || _workContext.IsAdmin;
+                //model.IsLoggedInAsVendor = _workContext.CurrentVendor != null || _workContext.IsAdmin;
                 return Json(new { status = true, data = model });
             }
             else
@@ -985,10 +985,6 @@ namespace Nop.Web.Areas.Admin.Controllers
             {
                 var item = _appointmentModelFactory.PrepareVendorAppointmentInfoModel(appointment);
                 model.Add(item);
-                if (appointment.Customer != null)
-                {
-                    item.text = appointment.Customer.Username ?? appointment.Customer.Email;
-                };
                 item.backColor = "#E69138";
                 item.bubbleHtml = item.text;
                 item.moveDisabled = false;
@@ -1004,13 +1000,13 @@ namespace Nop.Web.Areas.Admin.Controllers
             var vendorResources = _appointmentModelFactory.PrepareVendorResourcesModel(parentProductId);
             var vendorResource = vendorResources.FirstOrDefault(o => o.id == resourceId.ToString());
 
-            VendorAppointmentInfoModel model = new VendorAppointmentInfoModel();
-            model.parentProductId = parentProductId.ToString();
-            model.resource = resourceId.ToString();
-            model.resourceName = vendorResource != null ? vendorResource.name : resourceId.ToString();
-            model.timeRange = $"{start.ToShortTimeString()} - {end.ToShortTimeString()}, {start.ToShortDateString()} {start.ToString("dddd")}";
-            model.start = start.ToString("yyyy-MM-ddTHH:mm:ss");
-            model.end = end.ToString("yyyy-MM-ddTHH:mm:ss"); ;
+            AppointmentEditModel model = new AppointmentEditModel();
+            model.ResourceId = resourceId;
+            model.ResourceName = vendorResource != null ? vendorResource.name : resourceId.ToString();
+            model.TimeSlot = $"{start.ToShortTimeString()} - {end.ToShortTimeString()}, {start.ToShortDateString()} {start.ToString("dddd")}";
+            model.Start = start.ToString("yyyy-MM-ddTHH:mm:ss");
+            model.End = end.ToString("yyyy-MM-ddTHH:mm:ss");
+            model.Status = AppointmentStatusType.Free.ToString();
 
             return Json(new { status = true, data = model });
         }

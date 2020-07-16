@@ -105,6 +105,10 @@ namespace Nop.Web.Areas.Admin.Models.Self
                 end = _dateTimeHelper.ConvertToUserTime(appointment.EndTimeUtc, DateTimeKind.Utc).ToString("yyyy-MM-ddTHH:mm:ss"),
                 resource = appointment.ResourceId.ToString()
             };
+            if (appointment.Customer != null)
+            {
+                model.text = appointment.Customer.Username ?? appointment.Customer.Email;
+            };
 
             return model;
         }
