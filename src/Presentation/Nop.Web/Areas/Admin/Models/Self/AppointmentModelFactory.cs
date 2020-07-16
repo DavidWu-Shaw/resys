@@ -69,7 +69,7 @@ namespace Nop.Web.Areas.Admin.Models.Self
             };
             if (appointment.Customer != null)
             {
-                model.text = appointment.Customer.Username;
+                model.text = appointment.Customer.Username ?? appointment.Customer.Email;
             };
 
             return model;

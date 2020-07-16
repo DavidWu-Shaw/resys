@@ -51,6 +51,7 @@
                     <nop-editor asp-for="@Model.AppointmentEditModel.CustomerFullName" asp-disabled="true" />
                 </div>
             </div>
+            <input type="hidden" id="appointmentId" />
             <input type="hidden" id="resourceId" />
             <input type="hidden" id="txtStart" name="txtStart" />
             <input type="hidden" id="txtEnd" name="txtEnd" />
@@ -74,6 +75,7 @@
 
 <script type="text/javascript">
     var nav = new DayPilot.Navigator("navigator");
+
     nav.onTimeRangeSelected = function (args) {
         var day = args.day;
 
@@ -205,6 +207,27 @@
         });
     };
 
+    dp.onEventClick = function (args) {
+        var params = {
+            id: args.e.id(),
+        };
+
+        $.ajax({
+            url: "@Url.Action("AppointmentEdit", "Product")",
+            type: "get",
+            data: params,
+            cache: false
+        })
+        .done(function (response) {
+            console.log("response =", response);
+            DisplaySelectedSlot(response);
+        })
+        .fail(function (xhr, ajaxOptions, thrownError) {
+            // Error
+            DisplayError(xhr, thrownError);
+        });
+    };
+
     dp.init();
 
     var scrollTo = DayPilot.Date.today();
@@ -303,6 +326,7 @@
         $("#booking-calendar").hide();
         $("#booking-form").show();
         if (response.status) {
+            $("#appointmentId").val(response.data.Id);
             $("#AppointmentEditModel_ResourceName").val(response.data.resourceName);
             $("#AppointmentEditModel_TimeSlot").val(response.data.timeRange);
             $("#resourceId").val(response.data.resource);
