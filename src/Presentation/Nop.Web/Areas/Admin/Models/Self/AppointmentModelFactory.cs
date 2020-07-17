@@ -2,6 +2,7 @@
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Self;
 using Nop.Services.Catalog;
+using Nop.Services.Customers;
 using Nop.Services.Helpers;
 using Nop.Web.Areas.Admin.Infrastructure.Cache;
 using Nop.Web.Areas.Admin.Models.Catalog;
@@ -13,12 +14,17 @@ namespace Nop.Web.Areas.Admin.Models.Self
     public partial class AppointmentModelFactory : IAppointmentModelFactory
     {
         private readonly IProductService _productService;
+        private readonly ICustomerService _customerService;
         private readonly IDateTimeHelper _dateTimeHelper;
         private readonly IStaticCacheManager _cacheManager;
 
-        public AppointmentModelFactory(IProductService productService, IDateTimeHelper dateTimeHelper, IStaticCacheManager cacheManager)
+        public AppointmentModelFactory(IProductService productService, 
+            ICustomerService customerService, 
+            IDateTimeHelper dateTimeHelper, 
+            IStaticCacheManager cacheManager)
         {
             _productService = productService;
+            _customerService = customerService;
             _dateTimeHelper = dateTimeHelper;
             _cacheManager = cacheManager;
         }
@@ -29,21 +35,18 @@ namespace Nop.Web.Areas.Admin.Models.Self
             if (appointment != null)
             {
                 model.Id = appointment.Id;
+                model.ResourceName = appointment.Product.Name;
+                model.ResourceId = appointment.ResourceId;
                 var start = _dateTimeHelper.ConvertToUserTime(appointment.StartTimeUtc, DateTimeKind.Utc);
                 var end = _dateTimeHelper.ConvertToUserTime(appointment.EndTimeUtc, DateTimeKind.Utc);
                 model.TimeSlot = $"{start.ToShortTimeString()} - {end.ToShortTimeString()}, {start.ToShortDateString()} {start.ToString("dddd")}";
-                model.Status = appointment.Status;
+                model.Status = appointment.Status.ToString();
                 model.Notes = appointment.Notes;
                 model.CustomerId = appointment.CustomerId ?? 0;
                 if (appointment.Customer != null)
                 {
-                    model.CustomerFullName = appointment.Customer.Email;
+                    model.CustomerFullName = _customerService.GetCustomerFullName(appointment.Customer);
                     model.CustomerEmail = appointment.Customer.Email;
-                }
-                else
-                {
-                    model.CustomerFullName = "N/A";
-                    model.CustomerEmail = "N/A";
                 }
             }
 
@@ -66,7 +69,7 @@ namespace Nop.Web.Areas.Admin.Models.Self
             };
             if (appointment.Customer != null)
             {
-                model.text = appointment.Customer.Username;
+                model.text = appointment.Customer.Username ?? appointment.Customer.Email;
             };
 
             return model;
@@ -85,7 +88,7 @@ namespace Nop.Web.Areas.Admin.Models.Self
             model.ShowSchedule = product.ParentGroupedProductId == 0 && product.ProductType == ProductType.SimpleProduct;
 
             model.BusinessBeginsHour = 9;
-            model.BusinessEndsHour = 21;
+            model.BusinessEndsHour = 23;
             model.BusinessMorningShiftEndsHour = 12;
             model.BusinessAfternoonShiftBeginsHour = 13;
             model.BusinessOnWeekends = true;
@@ -101,6 +104,10 @@ namespace Nop.Web.Areas.Admin.Models.Self
                 start = _dateTimeHelper.ConvertToUserTime(appointment.StartTimeUtc, DateTimeKind.Utc).ToString("yyyy-MM-ddTHH:mm:ss"),
                 end = _dateTimeHelper.ConvertToUserTime(appointment.EndTimeUtc, DateTimeKind.Utc).ToString("yyyy-MM-ddTHH:mm:ss"),
                 resource = appointment.ResourceId.ToString()
+            };
+            if (appointment.Customer != null)
+            {
+                model.text = appointment.Customer.Username ?? appointment.Customer.Email;
             };
 
             return model;

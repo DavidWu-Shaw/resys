@@ -1,9 +1,15 @@
-﻿using Nop.Web.Framework.Models;
+﻿using Nop.Web.Areas.Admin.Models.Self;
+using Nop.Web.Framework.Models;
 
 namespace Nop.Web.Areas.Admin.Models.Catalog
 {
     public class ProductCalendarModel : BaseNopEntityModel
     {
+        public ProductCalendarModel()
+        {
+            AppointmentEditModel = new AppointmentEditModel();
+        }
+
         public string ProductName { get; set; }
 
         public bool ShowCalendar { get; set; }
@@ -16,5 +22,6 @@ namespace Nop.Web.Areas.Admin.Models.Catalog
         public int BusinessAfternoonShiftBeginsHour { get; set; }
         public bool BusinessOnWeekends { get; set; }
 
+        public AppointmentEditModel AppointmentEditModel { get; set; }
     }
 }
