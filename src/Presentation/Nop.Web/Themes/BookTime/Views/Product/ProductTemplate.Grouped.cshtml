@@ -69,10 +69,10 @@
                             }
                             else if (Model.IsUserAuthenticated)
                             {
-                                <a id="join-button" href="#request-join" class="button-1 add-to-cart-button anchor-button">@T("Product.RequestToJoin")</a>
+                                <input type="button" id="join-button" class="button-1 add-to-cart-button" value="@T("Product.RequestToJoin")" onclick="JoinRequest.sendRequest('@Url.RouteUrl("SendJoinRequest", new { vendorId = Model.VendorModel.Id })');return false;" />
                             }
-                            @if (!string.IsNullOrEmpty(Model.ManageCalendarUrl))
-                            {
+                                @if (!string.IsNullOrEmpty(Model.ManageCalendarUrl))
+                                {
                                 <a href="@Model.ManageCalendarUrl" class="add-to-cart-button anchor-button">@T("Admin.Common.Calendar")</a>
                             }
                         </div>
